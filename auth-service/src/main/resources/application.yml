@@ -1,0 +1,13 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: auth-service
+
+jwt:
+  secret: capbank-secret-key
+  expiration: 3600000
+
+user-service:
+  url: http://localhost:8082/api/user

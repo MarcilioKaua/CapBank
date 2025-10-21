@@ -1,0 +1,35 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/user/**
+        - id: auth-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/auth/**
+        - id: bankaccount-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/bankaccount/**
+        - id: transaction-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/transaction/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+
+jwt:
+  secret: capbank-secret-key
+

@@ -1,13 +1,58 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { Sidebar } from './components/sidebar/sidebar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    MatIconModule,
+    MatButtonModule,
+    MatToolbarModule,
+    Sidebar
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements OnInit {
   protected readonly title = signal('capbank-frontend');
 
+  isMobile = signal(false);
+  sidebarOpen = signal(false);
+
+  ngOnInit(): void {
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.checkScreenSize();
+  }
+
+  private checkScreenSize(): void {
+    this.isMobile.set(window.innerWidth < 768);
+    if (!this.isMobile()) {
+      this.sidebarOpen.set(true);
+    } else {
+      this.sidebarOpen.set(false);
+    }
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(open => !open);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
+  }
+
+  onMenuClick(menuId: string): void {
+    console.log('Menu clicked:', menuId);
+  }
 }

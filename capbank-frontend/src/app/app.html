@@ -1,5 +1,41 @@
-<h1 class="text-3xl font-bold underline">
-  Hello world!
-</h1>
+<div class="app-container">
+  <!-- Mobile Header -->
+  <mat-toolbar class="mobile-header" *ngIf="isMobile()">
+    <button mat-icon-button (click)="toggleSidebar()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div class="mobile-header__logo">
+      <mat-icon>account_balance</mat-icon>
+      <span>BancoApp</span>
+    </div>
+    <div class="mobile-header__user">
+      <mat-icon>person</mat-icon>
+      <mat-icon>logout</mat-icon>
+    </div>
+  </mat-toolbar>
 
-<router-outlet />
+  <!-- Desktop Header -->
+  <header class="desktop-header" *ngIf="!isMobile()">
+    <div class="desktop-header__user">
+      <div class="desktop-header__user-info">
+        <span class="desktop-header__user-name">João Silva</span>
+      </div>
+      <button mat-icon-button>
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <app-sidebar
+    [isMobile]="isMobile()"
+    [isOpen]="sidebarOpen()"
+    (menuClick)="onMenuClick($event)"
+    (close)="closeSidebar()">
+  </app-sidebar>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.main-content--with-sidebar]="!isMobile() && sidebarOpen()">
+    <router-outlet />
+  </main>
+</div>

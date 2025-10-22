@@ -1,0 +1,23 @@
+package com.capbank.auth_service.infra.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+public class AuthRequest {
+
+    @NotBlank(message = "CPF is required")
+    // aceita formatado (000.000.000-00) ou só dígitos
+    @Pattern(regexp = "^(\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2})$", message = "Invalid CPF format")
+    private String cpf;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 4, max = 100, message = "Password length must be between 4 and 100")
+    private String password;
+
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+}

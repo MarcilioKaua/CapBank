@@ -1,18 +1,19 @@
 package com.capbank.user_service.infra.mapper;
 
-
 import com.capbank.user_service.core.domain.model.User;
-import com.capbank.user_service.infra.dto.UserCreateDTO;
-import com.capbank.user_service.infra.dto.UserDTO;
+import com.capbank.user_service.infra.dto.RegisterUserRequest;
+import com.capbank.user_service.infra.dto.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "senhaHash", ignore = true)
-    User toEntity(UserCreateDTO dto);
+    @Mapping(target = "passwordHash", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    User toEntity(RegisterUserRequest request);
 
-    UserDTO toDTO(User user);
+    UserResponse toResponse(User user);
 }
-

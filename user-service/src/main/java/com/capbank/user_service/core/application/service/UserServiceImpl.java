@@ -1,52 +1,73 @@
 package com.capbank.user_service.core.application.service;
 
-import com.capbank.user_service.core.application.ports.in.CreateUserUseCase;
-import com.capbank.user_service.core.application.ports.in.GetUserUseCase;
-import com.capbank.user_service.core.application.ports.in.ValidateCredentialsUseCase;
+import com.capbank.user_service.core.application.ports.in.RegisterUserUseCase;
+import com.capbank.user_service.core.application.ports.in.ValidateUserUseCase;
 import com.capbank.user_service.core.application.ports.out.UserRepositoryPort;
 import com.capbank.user_service.core.domain.model.User;
-import com.capbank.user_service.infra.dto.UserCreateDTO;
-import com.capbank.user_service.infra.dto.UserDTO;
-import com.capbank.user_service.infra.dto.ValidateCredentialsRequestDTO;
-import com.capbank.user_service.infra.exception.UserNotFoundException;
+import com.capbank.user_service.infra.dto.RegisterUserRequest;
+import com.capbank.user_service.infra.dto.UserResponse;
+import com.capbank.user_service.infra.dto.ValidateUserRequest;
 import com.capbank.user_service.infra.mapper.UserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-public class UserServiceImpl implements CreateUserUseCase, GetUserUseCase, ValidateCredentialsUseCase {
+public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase {
 
-    private final UserRepositoryPort userRepository;
+    private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    private final UserRepositoryPort repository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
 
-    public UserServiceImpl(UserRepositoryPort userRepository, PasswordEncoder passwordEncoder, UserMapper mapper) {
-        this.userRepository = userRepository;
+    public UserServiceImpl(UserRepositoryPort repository, PasswordEncoder passwordEncoder, UserMapper mapper) {
+        this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
     }
 
     @Override
-    public UserDTO create(UserCreateDTO dto) {
-        User user = mapper.toEntity(dto);
-        user.setSenhaHash(passwordEncoder.encode(dto.getSenha()));
-        user.setStatus(User.Status.ATIVO);
-        return mapper.toDTO(userRepository.save(user));
+    public UserResponse register(RegisterUserRequest request) {
+        final String cpf = normalizeCpf(request.getCpf());
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match.");
+        }
+
+        if (repository.existsByCpf(cpf)) {
+            throw new IllegalArgumentException("CPF already registered.");
+        }
+
+        if (repository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already registered.");
+        }
+
+        User user = mapper.toEntity(request);
+        user.setCpf(cpf);
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setStatus(User.Status.ACTIVE);
+
+        User saved = repository.save(user);
+        LOG.info("User created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
+
+        return mapper.toResponse(saved);
     }
 
     @Override
-    public UserDTO getById(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
-        return mapper.toDTO(user);
-    }
-
-    @Override
-    public boolean validate(ValidateCredentialsRequestDTO request) {
-        return userRepository.findByEmail(request.getEmail())
-                .map(u -> passwordEncoder.matches(request.getPassword(), u.getSenhaHash()))
+    public boolean validate(ValidateUserRequest request) {
+        String cpf = normalizeCpf(request.getCpf());
+        return repository.findByCpf(cpf)
+                .map(u -> passwordEncoder.matches(request.getPassword(), u.getPasswordHash()))
                 .orElse(false);
+    }
+
+    private String normalizeCpf(String cpf) {
+        return cpf == null ? null : cpf.replaceAll("\\D+", "");
+    }
+
+    private String safeHash(String value) {
+        return Integer.toHexString(value == null ? 0 : value.hashCode());
     }
 }

@@ -10,5 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepositoryAdapter extends UserRepositoryPort, JpaRepository<User, UUID> {
-    Optional<User> findByEmail(String email);
+    Optional<User> findByCpf(String cpf);
+    boolean existsByEmail(String email);
+    boolean existsByCpf(String cpf);
 }

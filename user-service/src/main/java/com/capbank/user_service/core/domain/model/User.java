@@ -8,45 +8,95 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String nomeCompleto;
+    private String fullName;
+    @Column(nullable = false, unique = true)
     private String cpf;
+    @Column(nullable = false, unique = true)
     private String email;
-    private String senhaHash;
-    private String telefone;
+
+    private String passwordHash;
+    private String phone;
+    private String accountType;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    private LocalDateTime dataCriacao = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    public enum Status { ATIVO, BLOQUEADO }
+    public enum Status { ACTIVE, BLOCKED }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public UUID getId() {
+        return id;
+    }
 
-    public String getNomeCompleto() { return nomeCompleto; }
-    public void setNomeCompleto(String nomeCompleto) { this.nomeCompleto = nomeCompleto; }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-    public String getCpf() { return cpf; }
-    public void setCpf(String cpf) { this.cpf = cpf; }
+    public String getFullName() {
+        return fullName;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-    public String getSenhaHash() { return senhaHash; }
-    public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
+    public String getCpf() {
+        return cpf;
+    }
 
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
 
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
+    public String getEmail() {
+        return email;
+    }
 
-    public LocalDateTime getDataCriacao() { return dataCriacao; }
-    public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
-

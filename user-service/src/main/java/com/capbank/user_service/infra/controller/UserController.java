@@ -1,42 +1,42 @@
 package com.capbank.user_service.infra.controller;
 
-import com.capbank.user_service.core.application.ports.in.CreateUserUseCase;
-import com.capbank.user_service.core.application.ports.in.GetUserUseCase;
-import com.capbank.user_service.core.application.ports.in.ValidateCredentialsUseCase;
-import com.capbank.user_service.infra.dto.UserCreateDTO;
-import com.capbank.user_service.infra.dto.UserDTO;
-import com.capbank.user_service.infra.dto.ValidateCredentialsRequestDTO;
+import com.capbank.user_service.core.application.ports.in.RegisterUserUseCase;
+import com.capbank.user_service.core.application.ports.in.ValidateUserUseCase;
+import com.capbank.user_service.infra.dto.RegisterUserRequest;
+import com.capbank.user_service.infra.dto.UserResponse;
+import com.capbank.user_service.infra.dto.ValidateUserRequest;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
 
-    private final CreateUserUseCase createUser;
-    private final GetUserUseCase getUser;
-    private final ValidateCredentialsUseCase validateCredentials;
+    private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
-    public UserController(CreateUserUseCase createUser, GetUserUseCase getUser, ValidateCredentialsUseCase validateCredentials) {
-        this.createUser = createUser;
-        this.getUser = getUser;
-        this.validateCredentials = validateCredentials;
+    private final RegisterUserUseCase registerUser;
+    private final ValidateUserUseCase validateUser;
+
+    public UserController(RegisterUserUseCase registerUser, ValidateUserUseCase validateUser) {
+        this.registerUser = registerUser;
+        this.validateUser = validateUser;
     }
 
-    @PostMapping
-    public ResponseEntity<UserDTO> create(@RequestBody UserCreateDTO dto) {
-        return ResponseEntity.ok(createUser.create(dto));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> get(@PathVariable UUID id) {
-        return ResponseEntity.ok(getUser.getById(id));
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
+        LOG.info("POST /api/user/register (cpfHash={})", Integer.toHexString(request.getCpf().hashCode()));
+        return ResponseEntity.ok(registerUser.register(request));
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<Boolean> validate(@RequestBody ValidateCredentialsRequestDTO dto) {
-        return ResponseEntity.ok(validateCredentials.validate(dto));
+    public ResponseEntity<Boolean> validate(@Valid @RequestBody ValidateUserRequest request) {
+        LOG.info("POST /api/user/validate (cpfHash={})", Integer.toHexString(request.getCpf().hashCode()));
+        return ResponseEntity.ok(validateUser.validate(request));
     }
 }

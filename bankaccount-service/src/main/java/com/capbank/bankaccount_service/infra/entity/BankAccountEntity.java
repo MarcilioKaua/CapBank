@@ -1,4 +1,4 @@
-package com.capbank.bankaccount_service.core.domain.model;
+package com.capbank.bankaccount_service.infra.entity;
 
 import com.capbank.bankaccount_service.core.domain.enums.AccountStatus;
 import com.capbank.bankaccount_service.core.domain.enums.AccountType;
@@ -8,20 +8,36 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class BankAccount {
+@Entity
+@Table(name = "bank_accounts")
+public class BankAccountEntity {
 
+    @Id
     private UUID id;
+
+    @Column(nullable = false, unique = true)
     private String accountNumber;
+
+    @Column(nullable = false)
     private String agency;
+
+    @Column(nullable = false)
     private BigDecimal balance;
+
+    @Enumerated(EnumType.STRING)
     private AccountType accountType;
+
+    @Column(nullable = false)
     private UUID userId;
+
+    @Enumerated(EnumType.STRING)
     private AccountStatus status;
+
     private LocalDateTime createdAt;
 
-    public BankAccount() {}
+    public BankAccountEntity() {}
 
-    public BankAccount(UUID id, String accountNumber, String agency, BigDecimal balance, AccountType accountType, UUID userId, AccountStatus status, LocalDateTime createdAt) {
+    public BankAccountEntity(UUID id, String accountNumber, String agency, BigDecimal balance, AccountType accountType, UUID userId, AccountStatus status, LocalDateTime createdAt) {
         this.id = id;
         this.accountNumber = accountNumber;
         this.agency = agency;

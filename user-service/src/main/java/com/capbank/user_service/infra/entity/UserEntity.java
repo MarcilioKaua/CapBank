@@ -1,4 +1,4 @@
-package com.capbank.user_service.core.domain.model;
+package com.capbank.user_service.infra.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

@@ -8,6 +8,7 @@ export interface Transaction {
   iconColor: string;
   sourceAccountId?: string;
   targetAccountId?: string;
+  balance?: number;
 }
 
 export interface QuickAction {

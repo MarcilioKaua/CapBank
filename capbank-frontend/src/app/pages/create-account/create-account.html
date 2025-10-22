@@ -1,0 +1,225 @@
+<div class="create-account-container">
+  <!-- Mobile Header -->
+  <mat-toolbar *ngIf="isMobile()" class="mobile-header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="mobile-header__title">Criar Conta</span>
+  </mat-toolbar>
+
+  <div class="create-account-content" [class.create-account-content--mobile]="isMobile()">
+    <!-- Desktop Left Panel -->
+    <div *ngIf="!isMobile()" class="brand-panel">
+      <div class="brand-panel__content">
+        <div class="brand-logo">
+          <mat-icon class="brand-logo__icon">account_balance</mat-icon>
+        </div>
+        <h1 class="brand-title">BancoRed</h1>
+        <p class="brand-subtitle">Seu banco digital de confiança</p>
+
+        <div class="benefits">
+          <div class="benefit-item">
+            <mat-icon class="benefit-icon">security</mat-icon>
+            <span class="benefit-text">Segurança máxima em todas as transações</span>
+          </div>
+          <div class="benefit-item">
+            <mat-icon class="benefit-icon">smartphone</mat-icon>
+            <span class="benefit-text">Acesso 24/7 pelo app ou web</span>
+          </div>
+          <div class="benefit-item">
+            <mat-icon class="benefit-icon">trending_up</mat-icon>
+            <span class="benefit-text">Investimentos com rentabilidade</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="form-panel">
+      <div class="form-content">
+        <!-- Desktop Header -->
+        <div *ngIf="!isMobile()" class="form-header">
+          <h2 class="form-title">Criar conta</h2>
+          <p class="form-subtitle">Preencha os dados para abrir sua conta</p>
+        </div>
+
+        <!-- Progress Stepper -->
+        <div class="progress-stepper">
+          <div class="stepper-container">
+            <div *ngFor="let step of steps; let i = index"
+                 class="step-item"
+                 [class.step-item--active]="i === currentStep()"
+                 [class.step-item--completed]="isStepCompleted(i)">
+
+              <div class="step-circle">
+                <mat-icon *ngIf="isStepCompleted(i)">check</mat-icon>
+                <span *ngIf="!isStepCompleted(i)">{{i + 1}}</span>
+              </div>
+
+              <span class="step-label">{{step.label}}</span>
+
+              <div *ngIf="i < steps.length - 1" class="step-connector"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 1: Personal Data -->
+        <div *ngIf="currentStep() === 0" class="step-content">
+          <form [formGroup]="personalDataForm" (ngSubmit)="onSubmitPersonalData()">
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Nome completo</mat-label>
+              <input matInput formControlName="fullName" placeholder="Digite seu nome completo">
+              <mat-error *ngIf="personalDataForm.get('fullName')?.errors?.['required']">
+                Nome completo é obrigatório
+              </mat-error>
+              <mat-error *ngIf="personalDataForm.get('fullName')?.errors?.['minlength']">
+                Nome deve ter pelo menos 3 caracteres
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>CPF</mat-label>
+              <input matInput formControlName="cpf" placeholder="000.000.000-00">
+              <mat-hint>Apenas números</mat-hint>
+              <mat-error *ngIf="personalDataForm.get('cpf')?.errors?.['required']">
+                CPF é obrigatório
+              </mat-error>
+              <mat-error *ngIf="personalDataForm.get('cpf')?.errors?.['pattern']">
+                CPF deve ter o formato 000.000.000-00
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Data de nascimento</mat-label>
+              <input matInput formControlName="birthDate" type="date">
+              <mat-error *ngIf="personalDataForm.get('birthDate')?.errors?.['required']">
+                Data de nascimento é obrigatória
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Telefone</mat-label>
+              <input matInput formControlName="phone" placeholder="(00) 00000-0000">
+              <mat-error *ngIf="personalDataForm.get('phone')?.errors?.['required']">
+                Telefone é obrigatório
+              </mat-error>
+              <mat-error *ngIf="personalDataForm.get('phone')?.errors?.['pattern']">
+                Telefone deve ter o formato (00) 00000-0000
+              </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit" class="step-button">
+              {{isMobile() ? 'Continuar' : 'Próximo'}}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </form>
+        </div>
+
+        <!-- Step 2: Access Data -->
+        <div *ngIf="currentStep() === 1" class="step-content">
+          <form [formGroup]="accessForm" (ngSubmit)="onSubmitAccess()">
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="email" type="email" placeholder="seu@email.com">
+              <mat-error *ngIf="accessForm.get('email')?.errors?.['required']">
+                Email é obrigatório
+              </mat-error>
+              <mat-error *ngIf="accessForm.get('email')?.errors?.['email']">
+                Email deve ter um formato válido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Senha</mat-label>
+              <input matInput formControlName="password" type="password" placeholder="Mínimo 8 caracteres">
+              <mat-error *ngIf="accessForm.get('password')?.errors?.['required']">
+                Senha é obrigatória
+              </mat-error>
+              <mat-error *ngIf="accessForm.get('password')?.errors?.['minlength']">
+                Senha deve ter pelo menos 8 caracteres
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Confirmar senha</mat-label>
+              <input matInput formControlName="confirmPassword" type="password" placeholder="Repita sua senha">
+              <mat-error *ngIf="accessForm.get('confirmPassword')?.errors?.['required']">
+                Confirmação de senha é obrigatória
+              </mat-error>
+            </mat-form-field>
+
+            <mat-checkbox formControlName="acceptTerms" class="terms-checkbox">
+              Aceito os <a href="#" class="terms-link">termos de uso</a> e <a href="#" class="terms-link">política de privacidade</a>
+            </mat-checkbox>
+
+            <div class="step-buttons">
+              <button mat-stroked-button type="button" (click)="previousStep()" class="back-button">
+                <mat-icon>arrow_back</mat-icon>
+                Voltar
+              </button>
+              <button mat-raised-button color="primary" type="submit" class="step-button">
+                {{isMobile() ? 'Continuar' : 'Próximo'}}
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3: Confirmation -->
+        <div *ngIf="currentStep() === 2" class="step-content">
+          <div class="confirmation-header">
+            <mat-icon class="confirmation-icon">mark_email_read</mat-icon>
+            <h3 class="confirmation-title">Verifique seu email</h3>
+            <p class="confirmation-text">
+              Enviamos um código de verificação para o seu email.
+              Digite o código abaixo para confirmar sua conta.
+            </p>
+          </div>
+
+          <form [formGroup]="confirmationForm" (ngSubmit)="onSubmitConfirmation()">
+            <mat-form-field appearance="outline" class="form-field verification-field">
+              <mat-label>Código de verificação</mat-label>
+              <input matInput formControlName="verificationCode" placeholder="000000" maxlength="6">
+              <mat-error *ngIf="confirmationForm.get('verificationCode')?.errors?.['required']">
+                Código de verificação é obrigatório
+              </mat-error>
+              <mat-error *ngIf="confirmationForm.get('verificationCode')?.errors?.['pattern']">
+                Código deve ter 6 dígitos
+              </mat-error>
+            </mat-form-field>
+
+            <div class="resend-section">
+              <p class="resend-text">Não recebeu o código?</p>
+              <button type="button" mat-button color="primary" (click)="resendCode()">
+                Reenviar código
+              </button>
+            </div>
+
+            <div class="step-buttons">
+              <button mat-stroked-button type="button" (click)="previousStep()" class="back-button">
+                <mat-icon>arrow_back</mat-icon>
+                Voltar
+              </button>
+              <button mat-raised-button color="primary" type="submit" class="step-button">
+                Criar conta
+                <mat-icon>check_circle</mat-icon>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Mobile Step Counter -->
+        <div *ngIf="isMobile()" class="step-counter">
+          Etapa {{currentStep() + 1}} de {{steps.length}}
+        </div>
+
+        <!-- Login Link -->
+        <div class="login-link">
+          <p>Já tem uma conta? <a routerLink="/login" class="link">Fazer login</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

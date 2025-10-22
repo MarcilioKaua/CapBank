@@ -18,7 +18,7 @@ public class UserClientAdapter implements UserClientPort {
 
     private final HttpClientBaseAdapter http;
 
-    @Value("${services.user.url}")
+    @Value("${services.user.base-url:http://localhost:8082/api/user}")
     private String userUrl;
 
     public UserClientAdapter(HttpClientBaseAdapter http) {

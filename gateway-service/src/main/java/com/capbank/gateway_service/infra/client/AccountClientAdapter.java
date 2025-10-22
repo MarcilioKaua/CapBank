@@ -11,7 +11,7 @@ public class AccountClientAdapter implements AccountClientPort {
 
     private final HttpClientBaseAdapter http;
 
-    @Value("${services.account.url}")
+    @Value("${services.account.base-url:http://localhost:8084/api/bankaccount}")
     private String accountUrl;
 
     public AccountClientAdapter(HttpClientBaseAdapter http) {

@@ -14,12 +14,3 @@ jwt:
   secret: dKLyb0ao3/f8ZlQ2CVJc9Auhz3VdaBo8NSnOxbA/8Kc=
   expiration: 3600000
   issuer: capbank-gateway
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    fetch-registry: true
-    register-with-eureka: true
-  instance:
-    prefer-ip-address: true

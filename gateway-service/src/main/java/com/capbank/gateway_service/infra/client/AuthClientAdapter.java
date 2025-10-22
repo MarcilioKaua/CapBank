@@ -14,7 +14,7 @@ public class AuthClientAdapter implements AuthClientPort {
     private static final Logger LOG = LoggerFactory.getLogger(AuthClientAdapter.class);
 
     private final HttpClientBaseAdapter http;
-    @Value("${services.auth.url}")
+    @Value("${services.auth.base-url:http://localhost:8083/api/auth}")
     private String authUrl;
 
     public AuthClientAdapter(HttpClientBaseAdapter http) {

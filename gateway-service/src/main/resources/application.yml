@@ -6,10 +6,53 @@ spring:
     name: gateway-service
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+      routes:
+        - id: user-login-proxy
+          uri: ${services.auth.base-url:http://localhost:8083}
+          predicates:
+            - Path=/api/user/login
+          filters:
+            - SetPath=/api/auth/login
+            - name: CircuitBreaker
+              args:
+                name: authCircuit
+                fallbackUri: forward:/fallback/service-unavailable
+        - id: user-service
+          uri: ${services.user.base-url:http://localhost:8082}
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userCircuit
+                fallbackUri: forward:/fallback/service-unavailable
+        - id: auth-service
+          uri: ${services.auth.base-url:http://localhost:8083}
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: authCircuit
+                fallbackUri: forward:/fallback/service-unavailable
+        - id: account-service
+          uri: ${services.account.base-url:http://localhost:8084}
+          predicates:
+            - Path=/api/bankaccount/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: accountCircuit
+                fallbackUri: forward:/fallback/service-unavailable
+        - id: transaction-service
+          uri: ${services.transaction.base-url:http://localhost:8085}
+          predicates:
+            - Path=/api/transaction/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: transactionCircuit
+                fallbackUri: forward:/fallback/service-unavailable
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin, RETAIN_UNIQUE
       globalcors:
@@ -19,20 +62,15 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    prefer-ip-address: true
-
 jwt:
   secret: capbank-secret-key
 
 services:
   auth:
-    url: http://auth-service/api/auth
+    base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:8083}
   user:
-    url: http://user-service/api/user
+    base-url: ${USER_SERVICE_BASE_URL:http://localhost:8082}
   account:
-    url: http://account-service/api/bankaccount
+    base-url: ${ACCOUNT_SERVICE_BASE_URL:http://localhost:8084}
+  transaction:
+    base-url: ${TRANSACTION_SERVICE_BASE_URL:http://localhost:8085}

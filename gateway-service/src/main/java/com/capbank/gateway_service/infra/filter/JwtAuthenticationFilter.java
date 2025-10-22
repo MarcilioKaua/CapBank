@@ -59,8 +59,7 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     private boolean isPublicRoute(String path) {
         return path.startsWith("/api/auth")
-                || path.startsWith("/api/user/register")
-                || path.startsWith("/api/user/validate")
+                || path.startsWith("/api/user")
                 || path.startsWith("/actuator");
     }
 

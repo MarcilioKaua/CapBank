@@ -8,7 +8,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="transaction-service" />
         <module name="auth-service" />
-        <module name="eureka-server" />
         <module name="gateway-service" />
         <module name="bankaccount-service" />
       </profile>
@@ -24,6 +23,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="capbank" target="17" />
+      <module name="eureka-server" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

@@ -1,0 +1,184 @@
+{
+  "info": {
+    "name": "CapBank - Gateway",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "8c0f1d86-6d9a-4e59-b2b8-5a9a7c2f19e1"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","auth","login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cpf\": \"{{cpf}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Capture token from response { accessToken: '...' } or { token: '...' } or { access_token: '...' }",
+                  "let json = {};",
+                  "try { json = pm.response.json(); } catch(e) {}",
+                  "const token = json.accessToken || json.token || json.access_token || json.jwt || '';",
+                  "if (token) { pm.environment.set('token', token); }",
+                  "pm.test('Token received', function () { pm.expect(token).to.be.a('string').and.not.empty; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Register (public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/user/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","user","register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"cpf\": \"{{cpf}}\",\n  \"email\": \"{{email}}\",\n  \"accountType\": \"{{accountType}}\",\n  \"password\": \"{{password}}\",\n  \"confirmPassword\": \"{{password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Validate (public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/user/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","user","validate"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cpf\": \"{{cpf}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = {};",
+                  "try { json = pm.response.json(); } catch(e) {}",
+                  "const token = json.accessToken || json.token || json.access_token || json.jwt || '';",
+                  "if (token) { pm.environment.set('token', token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bank Account (protected)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const token = pm.environment.get('token');",
+              "if (token) { pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token }); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "Get Accounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{baseUrl}}/api/bankaccount", "host": ["{{baseUrl}}"], "path": ["api","bankaccount"]}
+          }
+        },
+        {
+          "name": "Get Account by Id",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/bankaccount/{{accountId}}", "host": ["{{baseUrl}}"], "path": ["api","bankaccount","{{accountId}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transaction (protected)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const token = pm.environment.get('token');",
+              "if (token) { pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token }); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "List Transactions",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/transaction", "host": ["{{baseUrl}}"], "path": ["api","transaction"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Gateway Actuator (public)",
+          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/actuator/health", "host": ["{{baseUrl}}"], "path": ["actuator","health"]}}
+        },
+        {
+          "name": "Fallback (public)",
+          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/fallback/service-unavailable", "host": ["{{baseUrl}}"], "path": ["fallback","service-unavailable"]}}
+        }
+      ]
+    },
+    {
+      "name": "Negative tests",
+      "item": [
+        {
+          "name": "Protected without token → 401",
+          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/bankaccount", "host": ["{{baseUrl}}"], "path": ["api","bankaccount"]}},
+          "event": [
+            {"listen": "test", "script": {"exec": ["pm.test('Should be 401', function(){ pm.response.to.have.status(401); });"], "type": "text/javascript"}}
+          ]
+        }
+      ]
+    }
+  ]
+}

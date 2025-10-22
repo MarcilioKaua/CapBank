@@ -3,7 +3,7 @@ package com.capbank.user_service.core.application.service;
 import com.capbank.user_service.core.application.ports.in.RegisterUserUseCase;
 import com.capbank.user_service.core.application.ports.in.ValidateUserUseCase;
 import com.capbank.user_service.core.application.ports.out.UserRepositoryPort;
-import com.capbank.user_service.core.domain.model.User;
+import com.capbank.user_service.infra.entity.UserEntity;
 import com.capbank.user_service.infra.dto.RegisterUserRequest;
 import com.capbank.user_service.infra.dto.UserResponse;
 import com.capbank.user_service.infra.dto.ValidateUserRequest;
@@ -44,13 +44,13 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
             throw new IllegalArgumentException("Email already registered.");
         }
 
-        User user = mapper.toEntity(request);
-        user.setCpf(cpf);
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setStatus(User.Status.ACTIVE);
+        UserEntity userEntity = mapper.toEntity(request);
+        userEntity.setCpf(cpf);
+        userEntity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        userEntity.setStatus(UserEntity.Status.ACTIVE);
 
-        User saved = repository.save(user);
-        LOG.info("User created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
+        UserEntity saved = repository.save(userEntity);
+        LOG.info("UserEntity created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
 
         return mapper.toResponse(saved);
     }

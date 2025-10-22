@@ -14,7 +14,7 @@
 
     <groupId>com.capbank</groupId>
     <artifactId>auth-service</artifactId>
-    <version>v0.1.0</version>
+    <version>v0.1.1</version>
     <name>auth-service</name>
     <description>Authentication microservice for CapBank</description>
 

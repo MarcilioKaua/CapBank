@@ -45,6 +45,12 @@ public class BankAccountRepositoryAdapter implements BankAccountRepositoryPort {
     }
 
     @Override
+    public Optional<BankAccount> findByAccountNumber(String accountNumber) {
+        return jpaBankAccountRepository.findByAccountNumber(accountNumber)
+                .map(bankAccountMapper::toDomain);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         jpaBankAccountRepository.deleteById(id);
     }

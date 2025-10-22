@@ -11,4 +11,5 @@ public interface BankAccountRepositoryPort {
     void deleteById(UUID id);
     Optional<BankAccount> findById(UUID id);
     List<BankAccount> findAll();
+    Optional<BankAccount> findByAccountNumber(String accountNumber);
 }

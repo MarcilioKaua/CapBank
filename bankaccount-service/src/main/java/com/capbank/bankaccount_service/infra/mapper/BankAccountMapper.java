@@ -6,7 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface BankAccountMapper {
-
     BankAccountEntity toEntity(BankAccount domain);
     BankAccount toDomain(BankAccountEntity entity);
 }

@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres-transactions:
+    image: postgres:15-alpine
+    container_name: capbank-postgres-transactions
+    environment:
+      POSTGRES_DB: capbank_transactions
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5433:5432"  # Usando porta diferente para evitar conflitos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - capbank-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d capbank_transactions"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Transaction History Microservice
+  transaction-service:
+    build:
+      context: ./transaction-service
+      dockerfile: Dockerfile
+    container_name: capbank-transaction-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-transactions:5432/capbank_transactions
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8083
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+    ports:
+      - "8083:8083"
+    networks:
+      - capbank-network
+    depends_on:
+      postgres-transactions:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/transaction-service/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # pgAdmin (opcional - para administração do banco)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: capbank-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@capbank.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8080:80"
+    networks:
+      - capbank-network
+    depends_on:
+      - postgres-transactions
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  capbank-network:
+    driver: bridge
+    name: capbank-network

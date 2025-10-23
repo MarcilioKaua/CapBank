@@ -1,0 +1,454 @@
+.extract-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Mobile Header */
+.mobile-header {
+  background-color: #1976d2 !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.mobile-header__title {
+  flex: 1;
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.breadcrumb__link {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s;
+}
+
+.breadcrumb__link:hover {
+  color: #1976d2;
+}
+
+.breadcrumb__separator {
+  color: #ccc;
+  font-size: 1rem;
+  padding: 5px;
+}
+
+.breadcrumb__current {
+  color: #1976d2;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Page Header */
+.page-header {
+  padding: 2rem;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Filters Section */
+.filters-section {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Period Chips (Mobile) */
+.period-chips {
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+}
+
+.period-chip {
+  min-width: fit-content;
+  height: 32px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Filters Form */
+.filters-form {
+  padding: 1.5rem 2rem;
+}
+
+.desktop-filters {
+  display: flex;
+  gap: 1rem;
+}
+
+.filter-field {
+  min-width: 150px;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.export-btn {
+  height: 56px;
+  border-radius: 8px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Mobile Filters */
+.mobile-filters {
+  padding: 1rem;
+}
+
+.mobile-filter-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.mobile-select {
+  flex: 1;
+}
+
+.export-mobile-btn {
+  background-color: #1976d2;
+  color: white;
+}
+
+.mobile-search {
+  width: 100%;
+}
+
+/* Desktop Content */
+.desktop-content {
+  padding: 2rem;
+}
+
+.transaction-group {
+  margin-bottom: 2rem;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.group-date {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.transaction-count {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Table Styles */
+.transactions-table-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.transactions-table {
+  width: 100%;
+}
+
+.transactions-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.transactions-table td {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.description-cell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.transaction-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transaction-icon mat-icon {
+  color: white;
+  font-size: 1.125rem;
+  text-align: center;
+  justify-content: center;
+  display: grid;
+  align-items: center;
+}
+
+.description-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.description-main {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.description-sub {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.category-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.category-badge--deposit {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.category-badge--withdrawal {
+  background-color: #ffeaea;
+  color: #d32f2f;
+}
+
+.category-badge--transfer {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.amount {
+  font-weight: 600;
+}
+
+.amount--positive {
+  color: #4caf50;
+}
+
+.amount--negative {
+  color: #f44336;
+}
+
+.balance {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+/* Mobile Content */
+.mobile-content {
+  padding: 0 1rem;
+}
+
+.mobile-group {
+  margin-bottom: 1.5rem;
+}
+
+.mobile-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0.5rem 0.5rem;
+  background-color: transparent;
+}
+
+.mobile-group-date {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.mobile-group-total {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.mobile-transactions {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.mobile-transaction {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mobile-transaction:hover {
+  background-color: #f8f9fa;
+}
+
+.mobile-transaction:last-child {
+  border-bottom: none;
+}
+
+.mobile-transaction__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.mobile-transaction__icon mat-icon {
+  color: white;
+  font-size: 1.25rem;
+}
+
+.mobile-transaction__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mobile-transaction__main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-transaction__description {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.mobile-transaction__amount {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.mobile-transaction__sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-transaction__detail {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.mobile-transaction__balance {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.mobile-transaction__time {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 0.25rem;
+}
+
+.mobile-transaction__arrow {
+  color: #ccc;
+  font-size: 1.25rem;
+  margin-left: 0.5rem;
+}
+
+/* Pagination */
+.pagination-section {
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem 2rem;
+}
+
+.desktop-pagination {
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-pagination {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pagination-info {
+  text-align: center;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-indicator {
+  font-size: 0.875rem;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .extract-container {
+    padding-top: 64px; /* Account for mobile header */
+  }
+
+  .page-header {
+    display: none;
+  }
+
+  .breadcrumb {
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .breadcrumb__current {
+    color: #f44336;
+    font-weight: 600;
+  }
+}

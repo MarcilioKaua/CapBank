@@ -1,5 +1,47 @@
-<h1 class="text-3xl font-bold underline">
-  Hello world!
-</h1>
+<div class="app-container">
+  <!-- Mobile Header -->
+  @if (routeShowSidebar()) { @if (isMobile()) {
+  <mat-toolbar class="mobile-header">
+    <button mat-icon-button (click)="toggleSidebar()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div class="mobile-header__logo">
+      <mat-icon>account_balance</mat-icon>
+      <span class="font-bold">CAP Bank</span>
+    </div>
+    <div class="mobile-header__user">
+      <mat-icon>person</mat-icon>
+      <mat-icon>logout</mat-icon>
+    </div>
+  </mat-toolbar>
+  } @if (!isMobile()) {
+  <header class="desktop-header">
+    <div class="desktop-header__user">
+      <div class="desktop-header__user-info">
+        <span class="desktop-header__user-name">João Silva</span>
+      </div>
+      <button mat-icon-button>
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </header>
+  } }
 
-<router-outlet />
+  <!-- Sidebar -->
+  @if (routeShowSidebar()) {
+  <app-sidebar
+    [isMobile]="isMobile()"
+    [isOpen]="sidebarOpen()"
+    (menuClick)="onMenuClick($event)"
+    (close)="closeSidebar()"
+  ></app-sidebar>
+  }
+
+  <!-- Main Content -->
+  <main
+    class="main-content"
+    [class.main-content--with-sidebar]="!isMobile() && sidebarOpen() && routeShowSidebar()"
+  >
+    <router-outlet />
+  </main>
+</div>

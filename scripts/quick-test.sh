@@ -8,7 +8,7 @@ set -e
 echo "🚀 Iniciando teste rápido da API..."
 
 # URL base
-BASE_URL="http://localhost:8083/transaction-service"
+BASE_URL="http://localhost:8083"
 
 echo "✅ Serviço está ativo!"
 
@@ -19,7 +19,7 @@ TRANSACTION_ID="987fcdeb-51a2-43d1-b123-426614174$(date +%s)"
 echo "📝 Criando histórico de transação..."
 
 # Criar histórico de depósito
-curl -X POST "$BASE_URL/api/v1/transaction-history" \
+curl -X POST "$BASE_URL/api/transaction-history" \
   -H "Content-Type: application/json" \
   -d '{
     "account_id": "'$ACCOUNT_ID'",
@@ -34,10 +34,10 @@ echo ""
 echo "🔍 Consultando histórico da conta..."
 
 # Buscar por conta
-curl -s "$BASE_URL/api/v1/transaction-history/account/$ACCOUNT_ID?page=0&size=5" | jq '.'
+curl -s "$BASE_URL/api/transaction-history/account/$ACCOUNT_ID?page=0&size=5" | jq '.'
 
 echo ""
 echo "✅ Teste rápido concluído!"
 echo ""
-echo "🌐 Acesse o Swagger UI: http://localhost:8083/transaction-service/swagger-ui.html"
+echo "🌐 Acesse o Swagger UI: http://localhost:8083/swagger-ui.html"
 echo "🗄️  Acesse o pgAdmin: http://localhost:8080 (admin@capbank.com / admin123)"

@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
 
 spring:
   application:
@@ -11,6 +11,6 @@ spring:
       read-timeout: 5s
 
 jwt:
-  secret: dKLyb0ao3/f8ZlQ2CVJc9Auhz3VdaBo8NSnOxbA/8Kc=
-  expiration: 3600000
-  issuer: capbank-gateway
+  secret: ${JWT_SECRET:VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==}
+  expiration: ${JWT_EXPIRATION:3600000}
+  issuer: ${JWT_ISSUER:capbank-gateway}

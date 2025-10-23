@@ -1,14 +1,12 @@
 server:
-  port: 8083
-  servlet:
-    context-path: /transaction-service
+  port: 8085
 
 spring:
   application:
     name: transaction-service
 
   datasource:
-    url: jdbc:postgresql://postgres-transactions:5432/capbank_transactions
+    url: jdbc:postgresql://postgres-transactions:5432/db_transaction
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver

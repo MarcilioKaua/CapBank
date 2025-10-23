@@ -1,6 +1,6 @@
 <div class="extract-container">
-  <!-- Mobile Header -->
-  <mat-toolbar *ngIf="isMobile()" class="mobile-header">
+  @if (isMobile()) {
+  <mat-toolbar class="mobile-header">
     <button mat-icon-button (click)="goBack()">
       <mat-icon>arrow_back</mat-icon>
     </button>
@@ -9,42 +9,40 @@
       <mat-icon>more_vert</mat-icon>
     </button>
   </mat-toolbar>
-
-  <!-- Breadcrumb (Desktop only) -->
-  <nav *ngIf="!isMobile()" class="breadcrumb">
+  } @if (!isMobile()) {
+  <nav class="breadcrumb">
     <a routerLink="/dashboard" class="breadcrumb__link">Dashboard</a>
     <mat-icon class="breadcrumb__separator">chevron_right</mat-icon>
     <span class="breadcrumb__current">Extrato</span>
   </nav>
-
-  <!-- Page Header -->
+  } @if (!isMobile()) {
   <div class="page-header">
-    <h1 *ngIf="!isMobile()" class="page-title">Extrato</h1>
-    <p *ngIf="!isMobile()" class="page-subtitle">Acompanhe todas as suas transações</p>
+    <h1 class="page-title">Extrato</h1>
+    <p class="page-subtitle">Acompanhe todas as suas transações</p>
   </div>
+  }
 
-  <!-- Filters Section -->
   <div class="filters-section">
-    <!-- Period Filter (Mobile Chips) -->
-    <div *ngIf="isMobile()" class="period-chips">
+    @if (isMobile()) {
+    <div class="period-chips">
       <mat-chip-option
         *ngFor="let option of periodOptions"
         [selected]="selectedPeriod() === option.value"
         (click)="selectPeriod(option.value)"
-        class="period-chip">
-        {{option.label.replace('Últimos ', '').replace(' dias', ' dias')}}
+        class="period-chip"
+      >
+        {{ option.label.replace('Últimos ', '').replace(' dias', ' dias') }}
       </mat-chip-option>
     </div>
-
-    <!-- Filters Form -->
+    }
     <form [formGroup]="filterForm" class="filters-form">
-      <!-- Desktop Filters -->
-      <div *ngIf="!isMobile()" class="desktop-filters">
+      @if (!isMobile()) {
+      <div class="desktop-filters">
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Período</mat-label>
           <mat-select formControlName="period">
             <mat-option *ngFor="let option of periodOptions" [value]="option.value">
-              {{option.label}}
+              {{ option.label }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -53,14 +51,14 @@
           <mat-label>Tipo</mat-label>
           <mat-select formControlName="type">
             <mat-option *ngFor="let option of typeOptions" [value]="option.value">
-              {{option.label}}
+              {{ option.label }}
             </mat-option>
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="filter-field search-field">
           <mat-label>Buscar</mat-label>
-          <input matInput formControlName="search" placeholder="Buscar por descrição...">
+          <input matInput formControlName="search" placeholder="Buscar por descrição..." />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
@@ -69,14 +67,13 @@
           Exportar PDF
         </button>
       </div>
-
-      <!-- Mobile Filters -->
-      <div *ngIf="isMobile()" class="mobile-filters">
+      } @if (isMobile()) {
+      <div class="mobile-filters">
         <div class="mobile-filter-row">
           <mat-form-field appearance="outline" class="mobile-select">
             <mat-select formControlName="type">
               <mat-option *ngFor="let option of typeOptions" [value]="option.value">
-                {{option.label}}
+                {{ option.label }}
               </mat-option>
             </mat-select>
           </mat-form-field>
@@ -87,76 +84,78 @@
         </div>
 
         <mat-form-field appearance="outline" class="mobile-search">
-          <input matInput formControlName="search" placeholder="Buscar por descrição...">
+          <input matInput formControlName="search" placeholder="Buscar por descrição..." />
           <mat-icon matPrefix>search</mat-icon>
         </mat-form-field>
       </div>
+      }
     </form>
   </div>
 
-  <!-- Desktop Table View -->
-  <div *ngIf="!isMobile()" class="desktop-content">
+  @if (!isMobile()) {
+  <div class="desktop-content">
     <div *ngFor="let group of groupedTransactions()" class="transaction-group">
       <div class="group-header">
-        <h3 class="group-date">{{group.date}}</h3>
+        <h3 class="group-date">{{ group.date }}</h3>
         <div class="group-summary">
-          <span class="transaction-count">{{group.transactions.length}} transações</span>
+          <span class="transaction-count">{{ group.transactions.length }} transações</span>
         </div>
       </div>
 
       <mat-card class="transactions-table-card">
         <table mat-table [dataSource]="group.transactions" class="transactions-table">
-          <!-- Time Column -->
           <ng-container matColumnDef="time">
             <th mat-header-cell *matHeaderCellDef>Hora</th>
-            <td mat-cell *matCellDef="let transaction">{{formatTime(transaction.date)}}</td>
+            <td mat-cell *matCellDef="let transaction">{{ formatTime(transaction.date) }}</td>
           </ng-container>
 
-          <!-- Description Column -->
           <ng-container matColumnDef="description">
             <th mat-header-cell *matHeaderCellDef>Descrição</th>
             <td mat-cell *matCellDef="let transaction">
               <div class="description-cell">
                 <div class="transaction-icon" [style.background-color]="transaction.iconColor">
-                  <mat-icon>{{transaction.icon}}</mat-icon>
+                  <mat-icon>{{ transaction.icon }}</mat-icon>
                 </div>
                 <div class="description-content">
-                  <span class="description-main">{{transaction.description.split(' - ')[0]}}</span>
-                  <span class="description-sub">{{transaction.description.split(' - ')[1] || ''}}</span>
+                  <span class="description-main">{{
+                    transaction.description.split(' - ')[0]
+                  }}</span>
+                  <span class="description-sub">{{
+                    transaction.description.split(' - ')[1] || ''
+                  }}</span>
                 </div>
               </div>
             </td>
           </ng-container>
 
-          <!-- Category Column -->
           <ng-container matColumnDef="category">
             <th mat-header-cell *matHeaderCellDef>Categoria</th>
             <td mat-cell *matCellDef="let transaction">
               <span class="category-badge" [class]="'category-badge--' + transaction.type">
-                {{getTransactionCategory(transaction)}}
+                {{ getTransactionCategory(transaction) }}
               </span>
             </td>
           </ng-container>
 
-          <!-- Value Column -->
           <ng-container matColumnDef="value">
             <th mat-header-cell *matHeaderCellDef>Valor</th>
             <td mat-cell *matCellDef="let transaction">
-              <span class="amount" [class]="transaction.type === 'deposit' ? 'amount--positive' : 'amount--negative'">
-                {{formatAmount(transaction.amount, transaction.type)}}
+              <span
+                class="amount"
+                [class]="transaction.type === 'deposit' ? 'amount--positive' : 'amount--negative'"
+              >
+                {{ formatAmount(transaction.amount, transaction.type) }}
               </span>
             </td>
           </ng-container>
 
-          <!-- Balance Column -->
           <ng-container matColumnDef="balance">
             <th mat-header-cell *matHeaderCellDef>Saldo</th>
             <td mat-cell *matCellDef="let transaction">
-              <span class="balance">{{formatBalance(transaction.balance || 0)}}</span>
+              <span class="balance">{{ formatBalance(transaction.balance || 0) }}</span>
             </td>
           </ng-container>
 
-          <!-- Actions Column -->
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Ações</th>
             <td mat-cell *matCellDef="let transaction">
@@ -167,46 +166,61 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
       </mat-card>
     </div>
   </div>
-
-  <!-- Mobile List View -->
-  <div *ngIf="isMobile()" class="mobile-content">
+  } @if (isMobile()) {
+  <div class="mobile-content">
     <div *ngFor="let group of groupedTransactions()" class="mobile-group">
       <div class="mobile-group-header">
-        <span class="mobile-group-date">{{group.date}}</span>
-        <span class="mobile-group-total"
-              [class]="group.totalPositive > group.totalNegative ? 'amount--positive' : 'amount--negative'">
-          {{group.totalPositive > group.totalNegative ?
-            formatAmount(group.totalPositive - group.totalNegative, 'deposit') :
-            formatAmount(group.totalNegative - group.totalPositive, 'withdrawal')}}
+        <span class="mobile-group-date">{{ group.date }}</span>
+        <span
+          class="mobile-group-total"
+          [class]="
+            group.totalPositive > group.totalNegative ? 'amount--positive' : 'amount--negative'
+          "
+        >
+          {{
+            group.totalPositive > group.totalNegative
+              ? formatAmount(group.totalPositive - group.totalNegative, 'deposit')
+              : formatAmount(group.totalNegative - group.totalPositive, 'withdrawal')
+          }}
         </span>
       </div>
 
       <div class="mobile-transactions">
-        <div *ngFor="let transaction of group.transactions"
-             class="mobile-transaction"
-             (click)="viewDetails(transaction.id)">
+        <div
+          *ngFor="let transaction of group.transactions"
+          class="mobile-transaction"
+          (click)="viewDetails(transaction.id)"
+        >
           <div class="mobile-transaction__icon" [style.background-color]="transaction.iconColor">
-            <mat-icon>{{transaction.icon}}</mat-icon>
+            <mat-icon>{{ transaction.icon }}</mat-icon>
           </div>
 
           <div class="mobile-transaction__content">
             <div class="mobile-transaction__main">
-              <span class="mobile-transaction__description">{{transaction.description.split(' - ')[0]}}</span>
-              <span class="mobile-transaction__amount"
-                    [class]="transaction.type === 'deposit' ? 'amount--positive' : 'amount--negative'">
-                {{formatAmount(transaction.amount, transaction.type)}}
+              <span class="mobile-transaction__description">{{
+                transaction.description.split(' - ')[0]
+              }}</span>
+              <span
+                class="mobile-transaction__amount"
+                [class]="transaction.type === 'deposit' ? 'amount--positive' : 'amount--negative'"
+              >
+                {{ formatAmount(transaction.amount, transaction.type) }}
               </span>
             </div>
             <div class="mobile-transaction__sub">
-              <span class="mobile-transaction__detail">{{transaction.description.split(' - ')[1] || getTransactionCategory(transaction)}}</span>
-              <span class="mobile-transaction__balance">{{formatBalance(transaction.balance || 0)}}</span>
+              <span class="mobile-transaction__detail">{{
+                transaction.description.split(' - ')[1] || getTransactionCategory(transaction)
+              }}</span>
+              <span class="mobile-transaction__balance">{{
+                formatBalance(transaction.balance || 0)
+              }}</span>
             </div>
-            <div class="mobile-transaction__time">{{formatTime(transaction.date)}}</div>
+            <div class="mobile-transaction__time">{{ formatTime(transaction.date) }}</div>
           </div>
 
           <mat-icon class="mobile-transaction__arrow">chevron_right</mat-icon>
@@ -214,21 +228,24 @@
       </div>
     </div>
   </div>
+  }
 
-  <!-- Pagination -->
   <div class="pagination-section">
-    <div *ngIf="!isMobile()" class="desktop-pagination">
+    @if (!isMobile()) {
+
+    <div class="desktop-pagination">
       <mat-paginator
         [length]="filteredTransactions().length"
         [pageSize]="10"
         [pageSizeOptions]="[5, 10, 20]"
-        aria-label="Selecione página">
+        aria-label="Selecione página"
+      >
       </mat-paginator>
     </div>
-
-    <div *ngIf="isMobile()" class="mobile-pagination">
+    } @if (isMobile()) {
+    <div class="mobile-pagination">
       <div class="pagination-info">
-        <span>Mostrando 1-10 de {{filteredTransactions().length}} transações</span>
+        <span>Mostrando 1-10 de {{ filteredTransactions().length }} transações</span>
       </div>
       <div class="pagination-controls">
         <button mat-icon-button disabled>
@@ -240,5 +257,6 @@
         </button>
       </div>
     </div>
+    }
   </div>
 </div>

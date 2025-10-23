@@ -37,17 +37,17 @@ interface TransactionGroup {
     MatTableModule,
     MatPaginatorModule,
     MatChipsModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatIconModule,
   ],
   templateUrl: './extract.html',
-  styleUrl: './extract.css'
+  styleUrl: './extract.css',
 })
 export class Extract implements OnInit {
-
   filterForm = new FormGroup({
     period: new FormControl('7days'),
     type: new FormControl('all'),
-    search: new FormControl('')
+    search: new FormControl(''),
   });
 
   isMobile = signal(window.innerWidth < 768);
@@ -56,14 +56,14 @@ export class Extract implements OnInit {
   periodOptions = [
     { value: '7days', label: 'Últimos 7 dias' },
     { value: '30days', label: '30 dias' },
-    { value: 'custom', label: 'Customizar' }
+    { value: 'custom', label: 'Customizar' },
   ];
 
   typeOptions = [
     { value: 'all', label: 'Todas' },
     { value: 'deposit', label: 'Depósitos' },
     { value: 'withdrawal', label: 'Saques' },
-    { value: 'transfer', label: 'Transferências' }
+    { value: 'transfer', label: 'Transferências' },
   ];
 
   displayedColumns = ['time', 'description', 'category', 'value', 'balance', 'actions'];
@@ -73,19 +73,19 @@ export class Extract implements OnInit {
       id: '1',
       type: 'deposit',
       description: 'Depósito PIX - João Santos',
-      amount: 1250.00,
+      amount: 1250.0,
       date: '2024-10-21T14:30:00',
       icon: 'arrow_downward',
-      iconColor: '#4caf50'
+      iconColor: '#4caf50',
     },
     {
       id: '2',
       type: 'transfer',
       description: 'Transferência PIX - Maria Silva',
-      amount: 350.00,
+      amount: 350.0,
       date: '2024-10-21T12:15:00',
       icon: 'send',
-      iconColor: '#f44336'
+      iconColor: '#f44336',
     },
     {
       id: '3',
@@ -94,51 +94,51 @@ export class Extract implements OnInit {
       amount: 127.45,
       date: '2024-10-21T09:45:00',
       icon: 'shopping_cart',
-      iconColor: '#f44336'
+      iconColor: '#f44336',
     },
     {
       id: '4',
       type: 'deposit',
       description: 'Salário - Empresa XYZ Ltda',
-      amount: 4500.00,
+      amount: 4500.0,
       date: '2024-10-20T18:20:00',
       icon: 'account_balance_wallet',
-      iconColor: '#4caf50'
+      iconColor: '#4caf50',
     },
     {
       id: '5',
       type: 'transfer',
       description: 'Transferência - Para Maria Silva',
-      amount: 200.00,
+      amount: 200.0,
       date: '2024-10-20T19:45:00',
       icon: 'swap_horiz',
-      iconColor: '#f44336'
+      iconColor: '#f44336',
     },
     {
       id: '6',
       type: 'withdrawal',
       description: 'Combustível - Posto Shell',
-      amount: 140.80,
+      amount: 140.8,
       date: '2024-10-20T16:22:00',
       icon: 'local_gas_station',
-      iconColor: '#f44336'
+      iconColor: '#f44336',
     },
     {
       id: '7',
       type: 'deposit',
       description: 'Salário - Empresa XYZ Ltda',
-      amount: 3200.00,
+      amount: 3200.0,
       date: '2024-10-19T09:00:00',
       icon: 'account_balance_wallet',
-      iconColor: '#4caf50'
-    }
+      iconColor: '#4caf50',
+    },
   ]);
 
   filteredTransactions = computed(() => {
     const search = this.filterForm.get('search')?.value?.toLowerCase() || '';
     const type = this.filterForm.get('type')?.value || 'all';
 
-    return this.allTransactions().filter(transaction => {
+    return this.allTransactions().filter((transaction) => {
       const matchesSearch = transaction.description.toLowerCase().includes(search);
       const matchesType = type === 'all' || transaction.type === type;
       return matchesSearch && matchesType;
@@ -149,7 +149,7 @@ export class Extract implements OnInit {
     const transactions = this.filteredTransactions();
     const groups: { [key: string]: TransactionGroup } = {};
 
-    transactions.forEach(transaction => {
+    transactions.forEach((transaction) => {
       const date = new Date(transaction.date);
       const dateKey = date.toLocaleDateString('pt-BR');
       const displayDate = this.formatDateGroup(date);
@@ -159,13 +159,13 @@ export class Extract implements OnInit {
           date: displayDate,
           totalPositive: 0,
           totalNegative: 0,
-          transactions: []
+          transactions: [],
         };
       }
 
       groups[dateKey].transactions.push({
         ...transaction,
-        balance: this.calculateBalance(transaction.id)
+        balance: this.calculateBalance(transaction.id),
       });
 
       if (transaction.type === 'deposit') {
@@ -175,8 +175,9 @@ export class Extract implements OnInit {
       }
     });
 
-    return Object.values(groups).sort((a, b) =>
-      new Date(b.transactions[0].date).getTime() - new Date(a.transactions[0].date).getTime()
+    return Object.values(groups).sort(
+      (a, b) =>
+        new Date(b.transactions[0].date).getTime() - new Date(a.transactions[0].date).getTime()
     );
   });
 
@@ -218,7 +219,7 @@ export class Extract implements OnInit {
   formatAmount(amount: number, type: string): string {
     const formattedAmount = amount.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
 
     return type === 'deposit' ? `+R$ ${formattedAmount}` : `-R$ ${formattedAmount}`;
@@ -227,23 +228,27 @@ export class Extract implements OnInit {
   formatBalance(balance: number): string {
     return `R$ ${balance.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     })}`;
   }
 
   formatTime(dateString: string): string {
     return new Date(dateString).toLocaleTimeString('pt-BR', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 
   getTransactionCategory(transaction: Transaction): string {
     switch (transaction.type) {
-      case 'deposit': return 'Depósito';
-      case 'withdrawal': return transaction.description.includes('Cartão') ? 'Compra' : 'Saque';
-      case 'transfer': return 'Transferência';
-      default: return 'Outros';
+      case 'deposit':
+        return 'Depósito';
+      case 'withdrawal':
+        return transaction.description.includes('Cartão') ? 'Compra' : 'Saque';
+      case 'transfer':
+        return 'Transferência';
+      default:
+        return 'Outros';
     }
   }
 

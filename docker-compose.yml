@@ -31,7 +31,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     ports:
-      - "5433:5432"  # Usando porta diferente para evitar conflitos
+      - "5433:5432"
     volumes:
       - postgres_transactions_data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
@@ -62,6 +62,31 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: capbank-gateway-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8081
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+      AUTH_SERVICE_BASE_URL: http://auth-service:8083
+      USER_SERVICE_BASE_URL: http://user-service:8082
+      ACCOUNT_SERVICE_BASE_URL: http://bankaccount-service:8084
+      TRANSACTION_SERVICE_BASE_URL: http://transaction-service:8085
+      JWT_SECRET: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==
+    ports:
+      - "8081:8081"
+    networks:
+      - capbank-network
+    depends_on:
+      - auth-service
+      - user-service
+      - bankaccount-service
+      - transaction-service
+    restart: unless-stopped
 
   user-service:
     build:
@@ -95,7 +120,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8083
       LOGGING_LEVEL_COM_CAPBANK: INFO
-      JWT_SECRET: dKLyb0ao3/f8ZlQ2CVJc9Auhz3VdaBo8NSnOxbA/8Kc=
+      JWT_SECRET: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==
       JWT_EXPIRATION: 3600000
       JWT_ISSUER: capbank-gateway
       USER_SERVICE_URL: http://user-service:8082

@@ -63,7 +63,7 @@ spring:
             allowedHeaders: "*"
 
 jwt:
-  secret: capbank-secret-key
+  secret: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==
 
 services:
   auth:

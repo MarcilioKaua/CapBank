@@ -120,7 +120,13 @@ public class TransactionService implements CreateTransactionUseCase, FindTransac
 
     private TransactionHistory createHistoryFromTransaction(Transaction transaction, Money currentBalance) {
         Money balanceBefore = switch (transaction.getType()) {
-            case DEPOSIT -> currentBalance.subtract(transaction.getAmount());
+            case DEPOSIT -> {
+                try {
+                    yield currentBalance.subtract(transaction.getAmount());
+                } catch (IllegalArgumentException e) {
+                    yield Money.ZERO;
+                }
+            }
             case WITHDRAWAL, TRANSFER -> currentBalance.add(transaction.getAmount());
         };
 

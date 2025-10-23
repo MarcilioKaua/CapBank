@@ -22,6 +22,26 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    
+  postgres-accounts:
+    image: postgres:15-alpine
+    container_name: capbank-postgres-accounts
+    environment:
+      POSTGRES_DB: db_bankaccount
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_accounts_data:/var/lib/postgresql/data
+    networks:
+      - capbank-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bankaccount_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Transaction History Microservice
   transaction-service:
@@ -52,6 +72,30 @@ services:
       start_period: 60s
     restart: unless-stopped
 
+  # Bank Account Microservice
+  bankaccount-service:
+    build:
+      context: ./bankaccount-service
+      dockerfile: Dockerfile
+    container_name: capbank-bankaccount-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-accounts:5432/db_bankaccount
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SERVER_PORT: 8084
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+    ports:
+      - "8084:8084"
+    networks:
+      - capbank-network
+    depends_on:
+      postgres-accounts:
+        condition: service_healthy
+    restart: unless-stopped
+
   # pgAdmin (opcional - para administração do banco)
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -71,6 +115,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  postgres_accounts_data:
     driver: local
   pgadmin_data:
     driver: local

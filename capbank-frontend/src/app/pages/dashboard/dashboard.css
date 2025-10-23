@@ -29,13 +29,13 @@
 }
 
 .balance-card__label {
-  font-size: 0.875rem;
+  font-size: 1rem;
   opacity: 0.9;
   margin-bottom: 0.25rem;
 }
 
 .balance-card__account {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   opacity: 0.8;
 }
 
@@ -76,11 +76,6 @@
   height: 44px;
   border-radius: 8px;
   font-weight: 500;
-}
-
-.balance-card__btn--outline {
-  border-color: rgba(255, 255, 255, 0.5);
-  color: white;
 }
 
 .dashboard__content {
@@ -138,6 +133,9 @@
 .transaction-item__icon mat-icon {
   color: white;
   font-size: 1.25rem;
+  display: grid;
+  justify-content: center;
+  align-items: center;
 }
 
 .transaction-item__details {
@@ -233,6 +231,11 @@
   color: #ccc;
 }
 
+.dashboard__transactions {
+  padding-right: 1.5rem;
+  border-right: 1px solid #e0e0e0;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .dashboard {
@@ -262,5 +265,12 @@
 
   .quick-action {
     padding: 1rem;
+  }
+
+  .dashboard__transactions {
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 1.5rem;
   }
 }

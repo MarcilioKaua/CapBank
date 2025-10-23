@@ -41,6 +41,7 @@
 .breadcrumb__separator {
   color: #ccc;
   font-size: 1rem;
+  padding: 5px;
 }
 
 .breadcrumb__current {
@@ -100,7 +101,6 @@
 .desktop-filters {
   display: flex;
   gap: 1rem;
-  align-items: flex-end;
 }
 
 .filter-field {
@@ -178,6 +178,7 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  margin-bottom: 1rem;
 }
 
 .transactions-table {
@@ -214,6 +215,10 @@
 .transaction-icon mat-icon {
   color: white;
   font-size: 1.125rem;
+  text-align: center;
+  justify-content: center;
+  display: grid;
+  align-items: center;
 }
 
 .description-content {

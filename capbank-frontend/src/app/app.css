@@ -56,6 +56,11 @@
   gap: 1rem;
 }
 
+.desktop-header__user mat-icon {
+  display: grid;
+  align-items: center;
+}
+
 .desktop-header__user-info {
   text-align: right;
 }

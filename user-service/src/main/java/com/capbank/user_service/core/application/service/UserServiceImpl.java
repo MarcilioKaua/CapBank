@@ -5,6 +5,7 @@ import com.capbank.user_service.core.application.ports.in.GetUserUseCase;
 import com.capbank.user_service.core.application.ports.in.RegisterUserUseCase;
 import com.capbank.user_service.core.application.ports.in.UpdateUserUseCase;
 import com.capbank.user_service.core.application.ports.in.ValidateUserUseCase;
+import com.capbank.user_service.core.application.ports.out.GatewayClientPort;
 import com.capbank.user_service.core.application.ports.out.UserRepositoryPort;
 import com.capbank.user_service.infra.entity.UserEntity;
 import com.capbank.user_service.infra.dto.RegisterUserRequest;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase, GetUserUseCase, UpdateUserUseCase, DeleteUserUseCase {
@@ -25,14 +27,18 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
     private final UserRepositoryPort repository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
+    private final GatewayClientPort gatewayClient;
 
-    public UserServiceImpl(UserRepositoryPort repository, PasswordEncoder passwordEncoder, UserMapper mapper) {
+    public UserServiceImpl(UserRepositoryPort repository, PasswordEncoder passwordEncoder, UserMapper mapper,
+                           GatewayClientPort gatewayClient) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
+        this.gatewayClient = gatewayClient;
     }
 
     @Override
+    @Transactional
     public UserResponse register(RegisterUserRequest request) {
         final String cpf = normalizeCpf(request.getCpf());
 
@@ -52,6 +58,13 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
         userEntity.setCpf(cpf);
         userEntity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userEntity.setStatus(UserEntity.Status.ACTIVE);
+
+        try {
+            gatewayClient.createForUser(userEntity.getId(), userEntity.getAccountType());
+        } catch (RuntimeException ex) {
+            LOG.error("Failed to create bank account for userId={}, rolling back user creation. Reason: {}", userEntity.getId(), ex.getMessage());
+            throw new IllegalStateException("Failed to create bank account. User registration aborted.", ex);
+        }
 
         UserEntity saved = repository.save(userEntity);
         LOG.info("UserEntity created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
@@ -93,6 +106,9 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
         }
         if (request.getPhone() != null) {
             user.setPhone(request.getPhone());
+        }
+        if (request.getBirthDate() != null) {
+            user.setBirthDate(request.getBirthDate());
         }
         if (request.getAccountType() != null) {
             user.setAccountType(request.getAccountType());

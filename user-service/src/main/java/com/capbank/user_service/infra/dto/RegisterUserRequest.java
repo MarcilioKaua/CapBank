@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 
 public class RegisterUserRequest {
 
@@ -17,6 +18,10 @@ public class RegisterUserRequest {
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email")
     private String email;
+
+    private String phone;
+
+    private LocalDate birthDate;
 
     @NotBlank(message = "Account type is required")
     private String accountType;
@@ -50,6 +55,22 @@ public class RegisterUserRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     public String getAccountType() {

@@ -1,6 +1,7 @@
 package com.capbank.user_service.infra.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class UserEntity {
 
     private String passwordHash;
     private String phone;
+    private LocalDate birthDate;
     private String accountType;
 
     @Enumerated(EnumType.STRING)
@@ -74,6 +76,14 @@ public class UserEntity {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     public String getAccountType() {

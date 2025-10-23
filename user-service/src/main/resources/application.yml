@@ -31,6 +31,9 @@ app:
     postgresql:
       version: 16
 
+  gateway:
+    base-url: http://localhost:8081
+
   rest:
     template:
       connect-timeout: 3s

@@ -53,10 +53,10 @@
 
               <div class="step-circle">
                 <mat-icon *ngIf="isStepCompleted(i)">check</mat-icon>
-                <span *ngIf="!isStepCompleted(i)">{{i + 1}}</span>
+                <span *ngIf="!isStepCompleted(i)">{{ i + 1 }}</span>
               </div>
 
-              <span class="step-label">{{step.label}}</span>
+              <span class="step-label">{{ step.label }}</span>
 
               <div *ngIf="i < steps.length - 1" class="step-connector"></div>
             </div>
@@ -80,7 +80,7 @@
 
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>CPF</mat-label>
-              <input matInput formControlName="cpf" placeholder="000.000.000-00">
+              <input matInput formControlName="cpf" placeholder="000.000.000-00" cpfMask>
               <mat-hint>Apenas números</mat-hint>
               <mat-error *ngIf="personalDataForm.get('cpf')?.errors?.['required']">
                 CPF é obrigatório
@@ -100,7 +100,7 @@
 
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Telefone</mat-label>
-              <input matInput formControlName="phone" placeholder="(00) 00000-0000">
+              <input matInput formControlName="phone" placeholder="(00) 00000-0000" phoneMask>
               <mat-error *ngIf="personalDataForm.get('phone')?.errors?.['required']">
                 Telefone é obrigatório
               </mat-error>
@@ -110,7 +110,7 @@
             </mat-form-field>
 
             <button mat-raised-button color="primary" type="submit" class="step-button">
-              {{isMobile() ? 'Continuar' : 'Próximo'}}
+              {{ isMobile() ? 'Continuar' : 'Próximo' }}
               <mat-icon>arrow_forward</mat-icon>
             </button>
           </form>
@@ -148,6 +148,9 @@
               <mat-error *ngIf="accessForm.get('confirmPassword')?.errors?.['required']">
                 Confirmação de senha é obrigatória
               </mat-error>
+              <mat-error *ngIf="accessForm.errors?.['passwordsMismatch'] && accessForm.get('confirmPassword')?.touched">
+                As senhas não conferem
+              </mat-error>
             </mat-form-field>
 
             <mat-checkbox formControlName="acceptTerms" class="terms-checkbox">
@@ -160,7 +163,7 @@
                 Voltar
               </button>
               <button mat-raised-button color="primary" type="submit" class="step-button">
-                {{isMobile() ? 'Continuar' : 'Próximo'}}
+                {{ isMobile() ? 'Continuar' : 'Próximo' }}
                 <mat-icon>arrow_forward</mat-icon>
               </button>
             </div>
@@ -212,7 +215,7 @@
 
         <!-- Mobile Step Counter -->
         <div *ngIf="isMobile()" class="step-counter">
-          Etapa {{currentStep() + 1}} de {{steps.length}}
+          Etapa {{ currentStep() + 1 }} de {{ steps.length }}
         </div>
 
         <!-- Login Link -->

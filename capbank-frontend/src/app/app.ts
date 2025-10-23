@@ -1,30 +1,38 @@
 import { Component, signal, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Sidebar } from './components/sidebar/sidebar';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    MatIconModule,
-    MatButtonModule,
-    MatToolbarModule,
-    Sidebar
-  ],
+  imports: [CommonModule, RouterOutlet, MatIconModule, MatButtonModule, MatToolbarModule, Sidebar],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App implements OnInit {
   protected readonly title = signal('capbank-frontend');
 
   isMobile = signal(false);
   sidebarOpen = signal(false);
+  routeShowSidebar = signal(false);
+
+  constructor(private router: Router) {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.updateSidebarVisibility(event.urlAfterRedirects);
+      });
+  }
+
+  private updateSidebarVisibility(url: string): void {
+    const hideSidebarRoutes = ['/login', '/create-account'];
+    this.routeShowSidebar.set(!hideSidebarRoutes.some((route) => url.startsWith(route)));
+  }
 
   ngOnInit(): void {
     this.checkScreenSize();
@@ -45,7 +53,7 @@ export class App implements OnInit {
   }
 
   toggleSidebar(): void {
-    this.sidebarOpen.update(open => !open);
+    this.sidebarOpen.update((open) => !open);
   }
 
   closeSidebar(): void {

@@ -6,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { Transaction, QuickAction } from '../../shared/models/transaction.model';
+import { MatChip, MatChipOption } from '@angular/material/chips';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,10 +17,13 @@ import { Transaction, QuickAction } from '../../shared/models/transaction.model'
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    MatChip,
+    MatMenuModule,
+    MatChipOption,
   ],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
   balance = signal(12547.89);
@@ -27,7 +32,7 @@ export class Dashboard implements OnInit {
   formattedBalance = computed(() => {
     return this.balance().toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
   });
 
@@ -36,47 +41,47 @@ export class Dashboard implements OnInit {
       id: '1',
       type: 'deposit',
       description: 'Depósito PIX',
-      amount: 1250.00,
+      amount: 1250.0,
       date: 'Hoje, 14:30',
       icon: 'arrow_downward',
-      iconColor: '#4caf50'
+      iconColor: '#4caf50',
     },
     {
       id: '2',
       type: 'withdrawal',
       description: 'Supermercado ABC',
-      amount: 89.50,
+      amount: 89.5,
       date: 'Ontem, 18:45',
       icon: 'shopping_cart',
-      iconColor: '#f44336'
+      iconColor: '#f44336',
     },
     {
       id: '3',
       type: 'transfer',
       description: 'Transferência para Maria',
-      amount: 300.00,
+      amount: 300.0,
       date: 'Ontem, 16:20',
       icon: 'send',
-      iconColor: '#2196f3'
+      iconColor: '#2196f3',
     },
     {
       id: '4',
       type: 'withdrawal',
       description: 'Conta de Luz',
-      amount: 145.30,
+      amount: 145.3,
       date: '22/10, 10:15',
       icon: 'flash_on',
-      iconColor: '#ff9800'
+      iconColor: '#ff9800',
     },
     {
       id: '5',
       type: 'deposit',
       description: 'Salário - Empresa XYZ',
-      amount: 4500.00,
+      amount: 4500.0,
       date: '20/10, 08:00',
       icon: 'account_balance_wallet',
-      iconColor: '#4caf50'
-    }
+      iconColor: '#4caf50',
+    },
   ]);
 
   quickActions: QuickAction[] = [
@@ -86,7 +91,7 @@ export class Dashboard implements OnInit {
       subtitle: 'Envie dinheiro rapidamente',
       icon: 'send',
       color: '#ff9800',
-      route: '/transfers'
+      route: '/transfers',
     },
     {
       id: 'extract',
@@ -94,7 +99,7 @@ export class Dashboard implements OnInit {
       subtitle: 'Veja todas as movimentações',
       icon: 'receipt_long',
       color: '#2196f3',
-      route: '/extract'
+      route: '/extract',
     },
     {
       id: 'profile',
@@ -102,8 +107,8 @@ export class Dashboard implements OnInit {
       subtitle: 'Gerencie suas informações',
       icon: 'person',
       color: '#4caf50',
-      route: '/profile'
-    }
+      route: '/profile',
+    },
   ];
 
   ngOnInit(): void {
@@ -111,17 +116,19 @@ export class Dashboard implements OnInit {
   }
 
   toggleBalanceVisibility(): void {
-    this.balanceVisible.update(visible => !visible);
+    this.balanceVisible.update((visible) => !visible);
   }
 
   getAmountClass(type: string): string {
-    return type === 'deposit' ? 'transaction-item__amount--positive' : 'transaction-item__amount--negative';
+    return type === 'deposit'
+      ? 'transaction-item__amount--positive'
+      : 'transaction-item__amount--negative';
   }
 
   formatAmount(amount: number, type: string): string {
     const formattedAmount = amount.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
 
     return type === 'deposit' ? `+ R$ ${formattedAmount}` : `- R$ ${formattedAmount}`;

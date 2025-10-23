@@ -15,7 +15,6 @@
     <mat-icon class="breadcrumb__separator">chevron_right</mat-icon>
     <span class="breadcrumb__current">Extrato</span>
   </nav>
-  } @if (!isMobile()) {
   <div class="page-header">
     <h1 class="page-title">Extrato</h1>
     <p class="page-subtitle">Acompanhe todas as suas transações</p>
@@ -25,44 +24,49 @@
   <div class="filters-section">
     @if (isMobile()) {
     <div class="period-chips">
+      @for (option of periodOptions; track option.value) {
       <mat-chip-option
-        *ngFor="let option of periodOptions"
         [selected]="selectedPeriod() === option.value"
         (click)="selectPeriod(option.value)"
         class="period-chip"
       >
         {{ option.label.replace('Últimos ', '').replace(' dias', ' dias') }}
       </mat-chip-option>
+      }
     </div>
     }
     <form [formGroup]="filterForm" class="filters-form">
       @if (!isMobile()) {
       <div class="desktop-filters">
-        <mat-form-field appearance="outline" class="filter-field">
+        <mat-form-field class="filter-field">
           <mat-label>Período</mat-label>
           <mat-select formControlName="period">
-            <mat-option *ngFor="let option of periodOptions" [value]="option.value">
+            @for (option of periodOptions; track option.value) {
+            <mat-option [value]="option.value">
               {{ option.label }}
             </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="filter-field">
+        <mat-form-field class="filter-field">
           <mat-label>Tipo</mat-label>
           <mat-select formControlName="type">
-            <mat-option *ngFor="let option of typeOptions" [value]="option.value">
+            @for (option of typeOptions; track option.value) {
+            <mat-option [value]="option.value">
               {{ option.label }}
             </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="filter-field search-field">
+        <mat-form-field class="filter-field search-field">
           <mat-label>Buscar</mat-label>
           <input matInput formControlName="search" placeholder="Buscar por descrição..." />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
-        <button mat-raised-button color="primary" class="export-btn" (click)="exportPDF()">
+        <button mat-flat-button color="primary" class="export-btn" (click)="exportPDF()">
           <mat-icon>picture_as_pdf</mat-icon>
           Exportar PDF
         </button>
@@ -94,11 +98,12 @@
 
   @if (!isMobile()) {
   <div class="desktop-content">
-    <div *ngFor="let group of groupedTransactions()" class="transaction-group">
+    <div class="transaction-group">
+      @for (group of groupedTransactions(); track group.date) {
       <div class="group-header">
         <h3 class="group-date">{{ group.date }}</h3>
         <div class="group-summary">
-          <span class="transaction-count">{{ group.transactions.length }} transações</span>
+          <span class="transaction-count">{{ numberOfTransactions(group) }} </span>
         </div>
       </div>
 
@@ -169,6 +174,7 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
       </mat-card>
+      }
     </div>
   </div>
   } @if (isMobile()) {
@@ -232,7 +238,6 @@
 
   <div class="pagination-section">
     @if (!isMobile()) {
-
     <div class="desktop-pagination">
       <mat-paginator
         [length]="filteredTransactions().length"

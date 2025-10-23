@@ -7,18 +7,15 @@
           <span class="balance-card__label">Conta Corrente</span>
           <span class="balance-card__account">Ag: 1234 • Conta: 56789-0</span>
         </div>
-        <button
-          mat-icon-button
-          class="balance-card__toggle"
-          (click)="toggleBalanceVisibility()">
-          <mat-icon>{{balanceVisible() ? 'visibility_off' : 'visibility'}}</mat-icon>
+        <button mat-icon-button class="balance-card__toggle" (click)="toggleBalanceVisibility()">
+          <mat-icon>{{ balanceVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
       </div>
 
       <div class="balance-card__amount">
         <span class="balance-card__currency">R$</span>
         <span class="balance-card__value" [class.balance-card__value--hidden]="!balanceVisible()">
-          {{balanceVisible() ? formattedBalance() : '••••••'}}
+          {{ balanceVisible() ? formattedBalance() : '••••••' }}
         </span>
       </div>
 
@@ -27,7 +24,7 @@
           <mat-icon>send</mat-icon>
           Transferir
         </button>
-        <button mat-stroked-button class="balance-card__btn balance-card__btn--outline">
+        <button mat-flat-button class="balance-card__btn">
           <mat-icon>receipt_long</mat-icon>
           Extrato
         </button>
@@ -44,36 +41,33 @@
       </div>
 
       <div class="transactions-list">
-        <div
-          *ngFor="let transaction of recentTransactions()"
-          class="transaction-item">
+        @for (transaction of recentTransactions(); track transaction.id) {
+        <div class="transaction-item">
           <div class="transaction-item__icon" [style.background-color]="transaction.iconColor">
-            <mat-icon>{{transaction.icon}}</mat-icon>
+            <mat-icon>{{ transaction.icon }}</mat-icon>
           </div>
           <div class="transaction-item__details">
-            <span class="transaction-item__description">{{transaction.description}}</span>
-            <span class="transaction-item__date">{{transaction.date}}</span>
+            <span class="transaction-item__description">{{ transaction.description }}</span>
+            <span class="transaction-item__date">{{ transaction.date }}</span>
           </div>
           <div class="transaction-item__amount" [class]="getAmountClass(transaction.type)">
-            {{formatAmount(transaction.amount, transaction.type)}}
+            {{ formatAmount(transaction.amount, transaction.type) }}
           </div>
         </div>
+        }
       </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="dashboard__actions">
       <div class="quick-actions">
-        <div
-          *ngFor="let action of quickActions"
-          class="quick-action"
-          [routerLink]="action.route">
+        <div *ngFor="let action of quickActions" class="quick-action" [routerLink]="action.route">
           <div class="quick-action__icon" [style.background-color]="action.color">
-            <mat-icon>{{action.icon}}</mat-icon>
+            <mat-icon>{{ action.icon }}</mat-icon>
           </div>
           <div class="quick-action__text">
-            <span class="quick-action__title">{{action.title}}</span>
-            <span class="quick-action__subtitle">{{action.subtitle}}</span>
+            <span class="quick-action__title">{{ action.title }}</span>
+            <span class="quick-action__subtitle">{{ action.subtitle }}</span>
           </div>
           <mat-icon class="quick-action__arrow">chevron_right</mat-icon>
         </div>

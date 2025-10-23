@@ -7,27 +7,18 @@
     <span class="header-title">Transferência</span>
   </mat-toolbar>
 
-  <!-- Desktop Layout -->
   <div *ngIf="!isMobile()" class="desktop-layout">
     <app-sidebar></app-sidebar>
 
     <main class="main-content">
-      <!-- Breadcrumb -->
-      <div class="breadcrumb">
-        <span class="breadcrumb-item">Dashboard</span>
-        <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
-        <span class="breadcrumb-item current">Transferência</span>
-      </div>
-
-      <!-- Page Header -->
+ 
       <div class="page-header">
         <h1 class="page-title">Transferência</h1>
         <p class="page-subtitle">Transfira dinheiro de forma rápida e segura</p>
       </div>
 
-      <!-- Transfer Content -->
       <div class="transfer-content">
-        <!-- Account Balance Card -->
+        
         <mat-card class="account-balance-card">
           <div class="balance-header">
             <h3>Sua Conta</h3>
@@ -39,59 +30,42 @@
           </div>
         </mat-card>
 
-        <!-- Transfer Form -->
         <mat-card class="transfer-form-card">
           <div class="form-header">
             <h3>Nova Transferência</h3>
           </div>
 
           <form [formGroup]="transferForm" (ngSubmit)="onTransfer()">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Conta Destino</mat-label>
-              <input
-                matInput
-                formControlName="destinationAccount"
-                placeholder="00000-0"
-                autocomplete="off">
-              <mat-icon matSuffix class="field-icon">account_balance</mat-icon>
-              <mat-error *ngIf="transferForm.get('destinationAccount')?.errors?.['required']">
-                Conta destino é obrigatória
-              </mat-error>
-              <mat-error *ngIf="transferForm.get('destinationAccount')?.errors?.['pattern']">
-                Formato inválido (ex: 12345-6)
-              </mat-error>
-            </mat-form-field>
+          
+            <app-custom-input
+              label="Conta Destino"
+              placeholder="00000-0"
+              formControlName="destinationAccount"
+              suffixIcon="account_balance"
+              [required]="true"
+              [errorMessage]="getDestinationAccountError()">
+            </app-custom-input>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Valor</mat-label>
-              <input
-                matInput
-                formControlName="amount"
-                type="number"
-                placeholder="0,00"
-                min="0"
-                step="0.01"
-                autocomplete="off">
-              <span matPrefix>R$&nbsp;</span>
-              <mat-icon matSuffix class="field-icon">attach_money</mat-icon>
-              <mat-error *ngIf="transferForm.get('amount')?.errors?.['required']">
-                Valor é obrigatório
-              </mat-error>
-              <mat-error *ngIf="transferForm.get('amount')?.errors?.['min']">
-                Valor deve ser maior que R$ 0,00
-              </mat-error>
-            </mat-form-field>
+   
+            <app-custom-input
+              label="Valor"
+              type="number"
+              placeholder="0,00"
+              formControlName="amount"
+              prefixText="R$"
+              suffixIcon="attach_money"
+              [required]="true"
+              [min]="0.01"
+              [step]="0.01"
+              [errorMessage]="getAmountError()">
+            </app-custom-input>
 
-            <mat-form-field appearance="outline" class="form-field description-field">
-              <mat-label>Descrição (Opcional)</mat-label>
-              <textarea
-                matInput
-                formControlName="description"
-                placeholder="Digite uma descrição para a transferência..."
-                rows="3"
-                autocomplete="off">
-              </textarea>
-            </mat-form-field>
+            <app-custom-input
+              label="Descrição (Opcional)"
+              placeholder="Digite uma descrição para a transferência..."
+              formControlName="description"
+              [rows]="3">
+            </app-custom-input>
 
             <button
               mat-raised-button
@@ -108,16 +82,10 @@
     </main>
   </div>
 
-  <!-- Mobile Layout -->
-  <div *ngIf="isMobile()" class="mobile-content">
-    <!-- Breadcrumb Mobile -->
-    <div class="mobile-breadcrumb">
-      <span class="breadcrumb-item">Dashboard</span>
-      <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
-      <span class="breadcrumb-item current">Transferência</span>
-    </div>
 
-    <!-- Account Balance -->
+  <div *ngIf="isMobile()" class="mobile-content">
+   
+    
     <mat-card class="balance-card">
       <div class="balance-header">
         <h3>Sua Conta</h3>
@@ -128,56 +96,42 @@
       </div>
     </mat-card>
 
-    <!-- Transfer Form -->
+   
     <mat-card class="transfer-card">
       <div class="card-header">
         <h3>Nova Transferência</h3>
       </div>
 
       <form [formGroup]="transferForm" (ngSubmit)="onTransfer()">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Conta Destino</mat-label>
-          <input
-            matInput
-            formControlName="destinationAccount"
-            placeholder="0000-0 00000-0"
-            autocomplete="off">
-          <mat-error *ngIf="transferForm.get('destinationAccount')?.errors?.['required']">
-            Conta destino é obrigatória
-          </mat-error>
-          <mat-error *ngIf="transferForm.get('destinationAccount')?.errors?.['pattern']">
-            Formato inválido (ex: 12345-6)
-          </mat-error>
-        </mat-form-field>
+      
+        <app-custom-input
+          label="Conta Destino"
+          placeholder="00000-0"
+          formControlName="destinationAccount"
+          suffixIcon="account_balance"
+          [required]="true"
+          [errorMessage]="getDestinationAccountError()">
+        </app-custom-input>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Valor</mat-label>
-          <input
-            matInput
-            formControlName="amount"
-            type="number"
-            placeholder="R$ 0,00"
-            min="0"
-            step="0.01"
-            autocomplete="off">
-          <mat-error *ngIf="transferForm.get('amount')?.errors?.['required']">
-            Valor é obrigatório
-          </mat-error>
-          <mat-error *ngIf="transferForm.get('amount')?.errors?.['min']">
-            Valor deve ser maior que R$ 0,00
-          </mat-error>
-        </mat-form-field>
+        <app-custom-input
+          label="Valor"
+          type="number"
+          placeholder="0,00"
+          formControlName="amount"
+          prefixText="R$"
+          suffixIcon="attach_money"
+          [required]="true"
+          [min]="0.01"
+          [step]="0.01"
+          [errorMessage]="getAmountError()">
+        </app-custom-input>
 
-        <mat-form-field appearance="outline" class="form-field description-field">
-          <mat-label>Descrição (opcional)</mat-label>
-          <textarea
-            matInput
-            formControlName="description"
-            placeholder="Digite uma descrição para a transferência..."
-            rows="3"
-            autocomplete="off">
-          </textarea>
-        </mat-form-field>
+        <app-custom-input
+          label="Descrição (opcional)"
+          placeholder="Digite uma descrição para a transferência..."
+          formControlName="description"
+          [rows]="3">
+        </app-custom-input>
 
         <button
           mat-raised-button

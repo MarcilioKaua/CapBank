@@ -12,6 +12,7 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { CurrencyPipe } from '@angular/common';
 import { DEFAULT_CURRENCY_CODE } from '@angular/core';
+import { CustomInputComponent } from '../../components/custom-input/custom-input';
 
 @Component({
   selector: 'app-transfers',
@@ -27,7 +28,8 @@ import { DEFAULT_CURRENCY_CODE } from '@angular/core';
     MatToolbarModule,
     MatSnackBarModule,
     Sidebar,
-    CurrencyPipe
+    CurrencyPipe,
+    CustomInputComponent
   ],
   templateUrl: './transfers.html',
   styleUrl: './transfers.css'
@@ -97,5 +99,28 @@ export class Transfers implements OnInit {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
+  }
+
+  // Métodos para obter mensagens de erro
+  getDestinationAccountError(): string {
+    const control = this.transferForm.get('destinationAccount');
+    if (control?.hasError('required')) {
+      return 'Conta destino é obrigatória';
+    }
+    if (control?.hasError('pattern')) {
+      return 'Formato inválido (ex: 12345-6)';
+    }
+    return '';
+  }
+
+  getAmountError(): string {
+    const control = this.transferForm.get('amount');
+    if (control?.hasError('required')) {
+      return 'Valor é obrigatório';
+    }
+    if (control?.hasError('min')) {
+      return 'Valor deve ser maior que R$ 0,00';
+    }
+    return '';
   }
 }

@@ -1,5 +1,5 @@
 <div class="login-container">
-  <!-- Desktop Header -->
+
   <mat-toolbar *ngIf="!isMobile()" class="desktop-header">
     <div class="header-brand">
       <mat-icon class="brand-icon">account_balance</mat-icon>
@@ -17,10 +17,8 @@
     </div>
   </mat-toolbar>
 
-  <!-- Main Content -->
   <div class="login-content" [class.login-content--mobile]="isMobile()">
 
-    <!-- Desktop Left Panel -->
     <div *ngIf="!isMobile()" class="hero-section">
       <div class="hero-content">
         <h1 class="hero-title">
@@ -43,11 +41,9 @@
       </div>
     </div>
 
-    <!-- Login Panel -->
     <div class="login-panel">
       <div class="login-card-container">
 
-        <!-- Mobile Logo -->
         <div *ngIf="isMobile()" class="mobile-brand">
           <div class="mobile-brand__icon">
             <mat-icon>account_balance</mat-icon>
@@ -68,45 +64,25 @@
           </div>
 
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>CPF</mat-label>
-              <input
-                matInput
-                formControlName="cpf"
-                placeholder="000.000.000-00"
-                autocomplete="username">
-              <mat-icon matSuffix class="input-icon">person</mat-icon>
-              <mat-error *ngIf="loginForm.get('cpf')?.errors?.['required']">
-                CPF é obrigatório
-              </mat-error>
-              <mat-error *ngIf="loginForm.get('cpf')?.errors?.['pattern']">
-                CPF deve ter o formato 000.000.000-00
-              </mat-error>
-            </mat-form-field>
+  
+            <app-custom-input
+              label="CPF"
+              placeholder="000.000.000-00"
+              formControlName="cpf"
+              suffixIcon="person"
+              [required]="true"
+              [errorMessage]="getCpfError()">
+            </app-custom-input>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Senha</mat-label>
-              <input
-                matInput
-                formControlName="password"
-                [type]="hidePassword() ? 'password' : 'text'"
-                placeholder="Digite sua senha"
-                autocomplete="current-password">
-              <button
-                mat-icon-button
-                matSuffix
-                type="button"
-                (click)="togglePasswordVisibility()"
-                class="password-toggle">
-                <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
-              </button>
-              <mat-error *ngIf="loginForm.get('password')?.errors?.['required']">
-                Senha é obrigatória
-              </mat-error>
-              <mat-error *ngIf="loginForm.get('password')?.errors?.['minlength']">
-                Senha deve ter pelo menos 4 caracteres
-              </mat-error>
-            </mat-form-field>
+            <app-custom-input
+              label="Senha"
+              type="password"
+              placeholder="Digite sua senha"
+              formControlName="password"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [errorMessage]="getPasswordError()">
+            </app-custom-input>
 
             <button mat-raised-button color="primary" type="submit" class="login-button">
               Entrar
@@ -130,7 +106,6 @@
           </div>
         </mat-card>
 
-        <!-- Mobile Copyright -->
         <div *ngIf="isMobile()" class="mobile-footer">
           <p>© 2024 NewBank. Todos os direitos reservados.</p>
         </div>
@@ -138,7 +113,6 @@
     </div>
   </div>
 
-  <!-- Desktop Cards Section -->
   <div *ngIf="!isMobile()" class="cards-section">
     <div class="cards-content">
       <h2 class="cards-title">Cartões NewBank</h2>

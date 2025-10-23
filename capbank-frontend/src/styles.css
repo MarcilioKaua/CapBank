@@ -2,6 +2,7 @@
 @import '@angular/material/prebuilt-themes/azure-blue.css';
 @import 'tailwindcss';
 
+
 * {
   margin: 0;
   padding: 0;
@@ -11,4 +12,44 @@
 
 body {
   background-color: #f5f5f5;
+}
+
+/* ========================================= */
+/* AJUSTE: Remover barra interna dos inputs  */
+/* ========================================= */
+
+/* Remove a barra divisória entre prefixo/sufixo e input */
+.mat-mdc-form-field-infix {
+  border-left: none !important;
+  padding-left: 0 !important;
+}
+
+/* Remove borders do notched outline que causam a barra */
+.mat-mdc-text-field-wrapper .mat-mdc-form-field-flex .mat-mdc-floating-label {
+  left: 0 !important;
+}
+
+/* Ajusta o espaçamento entre prefixo e campo */
+.mat-mdc-form-field-text-prefix,
+.mat-mdc-form-field-icon-prefix {
+  padding-right: 8px !important;
+  border-right: none !important;
+}
+
+.mat-mdc-form-field-text-suffix,
+.mat-mdc-form-field-icon-suffix {
+  padding-left: 8px !important;
+  border-left: none !important;
+}
+
+/* Remove completamente a pseudo-element que cria a linha divisória */
+.mat-mdc-form-field-text-prefix::after,
+.mat-mdc-form-field-icon-prefix::after,
+.mat-mdc-form-field-text-suffix::before,
+.mat-mdc-form-field-icon-suffix::before {
+  content: none !important;
+  display: none !important;
+  border: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }

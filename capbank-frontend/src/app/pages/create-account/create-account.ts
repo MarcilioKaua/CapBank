@@ -48,7 +48,7 @@ export class CreateAccount implements OnInit {
 
   steps = [
     { label: 'Dados Pessoais', icon: 'person' },
-    { label: 'Acesso', icon: 'lock' }
+    { label: 'Acesso', icon: 'lock' },
     { label: 'Confirmação', icon: 'check_circle' }
   ];
   

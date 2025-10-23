@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/transaction-history")
+@RequestMapping("/api/transaction-history")
 @Tag(name = "Transaction History", description = "APIs para gerenciamento de histórico de transações")
 public class TransactionHistoryController {
 

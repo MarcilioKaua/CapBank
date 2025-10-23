@@ -4,7 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
-import { MenuItem } from '../../shared/models/transaction.model';
+import { MenuItem } from '../../shared/models/sidebar.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -26,6 +26,7 @@ export class Sidebar {
 
   menuItems: MenuItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
+
     { id: 'transfers', label: 'Transferências', icon: 'swap_horiz', route: '/transfers' },
     { id: 'extract', label: 'Extrato', icon: 'receipt_long', route: '/extract' },
     { id: 'profile', label: 'Meu Perfil', icon: 'person', route: '/profile' },

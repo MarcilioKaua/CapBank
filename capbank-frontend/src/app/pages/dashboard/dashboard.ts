@@ -5,7 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-import { Transaction, QuickAction } from '../../shared/models/transaction.model';
+import { Transaction } from '../../shared/models/transaction.model';
+import { QuickAction } from '../../shared/models/sidebar.model';
 
 @Component({
   selector: 'app-dashboard',

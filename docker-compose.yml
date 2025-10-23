@@ -86,33 +86,25 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # Transaction History Microservice
-  transaction-service:
+  auth-service:
     build:
-      context: ./transaction-service
+      context: ./auth-service
       dockerfile: Dockerfile
-    container_name: capbank-transaction-service
+    container_name: capbank-auth-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-transactions:5432/db_transactions
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8083
       LOGGING_LEVEL_COM_CAPBANK: INFO
+      JWT_SECRET: dKLyb0ao3/f8ZlQ2CVJc9Auhz3VdaBo8NSnOxbA/8Kc=
+      JWT_EXPIRATION: 3600000
+      JWT_ISSUER: capbank-gateway
+      USER_SERVICE_URL: http://user-service:8082
     ports:
       - "8083:8083"
     networks:
       - capbank-network
     depends_on:
-      postgres-transactions:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+      - user-service
     restart: unless-stopped
 
   # Bank Account Microservice
@@ -137,6 +129,35 @@ services:
     depends_on:
       postgres-accounts:
         condition: service_healthy
+    restart: unless-stopped
+
+    # Transaction History Microservice
+  transaction-service:
+    build:
+      context: ./transaction-service
+      dockerfile: Dockerfile
+    container_name: capbank-transaction-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-transactions:5432/db_transactions
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8085
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+    ports:
+      - "8085:8085"
+    networks:
+      - capbank-network
+    depends_on:
+      postgres-transactions:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     restart: unless-stopped
 
   # pgAdmin (opcional - para administração do banco)

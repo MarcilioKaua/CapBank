@@ -63,6 +63,18 @@ services:
       timeout: 5s
       retries: 5
 
+  frontend-service:
+    build:
+      context: ./capbank-frontend
+      dockerfile: Dockerfile
+    container_name: capbank-frontend
+    ports:
+      - "8080:8080"
+    networks:
+      - capbank-network
+    depends_on:
+      - gateway-service
+
   gateway-service:
     build:
       context: ./gateway-service
@@ -194,7 +206,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin123
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
-      - "8080:80"
+      - "8090:80"
     networks:
       - capbank-network
     depends_on:

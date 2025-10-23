@@ -5,35 +5,19 @@ spring:
   application:
     name: user-service
 
-#   --- PostgreSQL (commented out for H2 testing) ---
   datasource:
-     url: jdbc:postgresql://localhost:5432/db_user
-     username: postgres
-     password: postgres
-     driver-class-name: org.postgresql.Driver
-
-#  # --- H2 in-memory database for local testing ---
-#  datasource:
-#    url: jdbc:h2:mem:userdb;MODE=PostgreSQL;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-
-  sql:
-    init:
-      mode: always
-      continue-on-error: true
-      platform: h2
-      # schema-locations and data-locations default to classpath:schema.sql and classpath:data.sql
+    url: jdbc:postgresql://localhost:5432/db_user
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
-    defer-datasource-initialization: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
 app:

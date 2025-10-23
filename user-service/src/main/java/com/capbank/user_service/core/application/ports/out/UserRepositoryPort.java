@@ -11,4 +11,5 @@ public interface UserRepositoryPort {
     Optional<UserEntity> findByCpf(String cpf);
     boolean existsByEmail(String email);
     boolean existsByCpf(String cpf);
+    void deleteByCpf(String cpf);
 }

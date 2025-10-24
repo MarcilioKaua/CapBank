@@ -49,8 +49,7 @@ export class CreateAccount implements OnInit {
 
   steps = [
     { label: 'Dados Pessoais', icon: 'person' },
-    { label: 'Acesso', icon: 'lock' },
-    { label: 'Confirmação', icon: 'check_circle' }
+    { label: 'Acesso', icon: 'lock' }
   ];
   
   currentStepTitle = computed(() => this.steps[this.currentStep()].label);
@@ -136,16 +135,6 @@ export class CreateAccount implements OnInit {
     return (value || '').toString().replace(/\D/g, '');
   }
   
-/*
-  onSubmitAccess(): void {
-    if (this.accessForm.valid) {
-      console.log('Access data:', this.accessForm.value);
-      this.nextStep();
-    } else {
-      this.accessForm.markAllAsTouched();
-    }
-  }*/
-
   onSubmitAccess() {
     if (this.accessForm.valid) {
       const personal = this.personalDataForm.value;
@@ -162,10 +151,7 @@ export class CreateAccount implements OnInit {
 
       this.createAccountService.createAccount(payload).subscribe({
         next: res => {
-          // caso backend retorne userId, ele já foi salvo no serviço
-          this.nextStep();
-          // opcional: chamar sendVerificationCode
-          //this.createAccountService.sendVerificationCode(access.email).subscribe();
+          console.log('Account created successfully!', res);
         },
         error: err => {
           // erro já definido em lastError signal; aqui podemos mostrar snackbar ou similar
@@ -174,15 +160,6 @@ export class CreateAccount implements OnInit {
       });
     } else {
       this.accessForm.markAllAsTouched();
-    }
-  }
-
-  onSubmitConfirmation(): void {
-    if (this.confirmationForm.valid) {
-      console.log('Confirmation:', this.confirmationForm.value);
-      console.log('Account created successfully!');
-    } else {
-      this.confirmationForm.markAllAsTouched();
     }
   }
 

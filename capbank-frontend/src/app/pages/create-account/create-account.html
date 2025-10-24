@@ -163,49 +163,6 @@
                 Voltar
               </button>
               <button mat-raised-button color="primary" type="submit" class="step-button">
-                {{ isMobile() ? 'Continuar' : 'Próximo' }}
-                <mat-icon>arrow_forward</mat-icon>
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Step 3: Confirmation -->
-        <div *ngIf="currentStep() === 2" class="step-content">
-          <div class="confirmation-header">
-            <mat-icon class="confirmation-icon">mark_email_read</mat-icon>
-            <h3 class="confirmation-title">Verifique seu email</h3>
-            <p class="confirmation-text">
-              Enviamos um código de verificação para o seu email.
-              Digite o código abaixo para confirmar sua conta.
-            </p>
-          </div>
-
-          <form [formGroup]="confirmationForm" (ngSubmit)="onSubmitConfirmation()">
-            <mat-form-field appearance="outline" class="form-field verification-field">
-              <mat-label>Código de verificação</mat-label>
-              <input matInput formControlName="verificationCode" placeholder="000000" maxlength="6">
-              <mat-error *ngIf="confirmationForm.get('verificationCode')?.errors?.['required']">
-                Código de verificação é obrigatório
-              </mat-error>
-              <mat-error *ngIf="confirmationForm.get('verificationCode')?.errors?.['pattern']">
-                Código deve ter 6 dígitos
-              </mat-error>
-            </mat-form-field>
-
-            <div class="resend-section">
-              <p class="resend-text">Não recebeu o código?</p>
-              <button type="button" mat-button color="primary" (click)="resendCode()">
-                Reenviar código
-              </button>
-            </div>
-
-            <div class="step-buttons">
-              <button mat-stroked-button type="button" (click)="previousStep()" class="back-button">
-                <mat-icon>arrow_back</mat-icon>
-                Voltar
-              </button>
-              <button mat-raised-button color="primary" type="submit" class="step-button">
                 Criar conta
                 <mat-icon>check_circle</mat-icon>
               </button>

@@ -5,31 +5,6 @@
 O **Banco Digital Simplificado** é um sistema desenvolvido com foco em **operações bancárias internas**, como criação de contas, transferências, consulta de extratos e histórico de transações.  
 O sistema inclui um **mecanismo de autenticação robusto** e integração com **mensageria** para envio de notificações (transações, alertas e segurança).
 
-
-## Figma: 
-
-https://www.figma.com/design/Q1biPUzijosAzFwfc4dkOE/Projeto-Final--Grupo-01----BANCO-DIGITAL?node-id=1-2&t=wptjOJs6ey3P1QJ9-0
-
-## Front:
- - Alison (Figma)
- - Juliana (Figma)
- - Carla (Figma)
-
-## Backend: 
- - Gustavo (MS Usuario Autenticação) 
- - Marcilio (MS Conta de Usuario, MS Transferencia, Docker)
- - Juliana (Autenticação, Gateway)
- - Carla (Extrato)
- - Alison (Notificação)
-
- ### Mensageria (Envio dos emails)
- RabbitMQ - 
-
-## Nomeclarutas
-
-
----
-
 ## 🚀 Funcionalidades Principais
 
 - 👤 **Cadastro e autenticação de usuários**
@@ -38,10 +13,64 @@ https://www.figma.com/design/Q1biPUzijosAzFwfc4dkOE/Projeto-Final--Grupo-01----B
 - 📄 **Extratos e histórico de transações**
 - 🔔 **Notificações automáticas via mensageria**
 
----
+
+##  📂 Visão Geral e Arquitetura
+
+### ✅ Executando o Projeto (exemplo)
+
+```bash
+# Clonar o repositório
+git clone https://github.com/MarcilioKaua/CapBank.git
+
+# Entrar no diretório
+cd banco-digital-simplificado
+
+# Rodar com Docker Compose (exemplo)
+docker-compose up --build
+```
+
+### ⚙️ Tecnologias Recomendadas
+
+| Camada | Sugestão                |
+|--------|-------------------------|
+| Backend | Java 17 (Spring Boot)   |
+| Banco de Dados | PostgreSQL 15           |
+| Autenticação | JWT + Refresh Token     |
+| Mensageria | RabbitMQ                |
+| Frontend | Angular 20              | 
+| Infraestrutura | Docker + Docker Compose |
+
+### 📚  Arquitetura Adotada por Microsserviço
+O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Segurança Centralizada (JWT) e Resiliência (Circuit Breaker).
+
+| Serviço              | Domínio / Responsabilidade                                | Padrão Arquitetural | Justificativa                                                                |
+|:---------------------|:----------------------------------------------------------| :--- |:-----------------------------------------------------------------------------|
+| **API Gateway**      | Roteamento, Validação JWT, Autorização Grossa.            | Spring Cloud Gateway (WebFlux) | Ponto de entrada e motor de segurança reativo.                               |
+| **Auth MS**          | Identidade, Login                                         | **Hexagonal (Ports & Adapters)** | Dominio de autenticação dos usuários                                         |
+| **User MS**          | Identidade, Cadastro de usuários                          | **Hexagonal (Ports & Adapters)** | Domínio de dados simples (CRUD).                                             |
+| **Banck-account MS** | CRUD de Conta Bancaria                                    | **Hexagonal (Ports & Adapters)** | Domínio de dados simples (CRUD).                                             |
+| **Transaction MS**   | Transações bancárias, Extrato e Histórico                 | **Hexagonal (Ports & Adapters)** | Domínio de dados de todo controle de transação bancária, extrato e histórico |
+| **Notificacao MS**   | Consumo de Eventos, Envio de E-mail, Log de Persistência. | **Hexagonal (Ports & Adapters)** | Isolamento de infraestrutura de mensageria (RabbitMQ).                       |
+
+
+## 🔍 Detalhamento dos Microsserviços e Rotas Chave
+
+| Serviço             | Rotas Chave (Externa)                          | Regra de Autorização Grossa (Gateway) |
+|:--------------------|:-----------------------------------------------|:--------------------------------------|
+| **Auth MS**         | `api/auth/login`                               | **PÚBLICO**                           |
+| **User MS**         | `POST api/user/register/`                      | **PÚBLICO**                           |
+| **Bank-Account MS** | `POST api/bankaccount/{accountNumber}/balance` | **USER**                              |
+| **Transaction MS**  | `GET api/transactions`                         | **USER**                              |
+
+## 🧑‍💻 Infraestrutura e DevOps
+
+### Docker Compose e Isolamento
+
+* **Rede:** Todos os MS, o RabbitMQ e o Postgres residem na rede privada (`capbank-network`). A comunicação é feita via **nome do serviço** (`http://auth-service:8081`).
+* **Exposição:** Apenas o **API Gateway** expõe a porta `8081`.
+* **DB Isolados:** Utilizamos um container **Postgres** para cada MS, com três bases de dados lógicas e isoladas (`user_db`, `db_transactions`, `db_bankaccount`) — o padrão *Database per Service*.
 
 ## 🧩 Arquitetura de Entidades
-
 ### 1. 🧍 Usuário (`User`)
 Representa a pessoa que utiliza o sistema.
 
@@ -52,14 +81,9 @@ Representa a pessoa que utiliza o sistema.
 | cpf | String | Documento único |
 | email | String | Login do usuário |
 | senha_hash | String | Senha criptografada |
-| telefone | String | Contato do usuário |
+| phone | String | Contato do usuário |
 | status | Enum | ativo, bloqueado |
 | data_criacao | DateTime | Data de cadastro |
-
-**Relacionamentos:**
-- 1 Usuário → N Contas
-- 1 Usuário → N Notificações
-- 1 Usuário → N Sessões de login
 
 ---
 
@@ -77,10 +101,6 @@ Armazena informações da conta bancária do usuário.
 | status | Enum | ativa, bloqueada, encerrada |
 | data_abertura | DateTime | Data de criação |
 
-**Relacionamentos:**
-- 1 Conta → N Transações
-- 1 Conta → N Registros de Histórico
-
 ---
 
 ### 3. 💰 Transação (`Transaction`)
@@ -97,9 +117,6 @@ Registra movimentações financeiras entre contas.
 | status | Enum | sucesso, pendente, falha |
 | descricao | String | Observação opcional |
 
-**Relacionamentos:**
-- 1 Transação → gera 1 ou mais notificações
-
 ---
 
 ### 4. 📜 Histórico / Extrato (`TransactionHistory`)
@@ -115,7 +132,7 @@ Mantém registro imutável de movimentações e saldos.
 | descricao | String | Detalhe da operação |
 | data_registro | DateTime | Data da atualização |
 
-
+---
 ### 5. 💬 Notificação (`Notification`)
 Gerencia mensagens automáticas enviadas ao usuário.
 
@@ -131,8 +148,7 @@ Gerencia mensagens automáticas enviadas ao usuário.
 | data_criacao | DateTime | Geração |
 | data_envio | DateTime | Envio efetivo |
 
-
-## 🔗 Relacionamentos (Resumo)
+### 🔗 Relacionamentos (Resumo)
 
 | Entidade | Relacionamento | Com |
 |-----------|----------------|-----|
@@ -141,9 +157,8 @@ Gerencia mensagens automáticas enviadas ao usuário.
 | Conta | 1:N | Histórico |
 | Usuário | 1:N | Notificação |
 | Transação | 1:N | Notificação (via evento) |
----
 
-# Mensageria
+## Mensageria
 
 ### 📩 Fila de Mensagens (`MessageQueue`) -- Não persiste no banco
 Simula ou integra com um sistema de mensageria (RabbitMQ, Kafka, etc.).
@@ -158,49 +173,30 @@ Simula ou integra com um sistema de mensageria (RabbitMQ, Kafka, etc.).
 | data_processamento | DateTime | Processamento |
 
 ---
+## Principais Telas do sistema
+### Login
+<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/82e32a34-bc79-4b57-ad08-226efe898aa8" />
+
+### Cadastrar usuário
+<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/11457c99-9159-456a-9339-a184090957b8" />
+
+### Extrato
+<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/c946185f-b90d-4d09-a0bd-2a0063dc051b" />
+
+### Transferência
+<img width="3726" height="2880" alt="image" src="https://github.com/user-attachments/assets/add2577b-2a4a-4234-b7fc-1d72a9a7d372" />
 
 
 ---
-
 ## 🧠 Extensões Futuras
 
-- 💳 Módulo de Cartões (crédito/débito virtuais)  
-- 💡 Chaves PIX e QR Code dinâmico  
-- 📈 Relatórios e dashboards de movimentação  
-- 🕵️ Logs de auditoria detalhados  
+### Funcionalidades
+- 💳 Módulo de Cartões (crédito/débito virtuais)
+- 💡 Chaves PIX e QR Code dinâmico
+- 📈 Relatórios e dashboards de movimentação
+- 🕵️ Logs de auditoria detalhados
 
----
-
-## ⚙️ Tecnologias Recomendadas
-
-| Camada | Sugestão |
-|--------|-----------|
-| Backend | Java 17 (Spring Boot) |
-| Banco de Dados | PostgreSQL |
-| Autenticação | JWT + Refresh Token |
-| Mensageria | RabbitMQ |
-| Frontend | Angular 20|
-| Infraestrutura | Docker + Docker Compose |
-
----
-
-## 🧪 Executando o Projeto (exemplo)
-
-```bash
-# Clonar o repositório
-git clone https://github.com/seuusuario/banco-digital-simplificado.git
-
-# Entrar no diretório
-cd banco-digital-simplificado
-
-# Rodar com Docker Compose (exemplo)
-docker-compose up --build
-
-```
-
-
-# Backlog
-### 5. 🔐 Sessão / Token (`AuthSession`)
+### 🔐 Sessão / Token (`AuthSession`)
 Controla sessões de autenticação e tokens JWT/refresh.
 
 | Campo | Tipo | Descrição |
@@ -215,7 +211,7 @@ Controla sessões de autenticação e tokens JWT/refresh.
 
 ---
 
-### 6. 🧾 Log de Acesso (`AccessLog`)
+### 🧾 Log de Acesso (`AccessLog`)
 Rastreia tentativas de login e acessos para auditoria.
 
 | Campo | Tipo | Descrição |

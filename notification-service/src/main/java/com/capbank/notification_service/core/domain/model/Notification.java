@@ -10,6 +10,7 @@ import java.util.UUID;
 public class Notification {
     private UUID id;
     private UUID userId;
+    private String recipientEmail;
     private NotificationType type;
     private String title;
     private String message;
@@ -47,6 +48,14 @@ public class Notification {
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public String getRecipientEmail() {
+        return recipientEmail;
+    }
+
+    public void setRecipientEmail(String recipientEmail) {
+        this.recipientEmail = recipientEmail;
     }
 
     public NotificationType getType() {

@@ -1,5 +1,8 @@
 package com.capbank.notification_service.infra.entity;
 
+import com.capbank.notification_service.core.domain.enums.NotificationChannel;
+import com.capbank.notification_service.core.domain.enums.NotificationStatus;
+import com.capbank.notification_service.core.domain.enums.NotificationType;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -11,20 +14,53 @@ public class NotificationEntity {
 
     @Id
     private UUID id;
-    private String accountNumber;
+
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
+
+    @Column(name = "recipient_email")
+    private String recipientEmail;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private NotificationType type;
+
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "message", nullable = false, columnDefinition = "TEXT")
     private String message;
-    private boolean readStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "channel", nullable = false)
+    private NotificationChannel channel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_status", nullable = false)
+    private NotificationStatus deliveryStatus;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "sent_at")
+    private LocalDateTime sentAt;
 
     public NotificationEntity() {
     }
 
-    public NotificationEntity(UUID id, String accountNumber, String message, boolean readStatus, LocalDateTime createdAt) {
+    public NotificationEntity(UUID id, UUID userId, String recipientEmail, NotificationType type, String title,
+                            String message, NotificationChannel channel, NotificationStatus deliveryStatus,
+                            LocalDateTime createdAt, LocalDateTime sentAt) {
         this.id = id;
-        this.accountNumber = accountNumber;
+        this.userId = userId;
+        this.recipientEmail = recipientEmail;
+        this.type = type;
+        this.title = title;
         this.message = message;
-        this.readStatus = readStatus;
+        this.channel = channel;
+        this.deliveryStatus = deliveryStatus;
         this.createdAt = createdAt;
+        this.sentAt = sentAt;
     }
 
     public UUID getId() {
@@ -35,12 +71,36 @@ public class NotificationEntity {
         this.id = id;
     }
 
-    public String getAccountNumber() {
-        return accountNumber;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public String getRecipientEmail() {
+        return recipientEmail;
+    }
+
+    public void setRecipientEmail(String recipientEmail) {
+        this.recipientEmail = recipientEmail;
+    }
+
+    public NotificationType getType() {
+        return type;
+    }
+
+    public void setType(NotificationType type) {
+        this.type = type;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getMessage() {
@@ -51,12 +111,20 @@ public class NotificationEntity {
         this.message = message;
     }
 
-    public boolean isReadStatus() {
-        return readStatus;
+    public NotificationChannel getChannel() {
+        return channel;
     }
 
-    public void setReadStatus(boolean readStatus) {
-        this.readStatus = readStatus;
+    public void setChannel(NotificationChannel channel) {
+        this.channel = channel;
+    }
+
+    public NotificationStatus getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(NotificationStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -65,5 +133,13 @@ public class NotificationEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getSentAt() {
+        return sentAt;
+    }
+
+    public void setSentAt(LocalDateTime sentAt) {
+        this.sentAt = sentAt;
     }
 }

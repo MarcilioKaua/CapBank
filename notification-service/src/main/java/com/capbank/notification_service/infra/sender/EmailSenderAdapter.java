@@ -19,13 +19,17 @@ public class EmailSenderAdapter implements NotificationSenderPort {
     @Override
     public void send(Notification notification) {
         try {
+            if (notification.getRecipientEmail() == null || notification.getRecipientEmail().isEmpty()) {
+                throw new NotificationException("Recipient email is required for email notification");
+            }
+
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo();
+            message.setTo(notification.getRecipientEmail());
             message.setSubject(notification.getTitle());
             message.setText(notification.getMessage());
             mailSender.send(message);
         } catch (Exception e) {
-            throw new NotificationException("Erro ao enviar email");
+            throw new NotificationException("Erro ao enviar email: " + e.getMessage());
         }
     }
 }

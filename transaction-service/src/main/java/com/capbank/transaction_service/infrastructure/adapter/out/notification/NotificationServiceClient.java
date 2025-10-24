@@ -22,7 +22,7 @@ public class NotificationServiceClient implements NotificationServicePort {
 
     public NotificationServiceClient(
             RestTemplate restTemplate,
-            @Value("${services.notification.url:http://localhost:8084}") String notificationServiceUrl) {
+            @Value("${services.notification.url:http://localhost:8086}") String notificationServiceUrl) {
         this.restTemplate = restTemplate;
         this.notificationServiceUrl = notificationServiceUrl;
     }
@@ -65,6 +65,7 @@ public class NotificationServiceClient implements NotificationServicePort {
     private NotificationRequest mapToRequest(TransactionNotification notification) {
         return new NotificationRequest(
                 notification.userId(),
+                null, // TODO: Get user email from user-service
                 notification.accountId().toString(),
                 notification.type().name(),
                 notification.channel().name(),
@@ -98,6 +99,7 @@ public class NotificationServiceClient implements NotificationServicePort {
  
     public record NotificationRequest(
             String userId,
+            String recipientEmail,
             String accountId,
             String type,
             String channel,

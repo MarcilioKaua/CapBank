@@ -46,9 +46,9 @@ O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Segurança Cent
 | Serviço             | Rotas Chave (Externa)                          | Regra de Autorização Grossa (Gateway) |
 |:--------------------|:-----------------------------------------------|:--------------------------------------|
 | **Auth MS**         | `api/auth/login`                               | **PÚBLICO**                           |
-| **User MS**         | `POST api/user/register/`                      | **USER**                              |
+| **User MS**         | `POST api/user/register/`                      | **PÚBLICO**                           |
 | **Bank-Account MS** | `POST api/bankaccount/{accountNumber}/balance` | **USER**                              |
-| **Transaction MS**  | `GET api/transactions`                                     | **USER**                              |
+| **Transaction MS**  | `GET api/transactions`                         | **USER**                              |
 
 ## 🧑‍💻 Infraestrutura e DevOps
 
@@ -69,7 +69,7 @@ Representa a pessoa que utiliza o sistema.
 | cpf | String | Documento único |
 | email | String | Login do usuário |
 | senha_hash | String | Senha criptografada |
-| telefone | String | Contato do usuário |
+| phone | String | Contato do usuário |
 | status | Enum | ativo, bloqueado |
 | data_criacao | DateTime | Data de cadastro |
 

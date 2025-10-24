@@ -155,7 +155,7 @@ export class CreateAccount implements OnInit {
         fullName: personal.fullName,
         cpf: this.onlyDigits(personal.cpf),
         email: access.email,
-        accountType: "ZZZ",
+        accountType: "DIGITAL",
         password: access.password,
         confirmPassword: access.confirmPassword
       }

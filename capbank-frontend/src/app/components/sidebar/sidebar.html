@@ -1,0 +1,31 @@
+<aside class="sidebar" [class.sidebar--mobile]="isMobile" [class.sidebar--open]="isOpen">
+  <div class="sidebar__header">
+    <div class="sidebar__logo">
+      <mat-icon class="sidebar__logo-icon">account_balance</mat-icon>
+      <span class="sidebar__logo-text">CAP Bank</span>
+    </div>
+  </div>
+
+  <nav class="sidebar__nav">
+    <mat-list class="sidebar__menu">
+      @for (item of menuItems; track item.id) {
+      <mat-list-item
+        [routerLink]="item.route"
+        routerLinkActive="sidebar__item--active"
+        class="sidebar__item"
+        (click)="onMenuClick(item.id)"
+      >
+        <div class="flex flex-row items-center">
+          <mat-icon class="sidebar__item-icon">{{ item.icon }}</mat-icon>
+          <span class="sidebar__item-text">{{ item.label }}</span>
+        </div>
+      </mat-list-item>
+      }
+    </mat-list>
+  </nav>
+</aside>
+
+<!-- Mobile overlay -->
+@if (isMobile && isOpen) {
+<div class="sidebar__overlay" (click)="onClose()"></div>
+}

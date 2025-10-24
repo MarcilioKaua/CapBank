@@ -1,0 +1,82 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: transaction-service
+
+  datasource:
+    url: jdbc:postgresql://postgres-transactions:5432/db_transaction
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 900000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        show_sql: false
+        generate_statistics: false
+    open-in-view: false
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: NON_NULL
+    serialization:
+      write-dates-as-timestamps: false
+
+# Logging Configuration - otimizado para container
+logging:
+  level:
+    com.capbank.transaction_service: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+  info:
+    title: Transaction History Service API
+    description: API para gerenciamento de histórico de transações bancárias
+    version: 1.0.0
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+
+# Application Info
+info:
+  app:
+    name: Transaction History Service
+    description: Microservice for managing transaction history
+    version: 1.0.0

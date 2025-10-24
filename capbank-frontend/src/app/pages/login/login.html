@@ -1,0 +1,187 @@
+<div class="login-container">
+
+  <mat-toolbar *ngIf="!isMobile()" class="desktop-header">
+    <div class="header-brand">
+      <mat-icon class="brand-icon">account_balance</mat-icon>
+      <span class="brand-text">NewBank</span>
+    </div>
+
+    <div class="header-nav">
+      <button mat-button class="nav-item">Produtos</button>
+      <button mat-button class="nav-item">Cartões</button>
+      <button mat-button class="nav-item">Empréstimos</button>
+      <button mat-button class="nav-item">Ajuda</button>
+      <button mat-raised-button color="primary" class="access-button">
+        Acessar Conta
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <div class="login-content" [class.login-content--mobile]="isMobile()">
+
+    <div *ngIf="!isMobile()" class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Seu banco digital <br>
+          <span class="hero-highlight">sem complicação</span>
+        </h1>
+        <p class="hero-subtitle">
+          Conta digital gratuita, cartão sem anuidade e investimentos
+          que rendem mais que a poupança.
+        </p>
+        <div class="hero-actions">
+          <button mat-raised-button class="download-btn" (click)="downloadApp()">
+            <mat-icon>download</mat-icon>
+            Baixar App
+          </button>
+          <button mat-stroked-button class="learn-btn" (click)="learnMore()">
+            Saiba Mais
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-panel">
+      <div class="login-card-container">
+
+        <div *ngIf="isMobile()" class="mobile-brand">
+          <div class="mobile-brand__icon">
+            <mat-icon>account_balance</mat-icon>
+          </div>
+          <h1 class="mobile-brand__title">NewBank</h1>
+          <p class="mobile-brand__subtitle">Seu banco digital</p>
+        </div>
+
+        <mat-card class="login-card">
+          <div class="login-header">
+            <div class="login-icon">
+              <mat-icon>lock</mat-icon>
+            </div>
+            <h2 class="login-title">{{isMobile() ? 'Bem-vindo' : 'Acesse sua conta'}}</h2>
+            <p class="login-subtitle">
+              {{isMobile() ? 'Entre com seus dados para acessar' : 'Digite seus dados para continuar'}}
+            </p>
+          </div>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+  
+            <app-custom-input
+              label="CPF"
+              placeholder="000.000.000-00"
+              formControlName="cpf"
+              suffixIcon="person"
+              [required]="true"
+              [errorMessage]="getCpfError()">
+            </app-custom-input>
+
+            <app-custom-input
+              label="Senha"
+              type="password"
+              placeholder="Digite sua senha"
+              formControlName="password"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [errorMessage]="getPasswordError()">
+            </app-custom-input>
+
+            <button mat-raised-button color="primary" type="submit" class="login-button">
+              Entrar
+            </button>
+          </form>
+
+          <div class="login-links">
+            <button mat-button color="primary" (click)="forgotPassword()" class="forgot-link">
+              Esqueci minha senha
+            </button>
+          </div>
+
+          <div class="signup-section">
+            <p class="signup-text">{{isMobile() ? 'ou' : 'Ainda não tem conta?'}}</p>
+            <button mat-button color="primary" (click)="goToCreateAccount()" class="signup-link">
+              {{isMobile() ? 'Ainda não tem conta?' : 'Criar conta'}}
+            </button>
+            <button *ngIf="isMobile()" mat-stroked-button color="primary" (click)="goToCreateAccount()" class="create-account-btn">
+              Criar conta
+            </button>
+          </div>
+        </mat-card>
+
+        <div *ngIf="isMobile()" class="mobile-footer">
+          <p>© 2024 NewBank. Todos os direitos reservados.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isMobile()" class="cards-section">
+    <div class="cards-content">
+      <h2 class="cards-title">Cartões NewBank</h2>
+      <p class="cards-subtitle">Escolha o cartão ideal para o seu perfil</p>
+
+      <div class="cards-grid">
+        <mat-card *ngFor="let card of cardPlans" class="card-plan" [style.background-color]="card.color">
+          <div class="card-plan__header">
+            <div class="card-plan__title">{{card.name}}</div>
+            <div *ngIf="card.popular" class="card-plan__badge">Mais Popular</div>
+          </div>
+          <p class="card-plan__subtitle">{{card.subtitle}}</p>
+
+          <div class="card-plan__benefits">
+            <div *ngFor="let benefit of card.benefits" class="benefit-item">
+              <mat-icon class="benefit-check">check</mat-icon>
+              <span>{{benefit}}</span>
+            </div>
+          </div>
+
+          <button mat-raised-button class="card-plan__button" (click)="requestCard(card.name)">
+            Solicitar Agora
+          </button>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop Footer -->
+  <footer *ngIf="!isMobile()" class="desktop-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <mat-icon class="footer-brand__icon">account_balance</mat-icon>
+        <div class="footer-brand__text">
+          <span class="footer-brand__title">NewBank</span>
+          <p class="footer-brand__description">
+            O banco digital que simplifica sua vida financeira.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-column">
+          <h4>Produtos</h4>
+          <a href="#">Conta Digital</a>
+          <a href="#">Cartão de Crédito</a>
+          <a href="#">Investimentos</a>
+        </div>
+
+        <div class="footer-column">
+          <h4>Suporte</h4>
+          <a href="#">Central de Ajuda</a>
+          <a href="#">Fale Conosco</a>
+          <a href="#">Segurança</a>
+        </div>
+
+        <div class="footer-column">
+          <h4>Redes Sociais</h4>
+          <div class="social-links">
+            <mat-icon>facebook</mat-icon>
+            <mat-icon>instagram</mat-icon>
+            <mat-icon>twitter</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 NewBank. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+</div>

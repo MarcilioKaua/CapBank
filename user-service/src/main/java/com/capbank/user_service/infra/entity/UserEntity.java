@@ -1,12 +1,13 @@
-package com.capbank.user_service.core.domain.model;
+package com.capbank.user_service.infra.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -19,6 +20,7 @@ public class User {
 
     private String passwordHash;
     private String phone;
+    private LocalDate birthDate;
     private String accountType;
 
     @Enumerated(EnumType.STRING)
@@ -74,6 +76,14 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     public String getAccountType() {

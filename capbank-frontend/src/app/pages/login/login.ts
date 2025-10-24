@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
+import { CustomInputComponent } from '../../components/custom-input/custom-input';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,8 @@ import { MatMenuModule } from '@angular/material/menu';
     MatIconModule,
     MatCardModule,
     MatToolbarModule,
-    MatMenuModule
+    MatMenuModule,
+    CustomInputComponent
   ],
   templateUrl: './login.html',
   styleUrl: './login.css'
@@ -123,5 +125,20 @@ export class Login implements OnInit {
 
   requestCard(cardType: string): void {
     console.log('Request card:', cardType);
+  }
+
+  // Métodos para obter mensagens de erro
+  getCpfError(): string {
+    const control = this.loginForm.get('cpf');
+    if (control?.hasError('required')) return 'CPF é obrigatório';
+    if (control?.hasError('pattern')) return 'CPF deve ter o formato 000.000.000-00';
+    return '';
+  }
+
+  getPasswordError(): string {
+    const control = this.loginForm.get('password');
+    if (control?.hasError('required')) return 'Senha é obrigatória';
+    if (control?.hasError('minlength')) return 'Senha deve ter pelo menos 4 caracteres';
+    return '';
   }
 }

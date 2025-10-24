@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormField, MatFormFieldModule } from '@angular/material/form-field';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatChipsModule } from '@angular/material/chips';
@@ -29,7 +29,6 @@ interface TransactionGroup {
     ReactiveFormsModule,
     RouterModule,
     MatCardModule,
-    MatIconModule,
     MatButtonModule,
     MatSelectModule,
     MatInputModule,
@@ -250,6 +249,11 @@ export class Extract implements OnInit {
       default:
         return 'Outros';
     }
+  }
+
+  numberOfTransactions(group: TransactionGroup): string {
+    const count = group.transactions.length;
+    return `${count} ${count !== 1 ? 'transações' : 'transação'}`;
   }
 
   exportPDF(): void {

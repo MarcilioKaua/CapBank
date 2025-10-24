@@ -21,7 +21,7 @@ WORKDIR /app
 
 COPY --from=builder /app/target/*.jar /app/app.jar
 
-EXPOSE 8083
+EXPOSE 8085
 
 ENTRYPOINT ["sh","-c","exec java $JAVA_TOOL_OPTIONS -jar /app/app.jar"]
 

@@ -1,6 +1,6 @@
 package com.capbank.user_service.infra.mapper;
 
-import com.capbank.user_service.core.domain.model.User;
+import com.capbank.user_service.infra.entity.UserEntity;
 import com.capbank.user_service.infra.dto.RegisterUserRequest;
 import com.capbank.user_service.infra.dto.UserResponse;
 import org.mapstruct.Mapper;
@@ -13,7 +13,7 @@ public interface UserMapper {
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "id", ignore = true)
-    User toEntity(RegisterUserRequest request);
+    UserEntity toEntity(RegisterUserRequest request);
 
-    UserResponse toResponse(User user);
+    UserResponse toResponse(UserEntity userEntity);
 }

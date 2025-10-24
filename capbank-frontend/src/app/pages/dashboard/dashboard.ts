@@ -1,14 +1,13 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatChip, MatChipOption } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { Transaction } from '../../shared/models/transaction.model';
+import { RouterModule } from '@angular/router';
 import { QuickAction } from '../../shared/models/sidebar.model';
+import { Transaction } from '../../shared/models/transaction.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,12 +18,10 @@ import { QuickAction } from '../../shared/models/sidebar.model';
     MatButtonModule,
     MatCardModule,
     MatDividerModule,
-    MatChip,
     MatMenuModule,
-    MatChipOption,
   ],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
   balance = signal(12547.89);
@@ -33,7 +30,7 @@ export class Dashboard implements OnInit {
   formattedBalance = computed(() => {
     return this.balance().toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
   });
 
@@ -45,7 +42,7 @@ export class Dashboard implements OnInit {
       amount: 1250.0,
       date: 'Hoje, 14:30',
       icon: 'arrow_downward',
-      iconColor: '#4caf50'
+      iconColor: '#4caf50',
     },
     {
       id: '2',
@@ -54,7 +51,7 @@ export class Dashboard implements OnInit {
       amount: 89.5,
       date: 'Ontem, 18:45',
       icon: 'shopping_cart',
-      iconColor: '#f44336'
+      iconColor: '#f44336',
     },
     {
       id: '3',
@@ -63,7 +60,7 @@ export class Dashboard implements OnInit {
       amount: 300.0,
       date: 'Ontem, 16:20',
       icon: 'send',
-      iconColor: '#2196f3'
+      iconColor: '#2196f3',
     },
     {
       id: '4',
@@ -72,7 +69,7 @@ export class Dashboard implements OnInit {
       amount: 145.3,
       date: '22/10, 10:15',
       icon: 'flash_on',
-      iconColor: '#ff9800'
+      iconColor: '#ff9800',
     },
     {
       id: '5',

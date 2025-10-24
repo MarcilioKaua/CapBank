@@ -84,7 +84,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # RabbitMQ Message Broker
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     container_name: capbank-rabbitmq
@@ -92,8 +91,8 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     ports:
-      - "5672:5672"    # AMQP port
-      - "15672:15672"  # Management UI port
+      - "5672:5672"   
+      - "15672:15672"  
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
@@ -259,7 +258,6 @@ services:
       RABBITMQ_PASSWORD: guest
       SERVER_PORT: 8086
       LOGGING_LEVEL_COM_CAPBANK: INFO
-      # Email configuration - add your credentials
       MAIL_HOST: smtp.gmail.com
       MAIL_PORT: 587
       MAIL_USERNAME: ${MAIL_USERNAME:-}
@@ -274,7 +272,7 @@ services:
       rabbitmq:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8086/api/v1/notifications/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8086/api/notifications/health"]
       interval: 30s
       timeout: 10s
       retries: 5

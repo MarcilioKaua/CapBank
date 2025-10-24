@@ -39,7 +39,7 @@ public class NotificationServiceClient implements NotificationServicePort {
             NotificationRequest request = mapToRequest(notification);
             HttpEntity<NotificationRequest> httpEntity = new HttpEntity<>(request, headers);
 
-            String url = notificationServiceUrl + "/api/v1/notifications";
+            String url = notificationServiceUrl + "/api/notifications";
             ResponseEntity<NotificationResponse> response = restTemplate.postForEntity(
                     url, httpEntity, NotificationResponse.class);
 

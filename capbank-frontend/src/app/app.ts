@@ -20,6 +20,7 @@ export class App implements OnInit {
   isMobile = signal(false);
   sidebarOpen = signal(false);
   routeShowSidebar = signal(false);
+  activeUrl = signal('');
 
   constructor(private router: Router) {
     this.router.events
@@ -31,7 +32,12 @@ export class App implements OnInit {
 
   private updateSidebarVisibility(url: string): void {
     const hideSidebarRoutes = ['/login', '/create-account'];
+    this.activeUrl.set(url);
     this.routeShowSidebar.set(!hideSidebarRoutes.some((route) => url.startsWith(route)));
+  }
+
+  get isCreateAccountPage(): boolean {
+    return this.activeUrl() === '/create-account';
   }
 
   ngOnInit(): void {

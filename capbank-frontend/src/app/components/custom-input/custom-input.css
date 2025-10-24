@@ -1,4 +1,3 @@
-
 .custom-input-container {
   position: relative;
   width: 100%;
@@ -17,6 +16,7 @@
   pointer-events: none;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: white;
+  border-radius: 0.2rem;
   padding: 0 4px;
   z-index: 1;
 }
@@ -135,16 +135,15 @@
   color: #999;
 }
 
-.custom-input[type="number"]::-webkit-inner-spin-button,
-.custom-input[type="number"]::-webkit-outer-spin-button {
+.custom-input[type='number']::-webkit-inner-spin-button,
+.custom-input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.custom-input[type="number"] {
+.custom-input[type='number'] {
   -moz-appearance: textfield;
 }
-
 
 .suffix {
   display: flex;
@@ -165,7 +164,6 @@
 .custom-input-container.focused .suffix-icon {
   color: #1976d2;
 }
-
 
 .password-toggle-btn {
   background: none;
@@ -196,7 +194,6 @@
 .custom-input-container.focused .password-toggle-btn .suffix-icon {
   color: #1976d2;
 }
-
 
 .error-message {
   display: flex;
@@ -285,9 +282,54 @@
   border-color: #1976d2;
 }
 
-
 .custom-input,
 .prefix,
 .suffix {
   transition: color 0.2s ease-in-out;
+}
+
+/* ============================= */
+/* SELECT CUSTOMIZADO */
+/* ============================= */
+.custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: #333;
+  padding: 16px 40px 16px 12px; /* espaço pra o ícone da seta */
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+  cursor: pointer;
+}
+
+/* Adiciona ícone de seta ▼ */
+.custom-select::-ms-expand {
+  display: none;
+}
+
+.input-wrapper::after {
+  font-family: 'Material Icons';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #666;
+  pointer-events: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.custom-input-container.focused .input-wrapper::after {
+  color: #1976d2;
+}
+
+.custom-select:disabled {
+  color: #999;
+  background-color: transparent;
+  cursor: not-allowed;
 }

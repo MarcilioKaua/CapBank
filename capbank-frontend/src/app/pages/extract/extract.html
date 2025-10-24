@@ -38,33 +38,15 @@
     <form [formGroup]="filterForm" class="filters-form">
       @if (!isMobile()) {
       <div class="desktop-filters">
-        <mat-form-field class="filter-field">
-          <mat-label>Período</mat-label>
-          <mat-select formControlName="period">
-            @for (option of periodOptions; track option.value) {
-            <mat-option [value]="option.value">
-              {{ option.label }}
-            </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+        <app-custom-input label="Período" type="select" [options]="periodOptions" />
+        <app-custom-input label="Tipo" type="select" [options]="typeOptions" />
 
-        <mat-form-field class="filter-field">
-          <mat-label>Tipo</mat-label>
-          <mat-select formControlName="type">
-            @for (option of typeOptions; track option.value) {
-            <mat-option [value]="option.value">
-              {{ option.label }}
-            </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field class="filter-field search-field">
-          <mat-label>Buscar</mat-label>
-          <input matInput formControlName="search" placeholder="Buscar por descrição..." />
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+        <app-custom-input
+          type="text"
+          label="Buscar"
+          placeholder="Buscar por descrição..."
+          suffixIcon="search"
+        />
 
         <button mat-flat-button color="primary" class="export-btn" (click)="exportPDF()">
           <mat-icon>picture_as_pdf</mat-icon>

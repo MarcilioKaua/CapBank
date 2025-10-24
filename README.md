@@ -16,6 +16,19 @@ O sistema inclui um **mecanismo de autenticação robusto** e integração com *
 
 ##  📂 Visão Geral e Arquitetura
 
+### ✅ Executando o Projeto (exemplo)
+
+```bash
+# Clonar o repositório
+git clone https://github.com/MarcilioKaua/CapBank.git
+
+# Entrar no diretório
+cd banco-digital-simplificado
+
+# Rodar com Docker Compose (exemplo)
+docker-compose up --build
+```
+
 ### ⚙️ Tecnologias Recomendadas
 
 | Camada | Sugestão                |
@@ -173,19 +186,6 @@ Simula ou integra com um sistema de mensageria (RabbitMQ, Kafka, etc.).
 ### Transferência
 <img width="3726" height="2880" alt="image" src="https://github.com/user-attachments/assets/add2577b-2a4a-4234-b7fc-1d72a9a7d372" />
 
-
-## 🧪 Executando o Projeto (exemplo)
-
-```bash
-# Clonar o repositório
-git clone https://github.com/MarcilioKaua/CapBank.git
-
-# Entrar no diretório
-cd banco-digital-simplificado
-
-# Rodar com Docker Compose (exemplo)
-docker-compose up --build
-```
 
 ---
 ## 🧠 Extensões Futuras

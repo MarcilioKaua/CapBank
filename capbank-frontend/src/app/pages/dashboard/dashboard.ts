@@ -19,9 +19,7 @@ import { QuickAction } from '../../shared/models/sidebar.model';
     MatButtonModule,
     MatCardModule,
     MatDividerModule,
-    MatChip,
     MatMenuModule,
-    MatChipOption,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'

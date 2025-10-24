@@ -178,7 +178,7 @@ Simula ou integra com um sistema de mensageria (RabbitMQ, Kafka, etc.).
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/seuusuario/banco-digital-simplificado.git
+git clone https://github.com/MarcilioKaua/CapBank.git
 
 # Entrar no diretório
 cd banco-digital-simplificado

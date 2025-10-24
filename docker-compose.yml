@@ -113,6 +113,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SERVER_PORT: 8082
+      GATEWAY_BASE_URL: http://gateway-service:8081
       LOGGING_LEVEL_COM_CAPBANK: INFO
     ports:
       - "8082:8082"
@@ -158,6 +159,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SERVER_PORT: 8084
+      GATEWAY_BASE_URL: http://gateway-service:8081
       LOGGING_LEVEL_COM_CAPBANK: INFO
     ports:
       - "8084:8084"
@@ -189,12 +191,6 @@ services:
     depends_on:
       postgres-transactions:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
     restart: unless-stopped
 
   # pgAdmin (opcional - para administração do banco)

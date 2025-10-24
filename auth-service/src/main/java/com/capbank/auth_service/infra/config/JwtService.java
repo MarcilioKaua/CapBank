@@ -1,5 +1,6 @@
 package com.capbank.auth_service.infra.config;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -19,26 +20,62 @@ public class JwtService {
     private String base64Secret;
 
     @Value("${jwt.expiration}")
-    private long expirationMillis;
+    private long accessExpirationMillis;
+
+    @Value("${jwt.refreshExpiration:604800000}") // default 7 days
+    private long refreshExpirationMillis;
 
     @Value("${jwt.issuer:capbank-gateway}")
     private String issuer;
 
-    public String generateToken(String cpf) {
-        Instant now = Instant.now();
-        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Secret));
+    private SecretKey getKey() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Secret));
+    }
 
+    public String generateAccessToken(String cpf) {
+        return buildToken(cpf, accessExpirationMillis, "access");
+    }
+
+    public String generateRefreshToken(String cpf) {
+        return buildToken(cpf, refreshExpirationMillis, "refresh");
+    }
+
+    private String buildToken(String subject, long expirationMillis, String tokenType) {
+        Instant now = Instant.now();
+        SecretKey key = getKey();
         return Jwts.builder()
                 .setId(UUID.randomUUID().toString())
-                .setSubject(cpf)
+                .setSubject(subject)
                 .setIssuer(issuer)
+                .claim("tokenType", tokenType)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusMillis(expirationMillis)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public long getExpirationSeconds() {
-        return expirationMillis / 1000;
+    public Claims parse(String token) {
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public String validateAndGetSubject(String token, String expectedTokenType) {
+        Claims claims = parse(token);
+        Object type = claims.get("tokenType");
+        if (expectedTokenType != null && (type == null || !expectedTokenType.equals(type.toString()))) {
+            throw new IllegalArgumentException("Invalid token type");
+        }
+        return claims.getSubject();
+    }
+
+    public long getAccessExpirationSeconds() {
+        return accessExpirationMillis / 1000;
+    }
+
+    public long getRefreshExpirationSeconds() {
+        return refreshExpirationMillis / 1000;
     }
 }

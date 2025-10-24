@@ -30,12 +30,49 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Capture token from response { accessToken: '...' } or { token: '...' } or { access_token: '...' }",
                   "let json = {};",
                   "try { json = pm.response.json(); } catch(e) {}",
-                  "const token = json.accessToken || json.token || json.access_token || json.jwt || '';",
-                  "if (token) { pm.environment.set('token', token); }",
-                  "pm.test('Token received', function () { pm.expect(token).to.be.a('string').and.not.empty; });"
+                  "const access = json.accessToken || json.token || json.access_token || json.jwt || '';",
+                  "const refresh = json.refreshToken || '';",
+                  "if (access) { pm.environment.set('token', access); }",
+                  "if (refresh) { pm.environment.set('refreshToken', refresh); }",
+                  "pm.test('Access token received', function () { pm.expect(access).to.be.a('string').and.not.empty; });",
+                  "pm.test('Refresh token received', function () { pm.expect(refresh).to.be.a('string').and.not.empty; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh (public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","auth","refresh"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = {};",
+                  "try { json = pm.response.json(); } catch(e) {}",
+                  "const access = json.accessToken || '';",
+                  "const refresh = json.refreshToken || '';",
+                  "if (access) { pm.environment.set('token', access); }",
+                  "if (refresh) { pm.environment.set('refreshToken', refresh); }",
+                  "pm.test('Access token refreshed', function () { pm.expect(access).to.be.a('string').and.not.empty; });"
                 ],
                 "type": "text/javascript"
               }

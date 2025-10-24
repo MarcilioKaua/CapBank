@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-import { Transaction, QuickAction } from '../../shared/models/transaction.model';
 import { MatChip, MatChipOption } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { Transaction } from '../../shared/models/transaction.model';

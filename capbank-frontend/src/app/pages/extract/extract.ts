@@ -13,6 +13,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Transaction } from '../../shared/models/transaction.model';
+import { CustomInputComponent } from '../../components/custom-input/custom-input';
 
 interface TransactionGroup {
   date: string;
@@ -38,6 +39,7 @@ interface TransactionGroup {
     MatChipsModule,
     MatToolbarModule,
     MatIconModule,
+    CustomInputComponent,
   ],
   templateUrl: './extract.html',
   styleUrl: './extract.css',

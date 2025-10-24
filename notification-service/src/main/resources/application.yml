@@ -5,7 +5,6 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
 
-  # JPA & Hibernate
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,7 +14,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
-  # RabbitMQ Configuration
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
@@ -29,7 +27,6 @@ spring:
           initial-interval: 3000
           max-attempts: 3
 
-  # Email Configuration
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -44,13 +41,11 @@ spring:
           timeout: 5000
           connectiontimeout: 5000
 
-# Server Configuration
 server:
   port: ${SERVER_PORT:8086}
   error:
     include-message: always
 
-# Queue Configuration
 rabbitmq:
   queue:
     notification: notification.queue
@@ -59,7 +54,6 @@ rabbitmq:
   routing-key:
     notification: notification.routing.key
 
-# Logging
 logging:
   level:
     com.capbank.notification_service: INFO
@@ -67,7 +61,6 @@ logging:
     org.springframework.mail: DEBUG
 
 ---
-# Docker Profile
 spring:
   config:
     activate:
@@ -95,7 +88,6 @@ server:
   port: 8086
 
 ---
-# Local Profile
 spring:
   config:
     activate:

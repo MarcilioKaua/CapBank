@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase, GetUserUseCase, UpdateUserUseCase, DeleteUserUseCase {
 
@@ -59,10 +61,13 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
         userEntity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userEntity.setStatus(UserEntity.Status.ACTIVE);
 
+        var generatedId = UUID.randomUUID();
+        userEntity.setId(generatedId);
+
         try {
             gatewayClient.createForUser(userEntity.getId(), userEntity.getAccountType());
         } catch (RuntimeException ex) {
-            LOG.error("Failed to create bank account for userId={}, rolling back user creation. Reason: {}", userEntity.getId(), ex.getMessage());
+            LOG.error("Failed to create bank account for userId={}, aborting user creation before persistence. Reason: {}", userEntity.getId(), ex.getMessage());
             throw new IllegalStateException("Failed to create bank account. User registration aborted.", ex);
         }
 

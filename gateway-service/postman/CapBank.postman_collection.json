@@ -61,7 +61,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"cpf\": \"{{cpf}}\",\n  \"email\": \"{{email}}\",\n  \"accountType\": \"{{accountType}}\",\n  \"password\": \"{{password}}\",\n  \"confirmPassword\": \"{{password}}\"\n}"
+              "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"cpf\": \"{{cpf}}\",\n  \"email\": \"{{email}}\",\n  \"phone\": \"{{phone}}\",\n  \"birthDate\": \"{{birthDate}}\",\n  \"accountType\": \"{{accountType}}\",\n  \"password\": \"{{password}}\",\n  \"confirmPassword\": \"{{password}}\"\n}"
             }
           }
         },
@@ -147,7 +147,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"email\": \"{{email}}\",\n  \"phone\": \"{{phone}}\",\n  \"accountType\": \"{{accountType}}\"\n}"
+              "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"email\": \"{{email}}\",\n  \"phone\": \"{{phone}}\",\n  \"birthDate\": \"{{birthDate}}\",\n  \"accountType\": \"{{accountType}}\"\n}"
             }
           }
         },

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/api/gateway")
@@ -24,12 +25,15 @@ public class GatewayOrchestratorController {
 
     private final HttpClientBaseAdapter httpClient;
     private final String accountBaseUrl;
+    private final String defaultAgency;
 
     public GatewayOrchestratorController(
             HttpClientBaseAdapter httpClient,
-            @Value("${services.account.base-url:http://localhost:8084}") String accountBaseUrl) {
+            @Value("${services.account.base-url:http://localhost:8084}") String accountBaseUrl,
+            @Value("${bank.account.default-agency:0001}") String defaultAgency) {
         this.httpClient = httpClient;
         this.accountBaseUrl = accountBaseUrl;
+        this.defaultAgency = defaultAgency;
     }
 
     @PostMapping("/user-registered")
@@ -39,18 +43,27 @@ public class GatewayOrchestratorController {
         }
         LOG.info("Gateway received USER_REGISTERED for userId={}, accountType={}", event.getUserId(), event.getAccountType());
 
+        String generatedAccountNumber = generateAccountNumber();
+        String agencyToUse = defaultAgency;
+
         BankAccountCreateRequest request = new BankAccountCreateRequest();
         request.setUserId(event.getUserId());
         request.setAccountType(event.getAccountType());
         request.setBalance(BigDecimal.ZERO);
-        request.setAccountNumber(null);
-        request.setAgency(null);
+        request.setAccountNumber(generatedAccountNumber);
+        request.setAgency(agencyToUse);
 
         String url = accountBaseUrl + "/api/bankaccount";
         httpClient.post(url, request, Void.class);
 
-        LOG.info("Bank account created for userId={}", event.getUserId());
+        LOG.info("Bank account created for userId={} with agency={} and accountNumber=****{}",
+                event.getUserId(), agencyToUse, generatedAccountNumber.substring(Math.max(0, generatedAccountNumber.length() - 4)));
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    private String generateAccountNumber() {
+        int number = ThreadLocalRandom.current().nextInt(10_000_000, 100_000_000);
+        return String.valueOf(number);
     }
 
     @ExceptionHandler(Exception.class)

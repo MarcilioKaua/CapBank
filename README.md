@@ -39,7 +39,6 @@ O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Segurança Cent
 | **Transaction MS**   | Transações bancárias, Extrato e Histórico                 | **Hexagonal (Ports & Adapters)** | Domínio de dados de todo controle de transação bancária, extrato e histórico |
 | **Notificacao MS**   | Consumo de Eventos, Envio de E-mail, Log de Persistência. | **Hexagonal (Ports & Adapters)** | Isolamento de infraestrutura de mensageria (RabbitMQ).                       |
 
---------------
 
 ## 🔍 Detalhamento dos Microsserviços e Rotas Chave
 
@@ -120,7 +119,7 @@ Mantém registro imutável de movimentações e saldos.
 | descricao | String | Detalhe da operação |
 | data_registro | DateTime | Data da atualização |
 
-
+---
 ### 5. 💬 Notificação (`Notification`)
 Gerencia mensagens automáticas enviadas ao usuário.
 
@@ -161,6 +160,19 @@ Simula ou integra com um sistema de mensageria (RabbitMQ, Kafka, etc.).
 | data_processamento | DateTime | Processamento |
 
 ---
+## Principais Telas do sistema
+### Login
+<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/82e32a34-bc79-4b57-ad08-226efe898aa8" />
+
+### Cadastrar usuário
+<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/11457c99-9159-456a-9339-a184090957b8" />
+
+### Extrato
+<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/c946185f-b90d-4d09-a0bd-2a0063dc051b" />
+
+### Transferência
+<img width="3726" height="2880" alt="image" src="https://github.com/user-attachments/assets/add2577b-2a4a-4234-b7fc-1d72a9a7d372" />
+
 
 ## 🧪 Executando o Projeto (exemplo)
 

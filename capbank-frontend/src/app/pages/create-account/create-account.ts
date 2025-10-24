@@ -14,6 +14,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { CpfMaskDirective } from '../../shared/directives/cpf-mask.directive';
 import { PhoneMaskDirective } from '../../shared/directives/phone-mask.directive';
+import { CreateAccountService } from 'src/app/core/services/create-account.service';
 
 @Component({
   selector: 'app-create-account',
@@ -55,6 +56,9 @@ export class CreateAccount implements OnInit {
   currentStepTitle = computed(() => this.steps[this.currentStep()].label);
 
   private fb = inject(FormBuilder);
+  private createAccountService = inject(CreateAccountService);
+  isLoading = this.createAccountService.isLoading;
+  lastError = this.createAccountService.lastError;
 
   constructor() {
     this.createForms();
@@ -127,11 +131,47 @@ export class CreateAccount implements OnInit {
       this.personalDataForm.markAllAsTouched();
     }
   }
-
+  
+  private onlyDigits(value: string): string {
+    return (value || '').toString().replace(/\D/g, '');
+  }
+  
+/*
   onSubmitAccess(): void {
     if (this.accessForm.valid) {
       console.log('Access data:', this.accessForm.value);
       this.nextStep();
+    } else {
+      this.accessForm.markAllAsTouched();
+    }
+  }*/
+
+  onSubmitAccess() {
+    if (this.accessForm.valid) {
+      const personal = this.personalDataForm.value;
+      const access = this.accessForm.value;
+
+      const payload = {        
+        fullName: personal.fullName,
+        cpf: this.onlyDigits(personal.cpf),
+        email: access.email,
+        accountType: "ZZZ",
+        password: access.password,
+        confirmPassword: access.confirmPassword
+      }
+
+      this.createAccountService.createAccount(payload).subscribe({
+        next: res => {
+          // caso backend retorne userId, ele já foi salvo no serviço
+          this.nextStep();
+          // opcional: chamar sendVerificationCode
+          //this.createAccountService.sendVerificationCode(access.email).subscribe();
+        },
+        error: err => {
+          // erro já definido em lastError signal; aqui podemos mostrar snackbar ou similar
+          console.error(err);
+        }
+      });
     } else {
       this.accessForm.markAllAsTouched();
     }
@@ -141,7 +181,6 @@ export class CreateAccount implements OnInit {
     if (this.confirmationForm.valid) {
       console.log('Confirmation:', this.confirmationForm.value);
       console.log('Account created successfully!');
-      // Navigate to success page or dashboard
     } else {
       this.confirmationForm.markAllAsTouched();
     }

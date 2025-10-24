@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -12,6 +12,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { CpfMaskDirective } from '../../shared/directives/cpf-mask.directive';
+import { PhoneMaskDirective } from '../../shared/directives/phone-mask.directive';
+import { CreateAccountService } from 'src/app/core/services/create-account.service';
 
 @Component({
   selector: 'app-create-account',
@@ -29,14 +32,16 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatCardModule,
     MatSelectModule,
     MatCheckboxModule,
-    MatToolbarModule
+    MatToolbarModule,
+    CpfMaskDirective,
+    PhoneMaskDirective
   ],
   templateUrl: './create-account.html',
-  styleUrl: './create-account.css'
+  styleUrls: ['./create-account.css']
 })
 export class CreateAccount implements OnInit {
-  isMobile = signal(window.innerWidth < 768);
-  currentStep = signal(0);
+  isMobile: WritableSignal<boolean> = signal(window.innerWidth < 768);
+  currentStep: WritableSignal<number> = signal(0);
 
   personalDataForm!: FormGroup;
   accessForm!: FormGroup;
@@ -44,17 +49,27 @@ export class CreateAccount implements OnInit {
 
   steps = [
     { label: 'Dados Pessoais', icon: 'person' },
-    { label: 'Acesso', icon: 'lock' },
-    { label: 'Confirmação', icon: 'check_circle' }
+    { label: 'Acesso', icon: 'lock' }
   ];
+  
+  currentStepTitle = computed(() => this.steps[this.currentStep()].label);
 
-  constructor(private fb: FormBuilder) {
+  private fb = inject(FormBuilder);
+  private createAccountService = inject(CreateAccountService);
+  isLoading = this.createAccountService.isLoading;
+  lastError = this.createAccountService.lastError;
+
+  constructor() {
     this.createForms();
   }
 
   ngOnInit(): void {
     this.checkScreenSize();
-    window.addEventListener('resize', () => this.checkScreenSize());
+  }
+  
+  @HostListener('window:resize')
+  onResize(): void {
+    this.isMobile.set(window.innerWidth < 768);
   }
 
   private checkScreenSize(): void {
@@ -74,11 +89,17 @@ export class CreateAccount implements OnInit {
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
       acceptTerms: [false, Validators.requiredTrue]
-    });
+    }, { validators: this.passwordsMatchValidator });
 
     this.confirmationForm = this.fb.group({
       verificationCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
     });
+  }
+
+  private passwordsMatchValidator(group: FormGroup) {
+    const pw = group.get('password')?.value;
+    const cpw = group.get('confirmPassword')?.value;
+    return pw === cpw ? null : { passwordsMismatch: true };
   }
 
   nextStep(): void {
@@ -109,23 +130,36 @@ export class CreateAccount implements OnInit {
       this.personalDataForm.markAllAsTouched();
     }
   }
-
-  onSubmitAccess(): void {
+  
+  private onlyDigits(value: string): string {
+    return (value || '').toString().replace(/\D/g, '');
+  }
+  
+  onSubmitAccess() {
     if (this.accessForm.valid) {
-      console.log('Access data:', this.accessForm.value);
-      this.nextStep();
+      const personal = this.personalDataForm.value;
+      const access = this.accessForm.value;
+
+      const payload = {        
+        fullName: personal.fullName,
+        cpf: this.onlyDigits(personal.cpf),
+        email: access.email,
+        accountType: "DIGITAL",
+        password: access.password,
+        confirmPassword: access.confirmPassword
+      }
+
+      this.createAccountService.createAccount(payload).subscribe({
+        next: res => {
+          console.log('Account created successfully!', res);
+        },
+        error: err => {
+          // erro já definido em lastError signal; aqui podemos mostrar snackbar ou similar
+          console.error(err);
+        }
+      });
     } else {
       this.accessForm.markAllAsTouched();
-    }
-  }
-
-  onSubmitConfirmation(): void {
-    if (this.confirmationForm.valid) {
-      console.log('Confirmation:', this.confirmationForm.value);
-      console.log('Account created successfully!');
-      // Navigate to success page or dashboard
-    } else {
-      this.confirmationForm.markAllAsTouched();
     }
   }
 
@@ -134,7 +168,7 @@ export class CreateAccount implements OnInit {
   }
 
   getCurrentStepTitle(): string {
-    return this.steps[this.currentStep()].label;
+    return this.currentStepTitle();
   }
 
   isStepCompleted(stepIndex: number): boolean {

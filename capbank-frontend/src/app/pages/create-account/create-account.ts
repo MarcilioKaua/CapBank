@@ -1,6 +1,20 @@
-import { Component, computed, HostListener, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  computed,
+  HostListener,
+  inject,
+  OnInit,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormGroup,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
@@ -15,6 +29,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { CpfMaskDirective } from '../../shared/directives/cpf-mask.directive';
 import { PhoneMaskDirective } from '../../shared/directives/phone-mask.directive';
 import { CreateAccountService } from 'src/app/core/services/create-account.service';
+import { CustomInputComponent } from 'src/app/components/custom-input/custom-input';
 
 @Component({
   selector: 'app-create-account',
@@ -34,10 +49,11 @@ import { CreateAccountService } from 'src/app/core/services/create-account.servi
     MatCheckboxModule,
     MatToolbarModule,
     CpfMaskDirective,
-    PhoneMaskDirective
+    PhoneMaskDirective,
+    CustomInputComponent,
   ],
   templateUrl: './create-account.html',
-  styleUrls: ['./create-account.css']
+  styleUrls: ['./create-account.css'],
 })
 export class CreateAccount implements OnInit {
   isMobile: WritableSignal<boolean> = signal(window.innerWidth < 768);
@@ -49,9 +65,9 @@ export class CreateAccount implements OnInit {
 
   steps = [
     { label: 'Dados Pessoais', icon: 'person' },
-    { label: 'Acesso', icon: 'lock' }
+    { label: 'Acesso', icon: 'lock' },
   ];
-  
+
   currentStepTitle = computed(() => this.steps[this.currentStep()].label);
 
   private fb = inject(FormBuilder);
@@ -66,7 +82,7 @@ export class CreateAccount implements OnInit {
   ngOnInit(): void {
     this.checkScreenSize();
   }
-  
+
   @HostListener('window:resize')
   onResize(): void {
     this.isMobile.set(window.innerWidth < 768);
@@ -81,18 +97,21 @@ export class CreateAccount implements OnInit {
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
       birthDate: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern(/^\(\d{2}\) \d{4,5}-\d{4}$/)]]
+      phone: ['', [Validators.required, Validators.pattern(/^\(\d{2}\) \d{4,5}-\d{4}$/)]],
     });
 
-    this.accessForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required],
-      acceptTerms: [false, Validators.requiredTrue]
-    }, { validators: this.passwordsMatchValidator });
+    this.accessForm = this.fb.group(
+      {
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ['', Validators.required],
+        acceptTerms: [false, Validators.requiredTrue],
+      },
+      { validators: this.passwordsMatchValidator }
+    );
 
     this.confirmationForm = this.fb.group({
-      verificationCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
+      verificationCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
     });
   }
 
@@ -104,13 +123,13 @@ export class CreateAccount implements OnInit {
 
   nextStep(): void {
     if (this.currentStep() < this.steps.length - 1) {
-      this.currentStep.update(step => step + 1);
+      this.currentStep.update((step) => step + 1);
     }
   }
 
   previousStep(): void {
     if (this.currentStep() > 0) {
-      this.currentStep.update(step => step - 1);
+      this.currentStep.update((step) => step - 1);
     }
   }
 
@@ -130,33 +149,33 @@ export class CreateAccount implements OnInit {
       this.personalDataForm.markAllAsTouched();
     }
   }
-  
+
   private onlyDigits(value: string): string {
     return (value || '').toString().replace(/\D/g, '');
   }
-  
+
   onSubmitAccess() {
     if (this.accessForm.valid) {
       const personal = this.personalDataForm.value;
       const access = this.accessForm.value;
 
-      const payload = {        
+      const payload = {
         fullName: personal.fullName,
         cpf: this.onlyDigits(personal.cpf),
         email: access.email,
-        accountType: "DIGITAL",
+        accountType: 'DIGITAL',
         password: access.password,
-        confirmPassword: access.confirmPassword
-      }
+        confirmPassword: access.confirmPassword,
+      };
 
       this.createAccountService.createAccount(payload).subscribe({
-        next: res => {
+        next: (res) => {
           console.log('Account created successfully!', res);
         },
-        error: err => {
+        error: (err) => {
           // erro já definido em lastError signal; aqui podemos mostrar snackbar ou similar
           console.error(err);
-        }
+        },
       });
     } else {
       this.accessForm.markAllAsTouched();
@@ -173,5 +192,71 @@ export class CreateAccount implements OnInit {
 
   isStepCompleted(stepIndex: number): boolean {
     return stepIndex < this.currentStep();
+  }
+
+  getFullNameError(): string {
+    const control = this.personalDataForm.get('fullName');
+    if (control?.hasError('required')) return 'Nome completo é obrigatório';
+    if (control?.hasError('minlength')) return 'Nome deve ter pelo menos 3 caracteres';
+    return '';
+  }
+
+  getCpfError(): string {
+    const control = this.personalDataForm.get('cpf');
+    if (control?.hasError('required')) return 'CPF é obrigatório';
+    if (control?.hasError('pattern')) return 'CPF deve ter o formato 000.000.000-00';
+    return '';
+  }
+
+  getBirthDateError(): string {
+    const control = this.personalDataForm.get('birthDate');
+    if (control?.hasError('required')) {
+      return 'Data de nascimento é obrigatória';
+    }
+    return '';
+  }
+
+  getPhoneError(): string {
+    const control = this.personalDataForm.get('phone');
+    if (control?.hasError('required')) {
+      return 'Telefone é obrigatório';
+    }
+    if (control?.hasError('pattern')) {
+      return 'Telefone deve ter o formato (00) 00000-0000';
+    }
+    return '';
+  }
+
+  getEmailError(): string {
+    const control = this.accessForm.get('email');
+    if (control?.hasError('required')) {
+      return 'Email é obrigatório';
+    }
+    if (control?.hasError('email')) {
+      return 'Email deve ter um formato válido';
+    }
+    return '';
+  }
+
+  getPasswordError(): string {
+    const control = this.accessForm.get('password');
+    if (control?.hasError('required')) {
+      return 'Senha é obrigatória';
+    }
+    if (control?.hasError('minlength')) {
+      return 'Senha deve ter pelo menos 8 caracteres';
+    }
+    return '';
+  }
+
+  getConfirmPasswordError(): string {
+    const control = this.accessForm.get('confirmPassword');
+    if (control?.hasError('required')) {
+      return 'Confirmação de senha é obrigatória';
+    }
+    if (this.accessForm.hasError('passwordsMismatch') && control?.touched) {
+      return 'As senhas não conferem';
+    }
+    return '';
   }
 }

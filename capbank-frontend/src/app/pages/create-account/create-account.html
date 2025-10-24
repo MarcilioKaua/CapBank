@@ -17,7 +17,7 @@
         <div class="brand-logo">
           <mat-icon class="brand-logo__icon">account_balance</mat-icon>
         </div>
-        <h1 class="brand-title">BancoRed</h1>
+        <h1 class="brand-title">CAP Bank</h1>
         <p class="brand-subtitle">Seu banco digital de confiança</p>
 
         <div class="benefits">
@@ -78,50 +78,43 @@
         <!-- Step 1: Personal Data -->
         <div *ngIf="currentStep() === 0" class="step-content">
           <form [formGroup]="personalDataForm" (ngSubmit)="onSubmitPersonalData()">
+            <app-custom-input
+              label="Nome completo"
+              formControlName="fullName"
+              suffixIcon="person"
+              [required]="true"
+              [errorMessage]="getFullNameError()"
+            />
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Nome completo</mat-label>
-              <input matInput formControlName="fullName" placeholder="Digite seu nome completo" />
-              <mat-error *ngIf="personalDataForm.get('fullName')?.errors?.['required']">
-                Nome completo é obrigatório
-              </mat-error>
-              <mat-error *ngIf="personalDataForm.get('fullName')?.errors?.['minlength']">
-                Nome deve ter pelo menos 3 caracteres
-              </mat-error>
-            </mat-form-field>
+            <app-custom-input
+              label="CPF"
+              placeholder="000.000.000-00"
+              cpfMask="000.000.000-00"
+              formControlName="cpf"
+              [required]="true"
+              [errorMessage]="getCpfError()"
+              suffixIcon="badge"
+            />
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>CPF</mat-label>
-              <input matInput formControlName="cpf" placeholder="000.000.000-00" cpfMask />
-              <mat-hint>Apenas números</mat-hint>
-              <mat-error *ngIf="personalDataForm.get('cpf')?.errors?.['required']">
-                CPF é obrigatório
-              </mat-error>
-              <mat-error *ngIf="personalDataForm.get('cpf')?.errors?.['pattern']">
-                CPF deve ter o formato 000.000.000-00
-              </mat-error>
-            </mat-form-field>
+            <app-custom-input
+              label="Data de nascimento"
+              formControlName="birthDate"
+              type="date"
+              [required]="true"
+              [errorMessage]="getBirthDateError()"
+              suffixIcon="calendar_today"
+            />
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Data de nascimento</mat-label>
-              <input matInput formControlName="birthDate" type="date" />
-              <mat-error *ngIf="personalDataForm.get('birthDate')?.errors?.['required']">
-                Data de nascimento é obrigatória
-              </mat-error>
-            </mat-form-field>
+            <app-custom-input
+              label="Telefone"
+              formControlName="phone"
+              phoneMask
+              [required]="true"
+              [errorMessage]="getPhoneError()"
+              suffixIcon="phone"
+            />
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Telefone</mat-label>
-              <input matInput formControlName="phone" placeholder="(00) 00000-0000" phoneMask />
-              <mat-error *ngIf="personalDataForm.get('phone')?.errors?.['required']">
-                Telefone é obrigatório
-              </mat-error>
-              <mat-error *ngIf="personalDataForm.get('phone')?.errors?.['pattern']">
-                Telefone deve ter o formato (00) 00000-0000
-              </mat-error>
-            </mat-form-field>
-
-            <button mat-raised-button color="primary" type="submit" class="step-button">
+            <button mat-flat-button color="primary" type="submit" class="step-button">
               {{ isMobile() ? 'Continuar' : 'Próximo' }}
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -131,48 +124,35 @@
         <!-- Step 2: Access Data -->
         <div *ngIf="currentStep() === 1" class="step-content">
           <form [formGroup]="accessForm" (ngSubmit)="onSubmitAccess()">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="email" type="email" placeholder="seu@email.com" />
-              <mat-error *ngIf="accessForm.get('email')?.errors?.['required']">
-                Email é obrigatório
-              </mat-error>
-              <mat-error *ngIf="accessForm.get('email')?.errors?.['email']">
-                Email deve ter um formato válido
-              </mat-error>
-            </mat-form-field>
+            <app-custom-input
+              label="Email"
+              formControlName="email"
+              [required]="true"
+              placeholder="seu@email.com"
+              type="email"
+              [errorMessage]="getEmailError()"
+              suffixIcon="email"
+            />
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Senha</mat-label>
-              <input
-                matInput
-                formControlName="password"
-                type="password"
-                placeholder="Mínimo 8 caracteres"
-              />
-              <mat-error *ngIf="accessForm.get('password')?.errors?.['required']">
-                Senha é obrigatória
-              </mat-error>
-              <mat-error *ngIf="accessForm.get('password')?.errors?.['minlength']">
-                Senha deve ter pelo menos 8 caracteres
-              </mat-error>
-            </mat-form-field>
+            <app-custom-input
+              label="Senha"
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              formControlName="password"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [errorMessage]="getPasswordError()"
+            />
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Confirmar senha</mat-label>
-              <input
-                matInput
-                formControlName="confirmPassword"
-                type="password"
-                placeholder="Repita sua senha"
-              />
-              <mat-error *ngIf="accessForm.get('confirmPassword')?.errors?.['required']">
-                Confirmação de senha é obrigatória
-              </mat-error>
-              <mat-error *ngIf="accessForm.errors?.['passwordsMismatch'] && accessForm.get('confirmPassword')?.touched">
-                As senhas não conferem
-              </mat-error>
-            </mat-form-field>
+            <app-custom-input
+              label="Confirmar senha"
+              type="password"
+              placeholder="Repita sua senha"
+              formControlName="confirmPassword"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [errorMessage]="getConfirmPasswordError()"
+            />
 
             <mat-checkbox formControlName="acceptTerms" class="terms-checkbox">
               Aceito os <a href="#" class="terms-link">termos de uso</a> e
@@ -180,11 +160,11 @@
             </mat-checkbox>
 
             <div class="step-buttons">
-              <button mat-stroked-button type="button" (click)="previousStep()" class="back-button">
+              <button mat-raised-button type="button" (click)="previousStep()" class="back-button">
                 <mat-icon>arrow_back</mat-icon>
                 Voltar
               </button>
-              <button mat-raised-button color="primary" type="submit" class="step-button">
+              <button mat-flat-button color="primary" type="submit" class="step-button">
                 Criar conta
                 <mat-icon>check_circle</mat-icon>
               </button>

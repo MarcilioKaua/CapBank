@@ -1,21 +1,7 @@
-import {
-  Component,
-  computed,
-  HostListener,
-  inject,
-  OnInit,
-  signal,
-  WritableSignal,
-} from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal, WritableSignal} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormGroup,
-  FormBuilder,
-  Validators,
-} from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router,RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,16 +14,17 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { CpfMaskDirective } from '../../shared/directives/cpf-mask.directive';
 import { PhoneMaskDirective } from '../../shared/directives/phone-mask.directive';
-import { CreateAccountService } from 'src/app/core/services/create-account.service';
+import { CreateAccountService } from 'src/app/shared/services/create-account.service';
 import { CustomInputComponent } from 'src/app/components/custom-input/custom-input';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-create-account',
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
     RouterModule,
+    ReactiveFormsModule,
     MatTabsModule,
     MatStepperModule,
     MatFormFieldModule,
@@ -61,7 +48,6 @@ export class CreateAccount implements OnInit {
 
   personalDataForm!: FormGroup;
   accessForm!: FormGroup;
-  confirmationForm!: FormGroup;
 
   steps = [
     { label: 'Dados Pessoais', icon: 'person' },
@@ -71,6 +57,9 @@ export class CreateAccount implements OnInit {
   currentStepTitle = computed(() => this.steps[this.currentStep()].label);
 
   private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private toast = inject(ToastService);
+  
   private createAccountService = inject(CreateAccountService);
   isLoading = this.createAccountService.isLoading;
   lastError = this.createAccountService.lastError;
@@ -103,16 +92,13 @@ export class CreateAccount implements OnInit {
     this.accessForm = this.fb.group(
       {
         email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(8)]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', Validators.required],
         acceptTerms: [false, Validators.requiredTrue],
       },
       { validators: this.passwordsMatchValidator }
     );
 
-    this.confirmationForm = this.fb.group({
-      verificationCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-    });
   }
 
   private passwordsMatchValidator(group: FormGroup) {
@@ -143,7 +129,6 @@ export class CreateAccount implements OnInit {
 
   onSubmitPersonalData(): void {
     if (this.personalDataForm.valid) {
-      console.log('Personal data:', this.personalDataForm.value);
       this.nextStep();
     } else {
       this.personalDataForm.markAllAsTouched();
@@ -170,10 +155,11 @@ export class CreateAccount implements OnInit {
 
       this.createAccountService.createAccount(payload).subscribe({
         next: (res) => {
-          console.log('Account created successfully!', res);
+          this.toast.show('Conta criada com sucesso!', 'success', 6000);
+          this.router.navigate(['login']);
         },
         error: (err) => {
-          // erro já definido em lastError signal; aqui podemos mostrar snackbar ou similar
+          this.toast.show(err?.error?.message, 'error', 4000);          
           console.error(err);
         },
       });

@@ -1,0 +1,11 @@
+<div class="toast-wrapper" aria-live="polite" aria-atomic="true">
+    <ng-container *ngFor="let t of toasts()">
+        <div class="toast" [attr.data-type]="t.type">
+            <div class="toast-left">
+                <div class="icon">{{ iconFor(t.type) }}</div>
+            </div>
+            <div class="toast-body">{{ t.message }}</div>
+            <button class="close-btn" (click)="toastService.dismiss(t.id)" aria-label="Fechar">✕</button>
+        </div>
+    </ng-container>
+</div>

@@ -1,0 +1,6 @@
+<div class="toast" [attr.data-type]="toast.type" role="status" aria-live="polite">
+    <div class="toast-content">
+        <span class="toast-icon" aria-hidden="true">{{ iconFor(toast.type) }}</span>
+        <div class="toast-message">{{ toast.message }}</div>
+    </div>
+</div>

@@ -34,7 +34,7 @@ export class Login implements OnInit {
   isMobile = signal(window.innerWidth < 768);
   hidePassword = signal(true);
   loginForm!: FormGroup;
-
+  
   cardPlans = [
     {
       name: 'Classic',
@@ -88,7 +88,7 @@ export class Login implements OnInit {
   private createLoginForm(): void {
     this.loginForm = this.fb.group({
       cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
-      password: ['', [Validators.required, Validators.minLength(4)]]
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 

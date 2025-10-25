@@ -1,15 +1,15 @@
 server:
-  port: 8084
+port: 8084
 
 spring:
   application:
     name: bankaccount-service
 
   datasource:
-     url: jdbc:postgresql://localhost:5432/db_bankaccount
-     username: postgres
-     password: postgres
-     driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/db_bankaccount
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
 
   sql:
     init:

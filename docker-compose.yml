@@ -189,12 +189,6 @@ services:
     depends_on:
       postgres-transactions:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
     restart: unless-stopped
 
   # pgAdmin (opcional - para administração do banco)

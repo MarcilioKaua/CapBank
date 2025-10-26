@@ -41,32 +41,36 @@ docker-compose up --build
 | Infraestrutura | Docker + Docker Compose |
 
 ### 📚  Arquitetura Adotada por Microsserviço
-O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Segurança Centralizada (JWT) e Resiliência (Circuit Breaker).
+O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Spring Cloud Gateway (WebFlux) Segurança Centralizada (JWT) e Resiliência (Circuit Breaker).
 
-| Serviço              | Domínio / Responsabilidade                                | Padrão Arquitetural | Justificativa                                                                |
-|:---------------------|:----------------------------------------------------------| :--- |:-----------------------------------------------------------------------------|
-| **API Gateway**      | Roteamento, Validação JWT, Autorização Grossa.            | Spring Cloud Gateway (WebFlux) | Ponto de entrada e motor de segurança reativo.                               |
-| **Auth MS**          | Identidade, Login                                         | **Hexagonal (Ports & Adapters)** | Dominio de autenticação dos usuários                                         |
-| **User MS**          | Identidade, Cadastro de usuários                          | **Hexagonal (Ports & Adapters)** | Domínio de dados simples (CRUD).                                             |
-| **Banck-account MS** | CRUD de Conta Bancaria                                    | **Hexagonal (Ports & Adapters)** | Domínio de dados simples (CRUD).                                             |
-| **Transaction MS**   | Transações bancárias, Extrato e Histórico                 | **Hexagonal (Ports & Adapters)** | Domínio de dados de todo controle de transação bancária, extrato e histórico |
-| **Notificacao MS**   | Consumo de Eventos, Envio de E-mail, Log de Persistência. | **Hexagonal (Ports & Adapters)** | Isolamento de infraestrutura de mensageria (RabbitMQ).                       |
+| Serviço                     | Domínio / Responsabilidade
+|:----------------------------|:------------------------------------------------------------------------------------------------|
+| **Gateway Service**         | Roteamento, Validação JWT, Autorização                                                          |
+| **Auth Service**            | Dominio de autenticação dos usuários Login                                                      |
+| **User Service**            | CRUD de usuários                                                                                | 
+| **Bank Account Service**    | CRUD de Conta Bancaria                                                                          | 
+| **Transaction Service**     | Transações bancárias, Extrato e Histórico, Controle de transação bancária, extrato e histórico  |
+| **Notificacao Service**     | Consumo de Eventos e mensageria (RabbitMQ), Envio de E-mail, Log de Persistência.               |
+
+<img width="814" height="804" alt="Microservices Diagram" src="https://github.com/user-attachments/assets/8b2ad338-95b3-4171-bce6-63b450e322af" />
 
 
 ## 🔍 Detalhamento dos Microsserviços e Rotas Chave
 
 | Serviço             | Rotas Chave (Externa)                          | Regra de Autorização Grossa (Gateway) |
 |:--------------------|:-----------------------------------------------|:--------------------------------------|
-| **Auth MS**         | `api/auth/login`                               | **PÚBLICO**                           |
-| **User MS**         | `POST api/user/register/`                      | **PÚBLICO**                           |
-| **Bank-Account MS** | `POST api/bankaccount/{accountNumber}/balance` | **USER**                              |
-| **Transaction MS**  | `GET api/transactions`                         | **USER**                              |
+| **Auth Service**         | `POST api/auth/login`                               | **PÚBLICO**                           |
+| **User Service**         | `POST api/user/register/`                      | **PÚBLICO**                           |
+| **Bank-Account Service** | `POST api/bankaccount/{accountNumber}/balance` | **USER**                              |
+| **Transaction Service**  | `POST api/transactions`                         | **USER**                              |
+
+<img width="1092" height="549" alt="Diagrama de Fluxo drawio" src="https://github.com/user-attachments/assets/0be41ce9-f4d4-4fd6-ad64-43770080e0b0" />
 
 ## 🧑‍💻 Infraestrutura e DevOps
 
 ### Docker Compose e Isolamento
 
-* **Rede:** Todos os MS, o RabbitMQ e o Postgres residem na rede privada (`capbank-network`). A comunicação é feita via **nome do serviço** (`http://auth-service:8081`).
+* **Rede:** Todos os MS, o RabbitMQ e o Postgres residem na rede privada (`capbank-network`). A comunicação é feita via **nome do serviço** (`http://auth-service:8082`).
 * **Exposição:** Apenas o **API Gateway** expõe a porta `8081`.
 * **DB Isolados:** Utilizamos um container **Postgres** para cada MS, com três bases de dados lógicas e isoladas (`user_db`, `db_transactions`, `db_bankaccount`) — o padrão *Database per Service*.
 

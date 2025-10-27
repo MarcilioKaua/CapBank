@@ -13,9 +13,9 @@ import { MatIconModule } from '@angular/material/icon';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => CustomInputComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class CustomInputComponent implements ControlValueAccessor, OnInit {
   @Input() label: string = '';
@@ -27,26 +27,30 @@ export class CustomInputComponent implements ControlValueAccessor, OnInit {
   @Input() errorMessage: string = '';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
-  @Input() rows: number = 1; 
+  @Input() rows: number = 1;
   @Input() min: number | null = null;
   @Input() max: number | null = null;
   @Input() step: number | null = null;
-  @Input() showPasswordToggle: boolean = false; 
+  @Input() showPasswordToggle: boolean = false;
+  @Input() options: { label: string; value: any }[] = [];
 
   value: any = '';
   isFocused: boolean = false;
   isTouched: boolean = false;
   showPassword: boolean = false;
 
-  
   onChange: any = () => {};
   onTouched: any = () => {};
 
-  ngOnInit() {
-  
-  }
+  ngOnInit() {}
 
   onInputChange(event: any) {
+    const value = event.target.value;
+    this.value = value;
+    this.onChange(value);
+  }
+
+  onSelectChange(event: any): void {
     const value = event.target.value;
     this.value = value;
     this.onChange(value);
@@ -95,5 +99,9 @@ export class CustomInputComponent implements ControlValueAccessor, OnInit {
       return this.showPassword ? 'text' : 'password';
     }
     return this.type;
+  }
+
+  get isSelect() {
+    return this.type === 'select';
   }
 }

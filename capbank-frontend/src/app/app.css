@@ -73,9 +73,12 @@
 
 .main-content {
   flex: 1;
-  padding-top: 64px;
   transition: margin-left 0.3s ease;
   margin-left: 0;
+}
+
+.main-content--with-header {
+  padding-top: 64px;
 }
 
 .main-content--with-sidebar {

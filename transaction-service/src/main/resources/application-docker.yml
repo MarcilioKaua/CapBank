@@ -1,14 +1,14 @@
 server:
-  port: 8085
+  port: ${SERVER_PORT:8085}
 
 spring:
   application:
     name: transaction-service
 
   datasource:
-    url: jdbc:postgresql://postgres-transactions:5432/db_transaction
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/db_transaction}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -19,10 +19,10 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
         format_sql: false
         show_sql: false
         generate_statistics: false
@@ -37,7 +37,7 @@ spring:
 # Logging Configuration - otimizado para container
 logging:
   level:
-    com.capbank.transaction_service: INFO
+    com.capbank.transaction_service: ${LOGGING_LEVEL_COM_CAPBANK:INFO}
     org.springframework.web: WARN
     org.springframework.security: WARN
     org.hibernate.SQL: WARN

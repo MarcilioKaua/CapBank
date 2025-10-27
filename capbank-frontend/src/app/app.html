@@ -41,7 +41,9 @@
   <main
     class="main-content"
     [class.main-content--with-sidebar]="!isMobile() && sidebarOpen() && routeShowSidebar()"
+    [class.main-content--with-header]="!isCreateAccountPage"
   >
     <router-outlet />
+    <app-toast-container></app-toast-container>
   </main>
 </div>

@@ -6,11 +6,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Sidebar } from './components/sidebar/sidebar';
 import { filter } from 'rxjs';
+import { ToastContainerComponent } from './components/toast/toast-container/toast-container.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, MatIconModule, MatButtonModule, MatToolbarModule, Sidebar],
+  imports: [CommonModule, RouterOutlet, MatIconModule, MatButtonModule, MatToolbarModule, Sidebar, ToastContainerComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -20,6 +21,7 @@ export class App implements OnInit {
   isMobile = signal(false);
   sidebarOpen = signal(false);
   routeShowSidebar = signal(false);
+  activeUrl = signal('');
 
   constructor(private router: Router) {
     this.router.events
@@ -31,7 +33,12 @@ export class App implements OnInit {
 
   private updateSidebarVisibility(url: string): void {
     const hideSidebarRoutes = ['/login', '/create-account'];
+    this.activeUrl.set(url);
     this.routeShowSidebar.set(!hideSidebarRoutes.some((route) => url.startsWith(route)));
+  }
+
+  get isCreateAccountPage(): boolean {
+    return this.activeUrl() === '/create-account';
   }
 
   ngOnInit(): void {

@@ -25,14 +25,25 @@ public record ErrorResponse(
         String path,
 
         @JsonProperty("validation_errors")
-        List<ValidationError> validationErrors
+        List<ValidationError> validationErrors,
+
+        @JsonProperty("correlationId")
+        String correlationId
 ) {
     public ErrorResponse(int status, String error, String message, String path) {
-        this(LocalDateTime.now(), status, error, message, path, null);
+        this(LocalDateTime.now(), status, error, message, path, null, null);
     }
 
     public ErrorResponse(int status, String error, String message, String path, List<ValidationError> validationErrors) {
-        this(LocalDateTime.now(), status, error, message, path, validationErrors);
+        this(LocalDateTime.now(), status, error, message, path, validationErrors, null);
+    }
+
+    public ErrorResponse(int status, String error, String message, String path, String correlationId) {
+        this(LocalDateTime.now(), status, error, message, path, null, correlationId);
+    }
+
+    public ErrorResponse(int status, String error, String message, String path, List<ValidationError> validationErrors, String correlationId) {
+        this(LocalDateTime.now(), status, error, message, path, validationErrors, correlationId);
     }
 
     public record ValidationError(String field, String message) {}

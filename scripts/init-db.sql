@@ -1,7 +1,7 @@
 
 CREATE SCHEMA IF NOT EXISTS transaction_history;
 
-ALTER DATABASE db_transactions SET search_path TO transaction_history, public;
+ALTER DATABASE db_transaction SET search_path TO transaction_history, public;
 
 -- Garantir permissões para o usuário postgres
 GRANT ALL PRIVILEGES ON SCHEMA transaction_history TO postgres;

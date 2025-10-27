@@ -91,8 +91,8 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     ports:
-      - "5672:5672"   
-      - "15672:15672"  
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
@@ -107,7 +107,9 @@ services:
     build:
       context: ./capbank-frontend
       dockerfile: Dockerfile
-    container_name: capbank-frontend
+    container_name: capbank-frontend-service
+    environment:
+      GATEWAY_BASE_URL: http://gateway-service:8081
     ports:
       - "8080:8080"
     networks:
@@ -124,8 +126,9 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8081
       LOGGING_LEVEL_COM_CAPBANK: INFO
-      AUTH_SERVICE_BASE_URL: http://auth-service:8083
+      FRONTEND_SERVICE_BASE_URL: http://frontend-service:8080
       USER_SERVICE_BASE_URL: http://user-service:8082
+      AUTH_SERVICE_BASE_URL: http://auth-service:8083
       ACCOUNT_SERVICE_BASE_URL: http://bankaccount-service:8084
       TRANSACTION_SERVICE_BASE_URL: http://transaction-service:8085
       NOTIFICATION_SERVICE_BASE_URL: http://notification-service:8086

@@ -7,6 +7,16 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: frontend-service
+          uri: ${services.frontend.base-url:http://localhost:8080}
+          predicates:
+            - Path=/
+            - Path=/index.html
+            - Path=/favicon.ico
+            - Path=/assets/**
+            - Path=/{path:^(?!api).*$}/**
+          filters:
+            - StripPrefix=0
         - id: user-login-proxy
           uri: ${services.auth.base-url:http://localhost:8083}
           predicates:
@@ -89,10 +99,12 @@ jwt:
   secret: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==
 
 services:
-  auth:
-    base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:8083}
+  frontend:
+    base-url: ${FRONTEND_SERVICE_BASE_URL:http://localhost:8080}
   user:
     base-url: ${USER_SERVICE_BASE_URL:http://localhost:8082}
+  auth:
+    base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:8083}
   account:
     base-url: ${ACCOUNT_SERVICE_BASE_URL:http://localhost:8084}
   transaction:

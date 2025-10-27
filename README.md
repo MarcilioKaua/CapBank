@@ -72,7 +72,7 @@ O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Spring Cloud Ga
 
 * **Rede:** Todos os MS, o RabbitMQ e o Postgres residem na rede privada (`capbank-network`). A comunicação é feita via **nome do serviço** (`http://auth-service:8082`).
 * **Exposição:** Apenas o **API Gateway** expõe a porta `8081`.
-* **DB Isolados:** Utilizamos um container **Postgres** para cada MS, com três bases de dados lógicas e isoladas (`user_db`, `db_transactions`, `db_bankaccount`) — o padrão *Database per Service*.
+* **DB Isolados:** Utilizamos um container **Postgres** para cada MS, com três bases de dados lógicas e isoladas (`user_db`, `db_transaction`, `db_bankaccount`) — o padrão *Database per Service*.
 
 ## 🧩 Arquitetura de Entidades
 ### 1. 🧍 Usuário (`User`)

@@ -26,7 +26,7 @@ services:
     image: postgres:15-alpine
     container_name: capbank-postgres-transactions
     environment:
-      POSTGRES_DB: db_transactions
+      POSTGRES_DB: db_transaction
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
@@ -38,7 +38,7 @@ services:
     networks:
       - capbank-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d db_transactions"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_transaction"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -215,7 +215,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-    # Transaction History Microservice
+  # Transaction History Microservice
   transaction-service:
     build:
       context: ./transaction-service
@@ -223,7 +223,7 @@ services:
     container_name: capbank-transaction-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-transactions:5432/db_transactions
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-transactions:5432/db_transaction
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -249,7 +249,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-notifications:5432/db_notification
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672

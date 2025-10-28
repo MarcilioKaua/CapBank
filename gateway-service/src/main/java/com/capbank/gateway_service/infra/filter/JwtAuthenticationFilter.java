@@ -61,7 +61,9 @@ public class JwtAuthenticationFilter implements WebFilter {
         return path.startsWith("/api/auth")
                 || path.startsWith("/api/user")
                 || path.startsWith("/api/gateway/user-registered")
-                || path.startsWith("/actuator");
+                || path.startsWith("/actuator")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/api-docs");
     }
 
     private String safeHash(String value) {

@@ -14,3 +14,12 @@ jwt:
   secret: ${JWT_SECRET:VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==}
   expiration: ${JWT_EXPIRATION:3600000}
   issuer: ${JWT_ISSUER:capbank-gateway}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+    enabled: true
+  api-docs:
+    enabled: true

@@ -72,6 +72,18 @@ logging:
     org.springframework.amqp: DEBUG
     org.springframework.mail: DEBUG
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+    enabled: true
+  api-docs:
+    enabled: true
+
+# =========================================================
+# 🐳 PROFILE DOCKER
+# =========================================================
 ---
 spring:
   config:
@@ -92,31 +104,6 @@ spring:
 
   rabbitmq:
     host: ${RABBITMQ_HOST:rabbitmq}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
-
-server:
-  port: ${SERVER_PORT:8086}
-
----
-spring:
-  config:
-    activate:
-      on-profile: local
-
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/db_notification}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 5
-      minimum-idle: 2
-      connection-timeout: 30000
-
-  rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}

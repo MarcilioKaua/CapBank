@@ -3,6 +3,10 @@ package com.capbank.gateway_service.infra.controller;
 import com.capbank.gateway_service.infra.client.HttpClientBaseAdapter;
 import com.capbank.gateway_service.infra.dto.BankAccountCreateRequest;
 import com.capbank.gateway_service.infra.dto.UserRegisteredEvent;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +40,30 @@ public class GatewayOrchestratorController {
         this.defaultAgency = defaultAgency;
     }
 
+    @Operation(
+            summary = "Cria automaticamente uma conta bancária para um novo usuário registrado",
+            description = """
+                    Esse endpoint é acionado quando o evento **USER_REGISTERED** é recebido.
+                    Ele gera um número de conta aleatório e envia uma requisição ao serviço de contas (`account-service`)
+                    para criar uma nova conta bancária vinculada ao usuário recém-cadastrado.
+                    """,
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Conta criada com sucesso"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Requisição inválida (faltando userId ou accountType)",
+                            content = @Content(schema = @Schema(implementation = String.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Erro interno durante a orquestração",
+                            content = @Content(schema = @Schema(implementation = String.class))
+                    )
+            }
+    )
     @PostMapping("/user-registered")
     public ResponseEntity<Void> onUserRegistered(@RequestBody UserRegisteredEvent event) {
         if (event.getUserId() == null || event.getAccountType() == null) {

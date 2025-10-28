@@ -109,3 +109,10 @@ services:
     base-url: ${ACCOUNT_SERVICE_BASE_URL:http://localhost:8084}
   transaction:
     base-url: ${TRANSACTION_SERVICE_BASE_URL:http://localhost:8085}
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: false

@@ -14,7 +14,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { CpfMaskDirective } from '../../shared/directives/cpf-mask.directive';
 import { PhoneMaskDirective } from '../../shared/directives/phone-mask.directive';
-import { CreateAccountService } from 'src/app/shared/services/create-account.service';
+import { AccountService } from 'src/app/shared/services/account.service';
 import { CustomInputComponent } from 'src/app/components/custom-input/custom-input';
 import { ToastService } from 'src/app/shared/services/toast.service';
 
@@ -60,9 +60,9 @@ export class CreateAccount implements OnInit {
   private router = inject(Router);
   private toast = inject(ToastService);
   
-  private createAccountService = inject(CreateAccountService);
-  isLoading = this.createAccountService.isLoading;
-  lastError = this.createAccountService.lastError;
+  private accountService = inject(AccountService);
+  isLoading = this.accountService.isLoading;
+  lastError = this.accountService.lastError;
 
   constructor() {
     this.createForms();
@@ -153,7 +153,7 @@ export class CreateAccount implements OnInit {
         confirmPassword: access.confirmPassword,
       };
 
-      this.createAccountService.createAccount(payload).subscribe({
+      this.accountService.createAccount(payload).subscribe({
         next: (res) => {
           this.toast.show('Conta criada com sucesso!', 'success', 6000);
           this.router.navigate(['login']);

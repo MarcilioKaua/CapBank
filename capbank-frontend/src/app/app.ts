@@ -6,11 +6,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Sidebar } from './components/sidebar/sidebar';
 import { filter } from 'rxjs';
+import { ToastContainerComponent } from './components/toast/toast-container/toast-container.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, MatIconModule, MatButtonModule, MatToolbarModule, Sidebar],
+  imports: [CommonModule, RouterOutlet, MatIconModule, MatButtonModule, MatToolbarModule, Sidebar, ToastContainerComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

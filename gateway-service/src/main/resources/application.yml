@@ -7,6 +7,16 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: frontend-service
+          uri: ${services.frontend.base-url:http://localhost:8080}
+          predicates:
+            - Path=/
+            - Path=/index.html
+            - Path=/favicon.ico
+            - Path=/assets/**
+            - Path=/{path:^(?!api).*$}/**
+          filters:
+            - StripPrefix=0
         - id: user-login-proxy
           uri: ${services.auth.base-url:http://localhost:8083}
           predicates:
@@ -22,6 +32,11 @@ spring:
           predicates:
             - Path=/api/user/**
           filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,INTERNAL_SERVER_ERROR
+                methods: GET,POST,PUT,DELETE
             - name: CircuitBreaker
               args:
                 name: userCircuit
@@ -62,14 +77,34 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userServiceCircuit:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+  timelimiter:
+    userServiceCircuit:
+      timeoutDuration: 10s
+
 jwt:
   secret: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==
 
 services:
-  auth:
-    base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:8083}
+  frontend:
+    base-url: ${FRONTEND_SERVICE_BASE_URL:http://localhost:8080}
   user:
     base-url: ${USER_SERVICE_BASE_URL:http://localhost:8082}
+  auth:
+    base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:8083}
   account:
     base-url: ${ACCOUNT_SERVICE_BASE_URL:http://localhost:8084}
   transaction:

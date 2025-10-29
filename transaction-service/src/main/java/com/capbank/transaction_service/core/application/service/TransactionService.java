@@ -1,8 +1,6 @@
 package com.capbank.transaction_service.core.application.service;
 
-import com.capbank.transaction_service.core.application.port.in.CreateTransactionUseCase;
-import com.capbank.transaction_service.core.application.port.in.FindTransactionUseCase;
-import com.capbank.transaction_service.core.application.port.in.UpdateTransactionStatusUseCase;
+import com.capbank.transaction_service.core.application.port.in.*;
 import com.capbank.transaction_service.core.application.port.out.NotificationServicePort;
 import com.capbank.transaction_service.core.application.port.out.TransactionHistoryRepositoryPort;
 import com.capbank.transaction_service.core.application.port.out.TransactionRepositoryPort;
@@ -20,7 +18,13 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class TransactionService implements CreateTransactionUseCase, FindTransactionUseCase, UpdateTransactionStatusUseCase {
+public class TransactionService implements
+        CreateTransactionUseCase,
+        DepositUseCase,
+        WithdrawalUseCase,
+        TransferUseCase,
+        FindTransactionUseCase,
+        UpdateTransactionStatusUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
@@ -37,8 +41,9 @@ public class TransactionService implements CreateTransactionUseCase, FindTransac
         this.notificationService = notificationService;
     }
 
+    // Original method - kept for backward compatibility
     @Override
-    public TransactionResult processTransaction(CreateTransactionCommand command) {
+    public CreateTransactionUseCase.TransactionResult processTransaction(CreateTransactionCommand command) {
         logger.info("Processing transaction: type={}, amount={}", command.type(), command.amount());
 
         try {
@@ -60,11 +65,123 @@ public class TransactionService implements CreateTransactionUseCase, FindTransac
             String message = String.format("Transaction processed successfully. Amount: %s, Type: %s",
                     savedTransaction.getAmount(), savedTransaction.getType());
 
-            return new TransactionResult(savedTransaction, message, notificationSent);
+            return new CreateTransactionUseCase.TransactionResult(savedTransaction, message, notificationSent);
 
         } catch (Exception e) {
             logger.error("Error processing transaction: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to process transaction: " + e.getMessage(), e);
+        }
+    }
+
+    // Specific method for deposits
+    @Override
+    public DepositUseCase.TransactionResult processDeposit(DepositUseCase.DepositCommand command) {
+        logger.info("Processing deposit: targetAccountId={}, amount={}",
+                   command.targetAccountId(), command.amount());
+
+        try {
+            // 1. Create deposit transaction
+            Transaction transaction = Transaction.createDeposit(
+                    command.targetAccountId(),
+                    command.amount(),
+                    command.description()
+            );
+            Transaction savedTransaction = transactionRepository.save(transaction);
+            logger.info("Deposit transaction created with ID: {}", savedTransaction.getId());
+
+            // 2. Create transaction history
+            Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
+            TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
+            historyRepository.save(history);
+            logger.info("Transaction history created for deposit: {}", savedTransaction.getId());
+
+            // 3. Send notification
+            boolean notificationSent = sendTransactionNotification(savedTransaction);
+            logger.info("Notification sent: {} for deposit: {}", notificationSent, savedTransaction.getId());
+
+            String message = String.format("Deposit processed successfully. Amount: %s",
+                    savedTransaction.getAmount());
+
+            return new DepositUseCase.TransactionResult(savedTransaction, message, notificationSent);
+
+        } catch (Exception e) {
+            logger.error("Error processing deposit: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to process deposit: " + e.getMessage(), e);
+        }
+    }
+
+    // Specific method for withdrawals
+    @Override
+    public WithdrawalUseCase.TransactionResult processWithdrawal(WithdrawalUseCase.WithdrawalCommand command) {
+        logger.info("Processing withdrawal: sourceAccountId={}, amount={}",
+                   command.sourceAccountId(), command.amount());
+
+        try {
+            // 1. Create withdrawal transaction
+            Transaction transaction = Transaction.createWithdrawal(
+                    command.sourceAccountId(),
+                    command.amount(),
+                    command.description()
+            );
+            Transaction savedTransaction = transactionRepository.save(transaction);
+            logger.info("Withdrawal transaction created with ID: {}", savedTransaction.getId());
+
+            // 2. Create transaction history
+            Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
+            TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
+            historyRepository.save(history);
+            logger.info("Transaction history created for withdrawal: {}", savedTransaction.getId());
+
+            // 3. Send notification
+            boolean notificationSent = sendTransactionNotification(savedTransaction);
+            logger.info("Notification sent: {} for withdrawal: {}", notificationSent, savedTransaction.getId());
+
+            String message = String.format("Withdrawal processed successfully. Amount: %s",
+                    savedTransaction.getAmount());
+
+            return new WithdrawalUseCase.TransactionResult(savedTransaction, message, notificationSent);
+
+        } catch (Exception e) {
+            logger.error("Error processing withdrawal: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to process withdrawal: " + e.getMessage(), e);
+        }
+    }
+
+    // Specific method for transfers
+    @Override
+    public TransferUseCase.TransactionResult processTransfer(TransferUseCase.TransferCommand command) {
+        logger.info("Processing transfer: sourceAccountId={}, targetAccountId={}, amount={}",
+                   command.sourceAccountId(), command.targetAccountId(), command.amount());
+
+        try {
+            // 1. Create transfer transaction
+            Transaction transaction = Transaction.createTransfer(
+                    command.sourceAccountId(),
+                    command.targetAccountId(),
+                    command.amount(),
+                    command.description()
+            );
+            Transaction savedTransaction = transactionRepository.save(transaction);
+            logger.info("Transfer transaction created with ID: {}", savedTransaction.getId());
+
+            // 2. Create transaction history
+            Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
+            TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
+            historyRepository.save(history);
+            logger.info("Transaction history created for transfer: {}", savedTransaction.getId());
+
+            // 3. Send notification
+            boolean notificationSent = sendTransactionNotification(savedTransaction);
+            logger.info("Notification sent: {} for transfer: {}", notificationSent, savedTransaction.getId());
+
+            String message = String.format("Transfer processed successfully. Amount: %s",
+                    savedTransaction.getAmount());
+
+            return new TransferUseCase.TransactionResult(savedTransaction, message, notificationSent);
+
+        } catch (Exception e) {
+            logger.error("Error processing transfer: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to process transfer: " + e.getMessage(), e);
         }
     }
 

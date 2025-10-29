@@ -26,6 +26,15 @@ spring:
         dialect: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
         format_sql: true
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+    enabled: true
+  api-docs:
+    enabled: true
+
 app:
   database:
     postgresql:

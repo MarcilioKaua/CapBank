@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -10,6 +10,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { CustomInputComponent } from '../../components/custom-input/custom-input';
+import { CpfMaskDirective } from 'src/app/shared/directives/cpf-mask.directive';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { ToastComponent } from 'src/app/components/toast/toast.component';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +29,8 @@ import { CustomInputComponent } from '../../components/custom-input/custom-input
     MatCardModule,
     MatToolbarModule,
     MatMenuModule,
-    CustomInputComponent
+    CustomInputComponent,
+    CpfMaskDirective
   ],
   templateUrl: './login.html',
   styleUrl: './login.css'
@@ -34,7 +39,12 @@ export class Login implements OnInit {
   isMobile = signal(window.innerWidth < 768);
   hidePassword = signal(true);
   loginForm!: FormGroup;
-  
+  private toast = inject(ToastService);
+
+  private authService = inject(AuthService);
+  isLoading = this.authService.isLoading;
+  lastError = this.authService.lastError;
+
   cardPlans = [
     {
       name: 'Classic',
@@ -95,8 +105,21 @@ export class Login implements OnInit {
   onSubmit(): void {
     if (this.loginForm.valid) {
       console.log('Login attempt:', this.loginForm.value);
+      this.authService.login(this.loginForm.value).subscribe({
+        next: (res) => {
+          this.toast.show('Login realizado com sucesso.', 'success', 6000);
+          console.log('Login successful:', res);
+          this.router.navigate(['/dashboard']);
+        },          
+        error: (err) => {
+          console.error('Login failed:', err);
+          this.toast.show(err?.error?.message, 'error', 4000);
+        }
+      }); 
+
       // Simulate login success
-      this.router.navigate(['/dashboard']);
+      //this.router.navigate(['/dashboard']);
+
     } else {
       this.loginForm.markAllAsTouched();
     }

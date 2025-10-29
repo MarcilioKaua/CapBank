@@ -46,19 +46,13 @@ logging:
 
 # SpringDoc OpenAPI Configuration
 springdoc:
-  api-docs:
-    path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
     tags-sorter: alpha
     operations-sorter: method
-  info:
-    title: Transaction History Service API
-    description: API para gerenciamento de histórico de transações bancárias
-    version: 1.0.0
-    contact:
-      name: Capbank Team
-      email: team@capbank.com
+    enabled: true
+  api-docs:
+    enabled: true
 
 # Management and Monitoring
 management:

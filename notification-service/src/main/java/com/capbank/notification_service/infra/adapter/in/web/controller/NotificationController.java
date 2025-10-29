@@ -7,6 +7,10 @@ import com.capbank.notification_service.core.domain.model.Notification;
 import com.capbank.notification_service.core.ports.in.NotificationUseCase;
 import com.capbank.notification_service.infra.adapter.in.web.dto.NotificationRequest;
 import com.capbank.notification_service.infra.adapter.in.web.dto.NotificationResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,18 @@ public class NotificationController {
         this.notificationUseCase = notificationUseCase;
     }
 
+    @Operation(
+            summary = "Cria e processa uma nova notificação",
+            description = "Recebe os dados de uma notificação, processa e retorna o status do envio.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Notificação criada com sucesso",
+                            content = @Content(schema = @Schema(implementation = NotificationResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Requisição inválida",
+                            content = @Content(schema = @Schema(implementation = NotificationResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
+                            content = @Content(schema = @Schema(implementation = NotificationResponse.class)))
+            }
+    )
     @PostMapping
     public ResponseEntity<NotificationResponse> createNotification(
             @Valid @RequestBody NotificationRequest request) {
@@ -79,6 +95,7 @@ public class NotificationController {
         return notification;
     }
 
+    @Operation(summary = "Verifica a saúde do serviço")
     @GetMapping("/health")
     public ResponseEntity<String> health() {
         return ResponseEntity.ok("Notification Service is running");

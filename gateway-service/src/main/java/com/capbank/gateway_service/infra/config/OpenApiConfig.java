@@ -1,15 +1,13 @@
-package com.capbank.transaction_service.infrastructure.config;
+package com.capbank.gateway_service.infra.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuração customizada para OpenAPI/Swagger
- * Define informações detalhadas sobre a API e seus endpoints
- */
+@OpenAPIDefinition
 @Configuration
 public class OpenApiConfig {
 
@@ -17,9 +15,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Transaction Service API")
+                        .title("Gateway Service API")
                         .version("1.0.0")
-                        .description("API para registro e consulta de transações bancárias")
+                        .description("API responsável por orquestrar eventos e chamadas entre microsserviço.")
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT"))

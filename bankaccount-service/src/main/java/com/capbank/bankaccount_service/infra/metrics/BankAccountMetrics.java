@@ -1,22 +1,19 @@
-package com.capbank.gateway_service.infra.metrics;
+package com.capbank.bankaccount_service.infra.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GatewayMetrics {
+public class BankAccountMetrics {
 
-    public GatewayMetrics(MeterRegistry registry) {
-        registry.counter("gateway.requests.total", "description", "Total de requisições roteadas pelo gateway");
-        registry.counter("gateway.errors.total", "description", "Total de erros de roteamento no gateway");
+    private final MeterRegistry registry;
+
+    public BankAccountMetrics(MeterRegistry registry) {
+        this.registry = registry;
     }
 
-    public void incrementRequest(MeterRegistry registry) {
-        registry.counter("gateway.requests.total").increment();
+    public void incrementAccountCreated() {
+        registry.counter("accounts.created.total", "type", "creation").increment();
     }
 
-    public void incrementError(MeterRegistry registry) {
-        registry.counter("gateway.errors.total").increment();
-    }
 }
-

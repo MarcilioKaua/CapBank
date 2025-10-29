@@ -6,6 +6,7 @@ import com.capbank.bankaccount_service.infra.dto.BankAccountRequestDTO;
 import com.capbank.bankaccount_service.infra.dto.BankAccountResponseDTO;
 import com.capbank.bankaccount_service.infra.mapper.BankAccountRequestMapper;
 import com.capbank.bankaccount_service.infra.mapper.BankAccountResponseMapper;
+import com.capbank.bankaccount_service.infra.metrics.BankAccountMetrics;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,15 +27,18 @@ public class BankAccountController {
     private final BankAccountUseCase bankAccountUseCase;
     private final BankAccountRequestMapper bankAccountRequestMapper;
     private final BankAccountResponseMapper bankAccountResponseMapper;
+    private final BankAccountMetrics bankAccountMetrics;
 
     public BankAccountController(
             BankAccountUseCase bankAccountUseCase,
             BankAccountRequestMapper bankAccountRequestMapper,
-            BankAccountResponseMapper bankAccountResponseMapper
+            BankAccountResponseMapper bankAccountResponseMapper,
+            BankAccountMetrics bankAccountMetrics
     ) {
         this.bankAccountUseCase = bankAccountUseCase;
         this.bankAccountRequestMapper = bankAccountRequestMapper;
         this.bankAccountResponseMapper = bankAccountResponseMapper;
+        this.bankAccountMetrics = bankAccountMetrics;
     }
 
     @Operation(
@@ -56,6 +60,7 @@ public class BankAccountController {
     public BankAccountResponseDTO create(@RequestBody BankAccountRequestDTO request) {
         BankAccount account = bankAccountRequestMapper.toDomain(request);
         var created = bankAccountUseCase.create(account);
+        bankAccountMetrics.incrementAccountCreated();
         return bankAccountResponseMapper.toResponse(created);
     }
 

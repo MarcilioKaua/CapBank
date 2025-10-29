@@ -122,6 +122,8 @@ services:
       context: ./gateway-service
       dockerfile: Dockerfile
     container_name: capbank-gateway-service
+    ports:
+      - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8081
@@ -158,6 +160,8 @@ services:
       SERVER_PORT: 8082
       GATEWAY_BASE_URL: http://gateway-service:8081
       LOGGING_LEVEL_COM_CAPBANK: INFO
+    ports:
+      - "8082:8082"
     networks:
       - capbank-network
     depends_on:
@@ -178,6 +182,8 @@ services:
       JWT_EXPIRATION: 3600000
       JWT_ISSUER: capbank-gateway
       USER_SERVICE_URL: http://user-service:8082
+    ports:
+      - "8083:8083"
     networks:
       - capbank-network
     depends_on:
@@ -200,6 +206,8 @@ services:
       SERVER_PORT: 8084
       GATEWAY_BASE_URL: http://gateway-service:8081
       LOGGING_LEVEL_COM_CAPBANK: INFO
+    ports:
+      - "8084:8084"
     networks:
       - capbank-network
     depends_on:
@@ -222,6 +230,8 @@ services:
       SERVER_PORT: 8085
       LOGGING_LEVEL_COM_CAPBANK: INFO
       SERVICES_NOTIFICATION_URL: http://notification-service:8086
+    ports:
+      - "8085:8085"
     networks:
       - capbank-network
     depends_on:
@@ -285,6 +295,30 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+  # Prometheus monitoring
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: capbank-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - capbank-network
+    depends_on:
+      - gateway-service
+      - user-service
+      - auth-service
+      - bankaccount-service
+      - transaction-service
+      - notification-service
+    restart: unless-stopped
+
 volumes:
   postgres_transactions_data:
     driver: local
@@ -297,6 +331,8 @@ volumes:
   rabbitmq_data:
     driver: local
   pgadmin_data:
+    driver: local
+  prometheus_data:
     driver: local
 
 networks:

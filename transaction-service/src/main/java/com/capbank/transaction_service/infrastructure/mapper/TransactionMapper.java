@@ -1,6 +1,9 @@
 package com.capbank.transaction_service.infrastructure.mapper;
 
 import com.capbank.transaction_service.core.application.port.in.CreateTransactionUseCase.CreateTransactionCommand;
+import com.capbank.transaction_service.core.application.port.in.DepositUseCase.DepositCommand;
+import com.capbank.transaction_service.core.application.port.in.WithdrawalUseCase.WithdrawalCommand;
+import com.capbank.transaction_service.core.application.port.in.TransferUseCase.TransferCommand;
 import com.capbank.transaction_service.core.application.port.in.FindTransactionUseCase.TransactionPage;
 import com.capbank.transaction_service.core.application.port.in.UpdateTransactionStatusUseCase.UpdateStatusCommand;
 import com.capbank.transaction_service.core.domain.entity.Transaction;
@@ -15,7 +18,35 @@ import java.util.List;
 @Component
 public class TransactionMapper {
 
+    // Specific mapper for deposits
+    public DepositCommand toDepositCommand(DepositRequest request) {
+        return new DepositCommand(
+                new AccountId(request.targetAccountId()),
+                new Money(request.amount()),
+                request.description()
+        );
+    }
 
+    // Specific mapper for withdrawals
+    public WithdrawalCommand toWithdrawalCommand(WithdrawalRequest request) {
+        return new WithdrawalCommand(
+                new AccountId(request.sourceAccountId()),
+                new Money(request.amount()),
+                request.description()
+        );
+    }
+
+    // Specific mapper for transfers
+    public TransferCommand toTransferCommand(TransferRequest request) {
+        return new TransferCommand(
+                new AccountId(request.sourceAccountId()),
+                new AccountId(request.targetAccountId()),
+                new Money(request.amount()),
+                request.description()
+        );
+    }
+
+    // Original mapper - kept for backward compatibility
     public CreateTransactionCommand toCommand(CreateTransactionRequest request) {
         AccountId sourceAccountId = request.sourceAccountId() != null && !request.sourceAccountId().trim().isEmpty()
                 ? new AccountId(request.sourceAccountId())

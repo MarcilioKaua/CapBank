@@ -8,7 +8,7 @@ set -e
 echo "🚀 Iniciando teste rápido da API..."
 
 # URL base
-BASE_URL="http://localhost:8083"
+BASE_URL="http://localhost:8085"
 
 echo "✅ Serviço está ativo!"
 

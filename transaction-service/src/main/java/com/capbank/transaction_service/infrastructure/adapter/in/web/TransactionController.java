@@ -1,10 +1,8 @@
 package com.capbank.transaction_service.infrastructure.adapter.in.web;
 
-import com.capbank.transaction_service.core.application.port.in.CreateTransactionUseCase;
-import com.capbank.transaction_service.core.application.port.in.FindTransactionUseCase;
+import com.capbank.transaction_service.core.application.port.in.*;
 import com.capbank.transaction_service.core.application.port.in.FindTransactionUseCase.FindTransactionQuery;
 import com.capbank.transaction_service.core.application.port.in.FindTransactionUseCase.TransactionPage;
-import com.capbank.transaction_service.core.application.port.in.UpdateTransactionStatusUseCase;
 import com.capbank.transaction_service.core.domain.entity.Transaction;
 import com.capbank.transaction_service.core.domain.enums.TransactionStatus;
 import com.capbank.transaction_service.core.domain.enums.TransactionType;
@@ -37,23 +35,143 @@ public class TransactionController {
     private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     private final CreateTransactionUseCase createTransactionUseCase;
+    private final DepositUseCase depositUseCase;
+    private final WithdrawalUseCase withdrawalUseCase;
+    private final TransferUseCase transferUseCase;
     private final FindTransactionUseCase findTransactionUseCase;
     private final UpdateTransactionStatusUseCase updateTransactionStatusUseCase;
     private final TransactionMapper mapper;
 
     public TransactionController(
             CreateTransactionUseCase createTransactionUseCase,
+            DepositUseCase depositUseCase,
+            WithdrawalUseCase withdrawalUseCase,
+            TransferUseCase transferUseCase,
             FindTransactionUseCase findTransactionUseCase,
             UpdateTransactionStatusUseCase updateTransactionStatusUseCase,
             TransactionMapper mapper) {
         this.createTransactionUseCase = createTransactionUseCase;
+        this.depositUseCase = depositUseCase;
+        this.withdrawalUseCase = withdrawalUseCase;
+        this.transferUseCase = transferUseCase;
         this.findTransactionUseCase = findTransactionUseCase;
         this.updateTransactionStatusUseCase = updateTransactionStatusUseCase;
         this.mapper = mapper;
     }
 
-    @Operation(summary = "Criar transação",
-               description = "Processa uma nova transação bancária e gera histórico automaticamente")
+    @Operation(summary = "Criar depósito",
+               description = "Processa um depósito bancário e gera histórico automaticamente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Depósito criado com sucesso",
+                    content = @Content(schema = @Schema(implementation = TransactionResultResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+        @ApiResponse(responseCode = "500", description = "Erro interno no processamento")
+    })
+    @PostMapping("/deposit")
+    public ResponseEntity<TransactionResultResponse> createDeposit(
+            @Valid @RequestBody DepositRequest request) {
+
+        logger.info("Creating deposit: targetAccountId={}, amount={}",
+                   request.targetAccountId(), request.amount());
+
+        try {
+            DepositUseCase.TransactionResult result = depositUseCase.processDeposit(
+                    mapper.toDepositCommand(request));
+
+            TransactionResultResponse response = new TransactionResultResponse(
+                    mapper.toResponse(result.transaction()),
+                    result.message(),
+                    result.notificationSent()
+            );
+
+            logger.info("Deposit created successfully with ID: {}", result.transaction().getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("Business rule violation creating deposit: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("Unexpected error creating deposit: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Operation(summary = "Criar saque",
+               description = "Processa um saque bancário e gera histórico automaticamente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Saque criado com sucesso",
+                    content = @Content(schema = @Schema(implementation = TransactionResultResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+        @ApiResponse(responseCode = "500", description = "Erro interno no processamento")
+    })
+    @PostMapping("/withdrawal")
+    public ResponseEntity<TransactionResultResponse> createWithdrawal(
+            @Valid @RequestBody WithdrawalRequest request) {
+
+        logger.info("Creating withdrawal: sourceAccountId={}, amount={}",
+                   request.sourceAccountId(), request.amount());
+
+        try {
+            WithdrawalUseCase.TransactionResult result = withdrawalUseCase.processWithdrawal(
+                    mapper.toWithdrawalCommand(request));
+
+            TransactionResultResponse response = new TransactionResultResponse(
+                    mapper.toResponse(result.transaction()),
+                    result.message(),
+                    result.notificationSent()
+            );
+
+            logger.info("Withdrawal created successfully with ID: {}", result.transaction().getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("Business rule violation creating withdrawal: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("Unexpected error creating withdrawal: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Operation(summary = "Criar transferência",
+               description = "Processa uma transferência bancária e gera histórico automaticamente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Transferência criada com sucesso",
+                    content = @Content(schema = @Schema(implementation = TransactionResultResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+        @ApiResponse(responseCode = "500", description = "Erro interno no processamento")
+    })
+    @PostMapping("/transfer")
+    public ResponseEntity<TransactionResultResponse> createTransfer(
+            @Valid @RequestBody TransferRequest request) {
+
+        logger.info("Creating transfer: sourceAccountId={}, targetAccountId={}, amount={}",
+                   request.sourceAccountId(), request.targetAccountId(), request.amount());
+
+        try {
+            TransferUseCase.TransactionResult result = transferUseCase.processTransfer(
+                    mapper.toTransferCommand(request));
+
+            TransactionResultResponse response = new TransactionResultResponse(
+                    mapper.toResponse(result.transaction()),
+                    result.message(),
+                    result.notificationSent()
+            );
+
+            logger.info("Transfer created successfully with ID: {}", result.transaction().getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("Business rule violation creating transfer: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("Unexpected error creating transfer: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Operation(summary = "Criar transação (DEPRECATED)",
+               description = "Processa uma nova transação bancária. Use os endpoints específicos: /deposit, /withdrawal, /transfer")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Transação criada com sucesso",
                     content = @Content(schema = @Schema(implementation = TransactionResultResponse.class))),
@@ -61,10 +179,11 @@ public class TransactionController {
         @ApiResponse(responseCode = "500", description = "Erro interno no processamento")
     })
     @PostMapping
+    @Deprecated
     public ResponseEntity<TransactionResultResponse> createTransaction(
             @Valid @RequestBody CreateTransactionRequest request) {
 
-        logger.info("Creating transaction: type={}, amount={}", request.transactionType(), request.amount());
+        logger.info("Creating transaction (DEPRECATED): type={}, amount={}", request.transactionType(), request.amount());
 
         try {
             CreateTransactionUseCase.TransactionResult result = createTransactionUseCase.processTransaction(
@@ -201,9 +320,4 @@ public class TransactionController {
     }
 
 
-    public record TransactionResultResponse(
-            TransactionResponse transaction,
-            String message,
-            boolean notificationSent
-    ) {}
 }

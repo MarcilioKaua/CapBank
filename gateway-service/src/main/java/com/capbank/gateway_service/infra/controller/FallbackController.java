@@ -2,6 +2,7 @@ package com.capbank.gateway_service.infra.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,10 +25,11 @@ public class FallbackController {
     @RequestMapping("/service-unavailable")
     public ResponseEntity<Map<String, Object>> serviceUnavailable(ServerWebExchange exchange) {
         String path = exchange.getRequest().getURI().getPath();
-        String method = exchange.getRequest().getMethodValue();
-        String routeId = Optional.ofNullable(exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ID_ATTR))
-                .map(Object::toString)
-                .orElse("unknown");
+        String method = Optional.ofNullable(exchange.getRequest().getMethod())
+                .map(m -> m.name())
+                .orElse("UNKNOWN");
+        Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
+        String routeId = route != null ? route.getId() : "unknown";
         String correlationId = exchange.getRequest().getHeaders().getFirst("X-Correlation-Id");
         Throwable cause = exchange.getAttribute(ServerWebExchangeUtils.CIRCUITBREAKER_EXECUTION_EXCEPTION_ATTR);
 

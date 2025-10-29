@@ -58,7 +58,8 @@ public class JwtAuthenticationFilter implements WebFilter {
         } catch (Exception e) {
             LOG.warn("JWT validation failed at path {}: {}", path, e.getMessage());
 
-            if (isTransactionOrTransferRequest(path, request.getMethodValue())) {
+            String methodName = request.getMethod() != null ? request.getMethod().name() : "";
+            if (isTransactionOrTransferRequest(path, methodName)) {
                 String refreshToken = request.getHeaders().getFirst(REFRESH_HEADER);
                 if (refreshToken != null && !refreshToken.isBlank()) {
                     try {
@@ -92,6 +93,8 @@ public class JwtAuthenticationFilter implements WebFilter {
                 || path.startsWith("/api/user")
                 || path.startsWith("/api/gateway/user-registered")
                 || path.startsWith("/actuator")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/api-docs")
                 || path.startsWith("/api/auth/refresh");
     }
 

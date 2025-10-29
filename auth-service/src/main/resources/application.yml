@@ -13,6 +13,7 @@ spring:
 jwt:
   secret: ${JWT_SECRET:VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==}
   expiration: ${JWT_EXPIRATION:3600000}
+  refreshExpiration: ${JWT_REFRESH_EXPIRATION:604800000}
   issuer: ${JWT_ISSUER:capbank-gateway}
 
 springdoc:

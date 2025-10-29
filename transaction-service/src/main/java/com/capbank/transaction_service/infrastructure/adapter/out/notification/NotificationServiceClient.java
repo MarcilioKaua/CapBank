@@ -4,6 +4,8 @@ import com.capbank.transaction_service.core.application.port.out.NotificationSer
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,11 +21,14 @@ public class NotificationServiceClient implements NotificationServicePort {
 
     private final RestTemplate restTemplate;
     private final String notificationServiceUrl;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
     public NotificationServiceClient(
             RestTemplate restTemplate,
+            CircuitBreakerFactory<?, ?> circuitBreakerFactory,
             @Value("${services.notification.url:http://localhost:8086}") String notificationServiceUrl) {
         this.restTemplate = restTemplate;
+        this.circuitBreakerFactory = circuitBreakerFactory;
         this.notificationServiceUrl = notificationServiceUrl;
     }
 
@@ -40,18 +45,24 @@ public class NotificationServiceClient implements NotificationServicePort {
             HttpEntity<NotificationRequest> httpEntity = new HttpEntity<>(request, headers);
 
             String url = notificationServiceUrl + "/api/notifications";
-            ResponseEntity<NotificationResponse> response = restTemplate.postForEntity(
-                    url, httpEntity, NotificationResponse.class);
+            CircuitBreaker cb = circuitBreakerFactory.create("transactionNotificationClient");
+            Boolean success = cb.run(() -> {
+                ResponseEntity<NotificationResponse> response = restTemplate.postForEntity(
+                        url, httpEntity, NotificationResponse.class);
+                boolean ok = response.getStatusCode().is2xxSuccessful();
+                if (ok) {
+                    logger.info("Notification sent successfully to user: {}", notification.userId());
+                } else {
+                    logger.warn("Failed to send notification. Status: {}", response.getStatusCode());
+                }
+                return ok;
+            }, throwable -> {
+                logger.error("Circuit breaker fallback - notification send failed for user {}: {}",
+                        notification.userId(), throwable.getMessage());
+                return false;
+            });
 
-            boolean success = response.getStatusCode().is2xxSuccessful();
-
-            if (success) {
-                logger.info("Notification sent successfully to user: {}", notification.userId());
-            } else {
-                logger.warn("Failed to send notification. Status: {}", response.getStatusCode());
-            }
-
-            return success;
+            return success != null && success;
 
         } catch (Exception e) {
             logger.error("Error sending notification to user {}: {}",
@@ -65,7 +76,7 @@ public class NotificationServiceClient implements NotificationServicePort {
     private NotificationRequest mapToRequest(TransactionNotification notification) {
         return new NotificationRequest(
                 notification.userId(),
-                null, // TODO: Get user email from user-service
+                null,
                 notification.accountId().toString(),
                 notification.type().name(),
                 notification.channel().name(),

@@ -36,4 +36,20 @@ public class AuthClientAdapter implements AuthClientPort {
             throw e;
         }
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public String refreshAccessToken(String refreshToken) {
+        try {
+            Map<String, Object> resp = http.post(authUrl + "/refresh",
+                    Map.of("refreshToken", refreshToken), Map.class);
+            if (resp == null || resp.get("accessToken") == null) {
+                throw new IllegalStateException("Auth refresh response without accessToken");
+            }
+            return resp.get("accessToken").toString();
+        } catch (Exception e) {
+            LOG.error("Auth refresh call failed: {}", e.getMessage());
+            throw e;
+        }
+    }
 }

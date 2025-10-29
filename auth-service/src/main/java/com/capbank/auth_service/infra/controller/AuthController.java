@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import com.capbank.auth_service.infra.dto.RefreshTokenRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,5 +49,11 @@ public class AuthController {
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody AuthRequest request) {
         LOG.info("POST /api/auth/login (cpfHash={})", Integer.toHexString(request.getCpf().hashCode()));
         return ResponseEntity.ok(authUseCase.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponseDTO> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        LOG.info("POST /api/auth/refresh");
+        return ResponseEntity.ok(authUseCase.refresh(request));
     }
 }

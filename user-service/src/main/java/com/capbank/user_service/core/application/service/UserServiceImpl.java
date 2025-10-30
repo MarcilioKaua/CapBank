@@ -1,17 +1,11 @@
 package com.capbank.user_service.core.application.service;
 
-import com.capbank.user_service.core.application.ports.in.DeleteUserUseCase;
-import com.capbank.user_service.core.application.ports.in.GetUserUseCase;
-import com.capbank.user_service.core.application.ports.in.RegisterUserUseCase;
-import com.capbank.user_service.core.application.ports.in.UpdateUserUseCase;
-import com.capbank.user_service.core.application.ports.in.ValidateUserUseCase;
+import com.capbank.user_service.core.application.ports.in.*;
 import com.capbank.user_service.core.application.ports.out.GatewayClientPort;
 import com.capbank.user_service.core.application.ports.out.UserRepositoryPort;
+import com.capbank.user_service.infra.client.dto.AuthResponseDTO;
+import com.capbank.user_service.infra.dto.*;
 import com.capbank.user_service.infra.entity.UserEntity;
-import com.capbank.user_service.infra.dto.RegisterUserRequest;
-import com.capbank.user_service.infra.dto.UpdateUserRequest;
-import com.capbank.user_service.infra.dto.UserResponse;
-import com.capbank.user_service.infra.dto.ValidateUserRequest;
 import com.capbank.user_service.infra.mapper.UserMapper;
 import com.capbank.user_service.infra.metrics.UserMetrics;
 import org.slf4j.Logger;
@@ -83,11 +77,29 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
     }
 
     @Override
-    public boolean validate(ValidateUserRequest request) {
-        String cpf = normalizeCpf(request.getCpf());
-        return repository.findByCpf(cpf)
-                .map(u -> passwordEncoder.matches(request.getPassword(), u.getPasswordHash()))
-                .orElse(false);
+    public UserLoginResponse validate(ValidateUserRequest request) {
+        String normalized = normalizeCpf(request.getCpf());
+
+        UserEntity user = repository.findByCpf(normalized)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        boolean validPassword = passwordEncoder.matches(request.getPassword(), user.getPasswordHash());
+        if (!validPassword) {
+            LOG.warn("Invalid password for cpfHash={}", safeHash(normalized));
+            throw new IllegalArgumentException("Invalid credentials.");
+        }
+
+        AuthResponseDTO tokenResponse;
+        try {
+            tokenResponse = gatewayClient.loginForUser(request.getCpf(), request.getPassword());
+        } catch (RuntimeException ex) {
+            LOG.error("Failed to generate token for cpfHash={}: {}", safeHash(normalized), ex.getMessage());
+            throw new IllegalStateException("Failed to generate token. User login aborted.", ex);
+        }
+
+        UserResponse userResponse = mapper.toResponse(user);
+        LOG.info("User validated successfully cpfHash={}", safeHash(normalized));
+        return new UserLoginResponse(userResponse, tokenResponse);
     }
 
     @Override

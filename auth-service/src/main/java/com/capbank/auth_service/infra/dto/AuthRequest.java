@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 public class AuthRequest {
 
     @NotBlank(message = "CPF is required")
-    // aceita formatado (000.000.000-00) ou só dígitos
     @Pattern(regexp = "^(\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2})$", message = "Invalid CPF format")
     private String cpf;
 

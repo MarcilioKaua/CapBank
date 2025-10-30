@@ -14,7 +14,7 @@
 
     <groupId>com.capbank</groupId>
     <artifactId>auth-service</artifactId>
-    <version>v0.1.2</version>
+    <version>v1.0.1</version>
     <name>auth-service</name>
     <description>Authentication microservice for CapBank</description>
 
@@ -75,7 +75,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>

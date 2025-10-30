@@ -1,4 +1,4 @@
-<div class="extract-container">
+<div>
   @if (isMobile()) {
   <mat-toolbar class="mobile-header">
     <button mat-icon-button (click)="goBack()">
@@ -9,7 +9,7 @@
       <mat-icon>more_vert</mat-icon>
     </button>
   </mat-toolbar>
-  } @if (!isMobile()) {
+  } @else {
   <nav class="breadcrumb">
     <a routerLink="/dashboard" class="breadcrumb__link">Dashboard</a>
     <mat-icon class="breadcrumb__separator">chevron_right</mat-icon>
@@ -22,57 +22,67 @@
   }
 
   <div class="filters-section">
-    @if (isMobile()) {
-    <div class="period-chips">
-      @for (option of periodOptions; track option.value) {
-      <mat-chip-option
-        [selected]="selectedPeriod() === option.value"
-        (click)="selectPeriod(option.value)"
-        class="period-chip"
-      >
-        {{ option.label.replace('Últimos ', '').replace(' dias', ' dias') }}
-      </mat-chip-option>
-      }
-    </div>
-    }
     <form [formGroup]="filterForm" class="filters-form">
       @if (!isMobile()) {
-      <div class="desktop-filters">
-        <app-custom-input label="Período" type="select" [options]="periodOptions" />
-        <app-custom-input label="Tipo" type="select" [options]="typeOptions" />
-
+      <div class="flex flex-row gap-3">
+        <app-custom-input
+          label="Categoria"
+          type="select"
+          [options]="typeOptions"
+          formControlName="type"
+          style="width: 200px; min-width: 150px"
+        />
+        <app-custom-input
+          label="Período"
+          type="select"
+          [options]="periodOptions"
+          formControlName="period"
+          style="width: 200px; min-width: 150px"
+        />
+        <app-custom-input
+          label="Data Inicial"
+          type="date"
+          formControlName="initialDate"
+          style="width: 150px"
+        />
+        <app-custom-input
+          label="Data Final"
+          type="date"
+          formControlName="finalDate"
+          style="width: 150px"
+        />
+      </div>
+      <div class="flex flex-row gap-3">
         <app-custom-input
           type="text"
-          label="Buscar"
+          label="Descrição"
           placeholder="Buscar por descrição..."
-          suffixIcon="search"
+          formControlName="search"
+          style="width: 736px"
         />
-
-        <button mat-flat-button color="primary" class="export-btn" (click)="exportPDF()">
-          <mat-icon>picture_as_pdf</mat-icon>
-          Exportar PDF
+        <button mat-flat-button color="primary" class="search-btn" (click)="findTransactions()">
+          <mat-icon>search</mat-icon>
+          Buscar
         </button>
       </div>
-      } @if (isMobile()) {
+      } @else {
       <div class="mobile-filters">
-        <div class="mobile-filter-row">
-          <mat-form-field appearance="outline" class="mobile-select">
-            <mat-select formControlName="type">
-              <mat-option *ngFor="let option of typeOptions" [value]="option.value">
-                {{ option.label }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <button mat-icon-button class="export-mobile-btn" (click)="exportPDF()">
-            <mat-icon>download</mat-icon>
-          </button>
-        </div>
-
-        <mat-form-field appearance="outline" class="mobile-search">
-          <input matInput formControlName="search" placeholder="Buscar por descrição..." />
-          <mat-icon matPrefix>search</mat-icon>
-        </mat-form-field>
+        <app-custom-input
+          label="Período"
+          type="select"
+          [options]="periodOptions"
+          formControlName="period"
+        />
+        <app-custom-input
+          type="text"
+          label="Descrição"
+          placeholder="Buscar por descrição..."
+          formControlName="search"
+        />
+        <button mat-flat-button color="primary" class="search-btn" (click)="findTransactions()">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
       </div>
       }
     </form>
@@ -92,8 +102,10 @@
       <mat-card class="transactions-table-card">
         <table mat-table [dataSource]="group.transactions" class="transactions-table">
           <ng-container matColumnDef="time">
-            <th mat-header-cell *matHeaderCellDef>Hora</th>
-            <td mat-cell *matCellDef="let transaction">{{ formatTime(transaction.date) }}</td>
+            <th mat-header-cell *matHeaderCellDef width="100px">Hora</th>
+            <td mat-cell *matCellDef="let transaction">
+              {{ formatTime(transaction.record_date) }}
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="description">
@@ -103,14 +115,7 @@
                 <div class="transaction-icon" [style.background-color]="transaction.iconColor">
                   <mat-icon>{{ transaction.icon }}</mat-icon>
                 </div>
-                <div class="description-content">
-                  <span class="description-main">{{
-                    transaction.description.split(' - ')[0]
-                  }}</span>
-                  <span class="description-sub">{{
-                    transaction.description.split(' - ')[1] || ''
-                  }}</span>
-                </div>
+                <span class="description-main">{{ transaction.description }}</span>
               </div>
             </td>
           </ng-container>
@@ -118,7 +123,10 @@
           <ng-container matColumnDef="category">
             <th mat-header-cell *matHeaderCellDef>Categoria</th>
             <td mat-cell *matCellDef="let transaction">
-              <span class="category-badge" [class]="'category-badge--' + transaction.type">
+              <span
+                class="category-badge"
+                [class]="'category-badge--' + transaction.transaction_type.toLowerCase()"
+              >
                 {{ getTransactionCategory(transaction) }}
               </span>
             </td>
@@ -129,9 +137,13 @@
             <td mat-cell *matCellDef="let transaction">
               <span
                 class="amount"
-                [class]="transaction.type === 'deposit' ? 'amount--positive' : 'amount--negative'"
+                [class]="
+                  transaction.transaction_type.toLowerCase() === 'deposit'
+                    ? 'amount--positive'
+                    : 'amount--negative'
+                "
               >
-                {{ formatAmount(transaction.amount, transaction.type) }}
+                {{ formatAmount(transaction.transaction_amount, transaction.transaction_type) }}
               </span>
             </td>
           </ng-container>
@@ -139,16 +151,7 @@
           <ng-container matColumnDef="balance">
             <th mat-header-cell *matHeaderCellDef>Saldo</th>
             <td mat-cell *matCellDef="let transaction">
-              <span class="balance">{{ formatBalance(transaction.balance || 0) }}</span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Ações</th>
-            <td mat-cell *matCellDef="let transaction">
-              <button mat-icon-button (click)="viewDetails(transaction.id)">
-                <mat-icon>visibility</mat-icon>
-              </button>
+              <span class="balance">{{ formatBalance(transaction.balance_after || 0) }}</span>
             </td>
           </ng-container>
 
@@ -159,9 +162,10 @@
       }
     </div>
   </div>
-  } @if (isMobile()) {
+  } @else {
   <div class="mobile-content">
-    <div *ngFor="let group of groupedTransactions()" class="mobile-group">
+    @for (group of groupedTransactions(); track group.date) {
+    <div class="mobile-group">
       <div class="mobile-group-header">
         <span class="mobile-group-date">{{ group.date }}</span>
         <span
@@ -179,12 +183,13 @@
       </div>
 
       <div class="mobile-transactions">
-        <div
-          *ngFor="let transaction of group.transactions"
-          class="mobile-transaction"
-          (click)="viewDetails(transaction.id)"
-        >
-          <div class="mobile-transaction__icon" [style.background-color]="transaction.iconColor">
+        @for (transaction of group.transactions; track transaction.record_date) {
+        <div class="mobile-transaction" (click)="viewDetails(transaction.id)">
+          <div
+            class="transaction-icon"
+            style="margin-right: 1rem"
+            [style.background-color]="transaction.iconColor"
+          >
             <mat-icon>{{ transaction.icon }}</mat-icon>
           </div>
 
@@ -195,9 +200,13 @@
               }}</span>
               <span
                 class="mobile-transaction__amount"
-                [class]="transaction.type === 'deposit' ? 'amount--positive' : 'amount--negative'"
+                [class]="
+                  transaction.transaction_type.toLocaleLowerCase() === 'deposit'
+                    ? 'amount--positive'
+                    : 'amount--negative'
+                "
               >
-                {{ formatAmount(transaction.amount, transaction.type) }}
+                {{ formatAmount(transaction.transaction_amount, transaction.transaction_type) }}
               </span>
             </div>
             <div class="mobile-transaction__sub">
@@ -205,45 +214,54 @@
                 transaction.description.split(' - ')[1] || getTransactionCategory(transaction)
               }}</span>
               <span class="mobile-transaction__balance">{{
-                formatBalance(transaction.balance || 0)
+                formatBalance(transaction.transaction_amount || 0)
               }}</span>
             </div>
-            <div class="mobile-transaction__time">{{ formatTime(transaction.date) }}</div>
+            <div class="mobile-transaction__time">
+              {{ formatTime(transaction.record_date) }}
+            </div>
           </div>
 
           <mat-icon class="mobile-transaction__arrow">chevron_right</mat-icon>
         </div>
+        }
       </div>
     </div>
+    }
   </div>
   }
 
   <div class="pagination-section">
-    @if (!isMobile()) {
-    <div class="desktop-pagination">
-      <mat-paginator
-        [length]="filteredTransactions().length"
-        [pageSize]="10"
-        [pageSizeOptions]="[5, 10, 20]"
-        aria-label="Selecione página"
+    <div class="pagination-info">
+      @if (filteredTransactions().length > 0) {
+      <span>
+        Mostrando {{ (currentPage() - 1) * pageSize() + 1 }} -
+        {{
+          currentPage() * pageSize() < filteredTransactions().length
+            ? currentPage() * pageSize()
+            : filteredTransactions().length
+        }}
+        de {{ filteredTransactions().length }} transações
+      </span>
+      } @else {
+      <span>Nenhuma transação encontrada</span>
+      }
+    </div>
+
+    <div class="pagination-controls">
+      <button mat-icon-button (click)="previousPage()" [disabled]="currentPage() === 1">
+        <mat-icon style="display: flex">chevron_left</mat-icon>
+      </button>
+
+      <span class="page-indicator">{{ currentPage() }} de {{ totalPages }}</span>
+
+      <button
+        mat-icon-button
+        (click)="nextPage()"
+        [disabled]="currentPage() === totalPages || filteredTransactions().length === 0"
       >
-      </mat-paginator>
+        <mat-icon style="display: flex">chevron_right</mat-icon>
+      </button>
     </div>
-    } @if (isMobile()) {
-    <div class="mobile-pagination">
-      <div class="pagination-info">
-        <span>Mostrando 1-10 de {{ filteredTransactions().length }} transações</span>
-      </div>
-      <div class="pagination-controls">
-        <button mat-icon-button disabled>
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <span class="page-indicator">1 de 3</span>
-        <button mat-icon-button>
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-      </div>
-    </div>
-    }
   </div>
 </div>

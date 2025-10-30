@@ -141,6 +141,14 @@
   margin: 0;
 }
 
+.custom-input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+  filter: invert(0.4);
+}
+
 .custom-input[type='number'] {
   -moz-appearance: textfield;
 }
@@ -296,20 +304,37 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   flex: 1;
-  border: none;
+  border-radius: 8px;
   outline: none;
-  background: transparent;
+  background-color: #fff;
   font-size: 16px;
   color: #333;
-  padding: 16px 40px 16px 12px; /* espaço pra o ícone da seta */
+  padding: 12px 40px 12px 14px; /* espaço para o ícone */
   width: 100%;
   font-family: 'Roboto', sans-serif;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
-/* Adiciona ícone de seta ▼ */
-.custom-select::-ms-expand {
-  display: none;
+.custom-select {
+  background-image: url("data:image/svg+xml;utf8,<svg fill='none' stroke='%23666' stroke-width='2' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+}
+
+.custom-select:focus {
+  border-color: #2563eb; /* azul moderno */
+}
+
+.custom-select:hover {
+  border-color: #9ca3af;
+}
+
+.custom-select option[value=''] {
+  color: #aaa;
 }
 
 .input-wrapper::after {
@@ -326,10 +351,4 @@
 
 .custom-input-container.focused .input-wrapper::after {
   color: #1976d2;
-}
-
-.custom-select:disabled {
-  color: #999;
-  background-color: transparent;
-  cursor: not-allowed;
 }

@@ -6,6 +6,8 @@ spring:
     name: gateway-service
   cloud:
     gateway:
+      metrics:
+        enabled: true
       routes:
         - id: frontend-service
           uri: ${services.frontend.base-url:http://localhost:8080}
@@ -81,7 +83,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 resilience4j:
   circuitbreaker:

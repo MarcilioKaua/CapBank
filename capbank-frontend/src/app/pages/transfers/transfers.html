@@ -7,7 +7,7 @@
     <span class="header-title">Transferência</span>
   </mat-toolbar>
 
-  <div *ngIf="!isMobile()" class="desktop-layout">
+  <div *ngIf="isMobile()" class="desktop-layout">
     <app-sidebar></app-sidebar>
 
     <main class="main-content">
@@ -84,7 +84,7 @@
     </main>
   </div>
 
-  <div *ngIf="isMobile()" class="mobile-content">
+  <div *ngIf="!isMobile()" class="mobile-content">
     <mat-card class="balance-card">
       <div class="balance-header">
         <h3>Sua Conta</h3>

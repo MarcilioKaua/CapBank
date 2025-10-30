@@ -4,16 +4,17 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';              // ✅ importar
 import localePt from '@angular/common/locales/pt';
+import { authInterceptor } from './shared/interceptors/auth.interceptor';
 
 registerLocaleData(localePt);  // registro simples
 
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
 
     { provide: LOCALE_ID, useValue: 'pt-BR' },    // locale global
     { provide: DEFAULT_CURRENCY_CODE, useValue: 'BRL' }, // moeda padrão

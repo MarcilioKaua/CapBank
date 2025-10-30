@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, HostListener } from '@angular/core';
+import { Component, signal, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Sidebar } from './components/sidebar/sidebar';
 import { filter } from 'rxjs';
 import { ToastContainerComponent } from './components/toast/toast-container/toast-container.component';
+import { AuthService } from './shared/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ import { ToastContainerComponent } from './components/toast/toast-container/toas
 })
 export class App implements OnInit {
   protected readonly title = signal('capbank-frontend');
+  private authService = inject(AuthService);
 
   isMobile = signal(false);
   sidebarOpen = signal(false);
@@ -70,4 +72,9 @@ export class App implements OnInit {
   onMenuClick(menuId: string): void {
     console.log('Menu clicked:', menuId);
   }
+  
+  logout() {
+    this.authService.logout();
+  }
+
 }

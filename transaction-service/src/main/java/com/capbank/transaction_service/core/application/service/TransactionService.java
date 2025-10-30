@@ -1,6 +1,7 @@
 package com.capbank.transaction_service.core.application.service;
 
 import com.capbank.transaction_service.core.application.port.in.*;
+import com.capbank.transaction_service.core.application.port.out.BankAccountServicePort;
 import com.capbank.transaction_service.core.application.port.out.NotificationServicePort;
 import com.capbank.transaction_service.core.application.port.out.TransactionHistoryRepositoryPort;
 import com.capbank.transaction_service.core.application.port.out.TransactionRepositoryPort;
@@ -31,17 +32,19 @@ public class TransactionService implements
     private final TransactionRepositoryPort transactionRepository;
     private final TransactionHistoryRepositoryPort historyRepository;
     private final NotificationServicePort notificationService;
+    private final BankAccountServicePort bankAccountService;
 
     public TransactionService(
             TransactionRepositoryPort transactionRepository,
             TransactionHistoryRepositoryPort historyRepository,
-            NotificationServicePort notificationService) {
+            NotificationServicePort notificationService,
+            BankAccountServicePort bankAccountService) {
         this.transactionRepository = transactionRepository;
         this.historyRepository = historyRepository;
         this.notificationService = notificationService;
+        this.bankAccountService = bankAccountService;
     }
 
-    // Original method - kept for backward compatibility
     @Override
     public CreateTransactionUseCase.TransactionResult processTransaction(CreateTransactionCommand command) {
         logger.info("Processing transaction: type={}, amount={}", command.type(), command.amount());
@@ -73,7 +76,6 @@ public class TransactionService implements
         }
     }
 
-    // Specific method for deposits
     @Override
     public DepositUseCase.TransactionResult processDeposit(DepositUseCase.DepositCommand command) {
         logger.info("Processing deposit: targetAccountId={}, amount={}",
@@ -89,13 +91,21 @@ public class TransactionService implements
             Transaction savedTransaction = transactionRepository.save(transaction);
             logger.info("Deposit transaction created with ID: {}", savedTransaction.getId());
 
-            // 2. Create transaction history
+            // 2. Update account balance
+            bankAccountService.updateBalance(
+                    savedTransaction.getTargetAccountId(),
+                    savedTransaction.getAmount(),
+                    BankAccountServicePort.BalanceOperation.ADD
+            );
+            logger.info("Account balance updated for deposit: {}", savedTransaction.getId());
+
+            // 3. Create transaction history
             Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
             TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
             historyRepository.save(history);
             logger.info("Transaction history created for deposit: {}", savedTransaction.getId());
 
-            // 3. Send notification
+            // 4. Send notification
             boolean notificationSent = sendTransactionNotification(savedTransaction);
             logger.info("Notification sent: {} for deposit: {}", notificationSent, savedTransaction.getId());
 
@@ -110,7 +120,6 @@ public class TransactionService implements
         }
     }
 
-    // Specific method for withdrawals
     @Override
     public WithdrawalUseCase.TransactionResult processWithdrawal(WithdrawalUseCase.WithdrawalCommand command) {
         logger.info("Processing withdrawal: sourceAccountId={}, amount={}",
@@ -126,13 +135,21 @@ public class TransactionService implements
             Transaction savedTransaction = transactionRepository.save(transaction);
             logger.info("Withdrawal transaction created with ID: {}", savedTransaction.getId());
 
-            // 2. Create transaction history
+            // 2. Update account balance
+            bankAccountService.updateBalance(
+                    savedTransaction.getSourceAccountId(),
+                    savedTransaction.getAmount(),
+                    BankAccountServicePort.BalanceOperation.SUBTRACT
+            );
+            logger.info("Account balance updated for withdrawal: {}", savedTransaction.getId());
+
+            // 3. Create transaction history
             Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
             TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
             historyRepository.save(history);
             logger.info("Transaction history created for withdrawal: {}", savedTransaction.getId());
 
-            // 3. Send notification
+            // 4. Send notification
             boolean notificationSent = sendTransactionNotification(savedTransaction);
             logger.info("Notification sent: {} for withdrawal: {}", notificationSent, savedTransaction.getId());
 
@@ -147,7 +164,6 @@ public class TransactionService implements
         }
     }
 
-    // Specific method for transfers
     @Override
     public TransferUseCase.TransactionResult processTransfer(TransferUseCase.TransferCommand command) {
         logger.info("Processing transfer: sourceAccountId={}, targetAccountId={}, amount={}",
@@ -164,13 +180,30 @@ public class TransactionService implements
             Transaction savedTransaction = transactionRepository.save(transaction);
             logger.info("Transfer transaction created with ID: {}", savedTransaction.getId());
 
-            // 2. Create transaction history
+            // 2. Update account balances
+            // Subtract from source account
+            bankAccountService.updateBalance(
+                    savedTransaction.getSourceAccountId(),
+                    savedTransaction.getAmount(),
+                    BankAccountServicePort.BalanceOperation.SUBTRACT
+            );
+            logger.info("Source account balance updated for transfer: {}", savedTransaction.getId());
+
+            // Add to target account
+            bankAccountService.updateBalance(
+                    savedTransaction.getTargetAccountId(),
+                    savedTransaction.getAmount(),
+                    BankAccountServicePort.BalanceOperation.ADD
+            );
+            logger.info("Target account balance updated for transfer: {}", savedTransaction.getId());
+
+            // 3. Create transaction history
             Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
             TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
             historyRepository.save(history);
             logger.info("Transaction history created for transfer: {}", savedTransaction.getId());
 
-            // 3. Send notification
+            // 4. Send notification
             boolean notificationSent = sendTransactionNotification(savedTransaction);
             logger.info("Notification sent: {} for transfer: {}", notificationSent, savedTransaction.getId());
 

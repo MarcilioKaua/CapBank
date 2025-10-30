@@ -85,3 +85,9 @@ info:
     encoding: UTF-8
     java:
       version: 17
+
+services:
+  bankaccount:
+    url: ${SERVICES_BANKACCOUNT_URL:http://localhost:8084}
+  notification:
+    url: ${SERVICES_NOTIFICATION_URL:http://localhost:8086}

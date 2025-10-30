@@ -19,7 +19,7 @@ public class TransactionPersistenceMapper {
                 transaction.getSourceAccountId() != null ? transaction.getSourceAccountId().getValue() : null,
                 transaction.getTargetAccountId() != null ? transaction.getTargetAccountId().getValue() : null,
                 transaction.getType(),
-                transaction.getAmount().getAmount(),
+                transaction.getAmount().getAmount().setScale(2),
                 transaction.getDescription(),
                 transaction.getTransactionDate(),
                 transaction.getStatus()

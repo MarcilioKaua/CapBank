@@ -100,7 +100,7 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     private boolean isTransactionOrTransferRequest(String path, String method) {
         if (!"POST".equalsIgnoreCase(method)) return false;
-        return path.startsWith("/api/transactions");
+        return path.startsWith("/api/transaction");
     }
 
     private String safeHash(String value) {

@@ -1,0 +1,267 @@
+<div>
+  @if (isMobile()) {
+  <mat-toolbar class="mobile-header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="mobile-header__title">Extrato</span>
+    <button mat-icon-button>
+      <mat-icon>more_vert</mat-icon>
+    </button>
+  </mat-toolbar>
+  } @else {
+  <nav class="breadcrumb">
+    <a routerLink="/dashboard" class="breadcrumb__link">Dashboard</a>
+    <mat-icon class="breadcrumb__separator">chevron_right</mat-icon>
+    <span class="breadcrumb__current">Extrato</span>
+  </nav>
+  <div class="page-header">
+    <h1 class="page-title">Extrato</h1>
+    <p class="page-subtitle">Acompanhe todas as suas transações</p>
+  </div>
+  }
+
+  <div class="filters-section">
+    <form [formGroup]="filterForm" class="filters-form">
+      @if (!isMobile()) {
+      <div class="flex flex-row gap-3">
+        <app-custom-input
+          label="Categoria"
+          type="select"
+          [options]="typeOptions"
+          formControlName="type"
+          style="width: 200px; min-width: 150px"
+        />
+        <app-custom-input
+          label="Período"
+          type="select"
+          [options]="periodOptions"
+          formControlName="period"
+          style="width: 200px; min-width: 150px"
+        />
+        <app-custom-input
+          label="Data Inicial"
+          type="date"
+          formControlName="initialDate"
+          style="width: 150px"
+        />
+        <app-custom-input
+          label="Data Final"
+          type="date"
+          formControlName="finalDate"
+          style="width: 150px"
+        />
+      </div>
+      <div class="flex flex-row gap-3">
+        <app-custom-input
+          type="text"
+          label="Descrição"
+          placeholder="Buscar por descrição..."
+          formControlName="search"
+          style="width: 736px"
+        />
+        <button mat-flat-button color="primary" class="search-btn" (click)="findTransactions()">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+      </div>
+      } @else {
+      <div class="mobile-filters">
+        <app-custom-input
+          label="Período"
+          type="select"
+          [options]="periodOptions"
+          formControlName="period"
+        />
+        <app-custom-input
+          type="text"
+          label="Descrição"
+          placeholder="Buscar por descrição..."
+          formControlName="search"
+        />
+        <button mat-flat-button color="primary" class="search-btn" (click)="findTransactions()">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+      </div>
+      }
+    </form>
+  </div>
+
+  @if (!isMobile()) {
+  <div class="desktop-content">
+    <div class="transaction-group">
+      @for (group of groupedTransactions(); track group.date) {
+      <div class="group-header">
+        <h3 class="group-date">{{ group.date }}</h3>
+        <div class="group-summary">
+          <span class="transaction-count">{{ numberOfTransactions(group) }} </span>
+        </div>
+      </div>
+
+      <mat-card class="transactions-table-card">
+        <table mat-table [dataSource]="group.transactions" class="transactions-table">
+          <ng-container matColumnDef="time">
+            <th mat-header-cell *matHeaderCellDef width="100px">Hora</th>
+            <td mat-cell *matCellDef="let transaction">
+              {{ formatTime(transaction.record_date) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Descrição</th>
+            <td mat-cell *matCellDef="let transaction">
+              <div class="description-cell">
+                <div class="transaction-icon" [style.background-color]="transaction.iconColor">
+                  <mat-icon>{{ transaction.icon }}</mat-icon>
+                </div>
+                <span class="description-main">{{ transaction.description }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>Categoria</th>
+            <td mat-cell *matCellDef="let transaction">
+              <span
+                class="category-badge"
+                [class]="'category-badge--' + transaction.transaction_type.toLowerCase()"
+              >
+                {{ getTransactionCategory(transaction) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef>Valor</th>
+            <td mat-cell *matCellDef="let transaction">
+              <span
+                class="amount"
+                [class]="
+                  transaction.transaction_type.toLowerCase() === 'deposit'
+                    ? 'amount--positive'
+                    : 'amount--negative'
+                "
+              >
+                {{ formatAmount(transaction.transaction_amount, transaction.transaction_type) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="balance">
+            <th mat-header-cell *matHeaderCellDef>Saldo</th>
+            <td mat-cell *matCellDef="let transaction">
+              <span class="balance">{{ formatBalance(transaction.balance_after || 0) }}</span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </mat-card>
+      }
+    </div>
+  </div>
+  } @else {
+  <div class="mobile-content">
+    @for (group of groupedTransactions(); track group.date) {
+    <div class="mobile-group">
+      <div class="mobile-group-header">
+        <span class="mobile-group-date">{{ group.date }}</span>
+        <span
+          class="mobile-group-total"
+          [class]="
+            group.totalPositive > group.totalNegative ? 'amount--positive' : 'amount--negative'
+          "
+        >
+          {{
+            group.totalPositive > group.totalNegative
+              ? formatAmount(group.totalPositive - group.totalNegative, 'deposit')
+              : formatAmount(group.totalNegative - group.totalPositive, 'withdrawal')
+          }}
+        </span>
+      </div>
+
+      <div class="mobile-transactions">
+        @for (transaction of group.transactions; track transaction.record_date) {
+        <div class="mobile-transaction" (click)="viewDetails(transaction.id)">
+          <div
+            class="transaction-icon"
+            style="margin-right: 1rem"
+            [style.background-color]="transaction.iconColor"
+          >
+            <mat-icon>{{ transaction.icon }}</mat-icon>
+          </div>
+
+          <div class="mobile-transaction__content">
+            <div class="mobile-transaction__main">
+              <span class="mobile-transaction__description">{{
+                transaction.description.split(' - ')[0]
+              }}</span>
+              <span
+                class="mobile-transaction__amount"
+                [class]="
+                  transaction.transaction_type.toLocaleLowerCase() === 'deposit'
+                    ? 'amount--positive'
+                    : 'amount--negative'
+                "
+              >
+                {{ formatAmount(transaction.transaction_amount, transaction.transaction_type) }}
+              </span>
+            </div>
+            <div class="mobile-transaction__sub">
+              <span class="mobile-transaction__detail">{{
+                transaction.description.split(' - ')[1] || getTransactionCategory(transaction)
+              }}</span>
+              <span class="mobile-transaction__balance">{{
+                formatBalance(transaction.transaction_amount || 0)
+              }}</span>
+            </div>
+            <div class="mobile-transaction__time">
+              {{ formatTime(transaction.record_date) }}
+            </div>
+          </div>
+
+          <mat-icon class="mobile-transaction__arrow">chevron_right</mat-icon>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <div class="pagination-section">
+    <div class="pagination-info">
+      @if (filteredTransactions().length > 0) {
+      <span>
+        Mostrando {{ (currentPage() - 1) * pageSize() + 1 }} -
+        {{
+          currentPage() * pageSize() < filteredTransactions().length
+            ? currentPage() * pageSize()
+            : filteredTransactions().length
+        }}
+        de {{ filteredTransactions().length }} transações
+      </span>
+      } @else {
+      <span>Nenhuma transação encontrada</span>
+      }
+    </div>
+
+    <div class="pagination-controls">
+      <button mat-icon-button (click)="previousPage()" [disabled]="currentPage() === 1">
+        <mat-icon style="display: flex">chevron_left</mat-icon>
+      </button>
+
+      <span class="page-indicator">{{ currentPage() }} de {{ totalPages }}</span>
+
+      <button
+        mat-icon-button
+        (click)="nextPage()"
+        [disabled]="currentPage() === totalPages || filteredTransactions().length === 0"
+      >
+        <mat-icon style="display: flex">chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

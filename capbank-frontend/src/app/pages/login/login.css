@@ -1,0 +1,571 @@
+.login-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Desktop Header */
+.desktop-header {
+  background-color: #ffffff !important;
+  color: #333 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-icon {
+  color: #1976d2;
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.brand-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-item {
+  color: #666;
+  font-weight: 500;
+}
+
+.access-button {
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+/* Main Content */
+.login-content {
+  display: flex;
+  min-height: 100vh;
+}
+
+.login-content--mobile {
+  flex-direction: column;
+  padding-top: 0;
+}
+
+/* Hero Section (Desktop) */
+.hero-section {
+  flex: 1;
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.hero-content {
+  max-width: 480px;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0 0 1.5rem 0;
+}
+
+.hero-highlight {
+  color: #ffd54f;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  margin: 0 0 2.5rem 0;
+  opacity: 0.9;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.download-btn,
+.learn-btn {
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0 2rem;
+}
+
+.download-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.learn-btn {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+/* Login Panel */
+.login-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
+
+.login-card-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Mobile Brand */
+.mobile-brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mobile-brand__icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.mobile-brand__icon mat-icon {
+  color: white;
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.mobile-brand__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.mobile-brand__subtitle {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Login Card */
+.login-card {
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: none;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-icon {
+  width: 64px;
+  height: 64px;
+  background-color: #1976d2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.login-icon mat-icon {
+  color: white;
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.login-subtitle {
+  color: #666;
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Login Form */
+.login-form {
+  margin-bottom: 1.5rem;
+}
+
+.form-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.input-icon {
+  color: #999;
+}
+
+.password-toggle {
+  color: #666;
+}
+
+.login-button {
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+/* Login Links */
+.login-links {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.forgot-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Signup Section */
+.signup-section {
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1.5rem;
+}
+
+.signup-text {
+  color: #666;
+  font-size: 0.875rem;
+  margin: 0 0 1rem 0;
+}
+
+.signup-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.create-account-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Mobile Footer */
+.mobile-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1rem 0;
+}
+
+.mobile-footer p {
+  color: #999;
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+/* Cards Section (Desktop) */
+.cards-section {
+  background-color: #f8f9fa;
+  padding: 4rem 2rem;
+}
+
+.cards-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cards-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 1rem 0;
+}
+
+.cards-subtitle {
+  color: #666;
+  font-size: 1.125rem;
+  margin: 0 0 3rem 0;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.card-plan {
+  padding: 2rem;
+  border-radius: 16px;
+  color: white;
+  text-align: left;
+  position: relative;
+  border: none;
+}
+
+.card-plan__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.card-plan__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.card-plan__badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.card-plan__subtitle {
+  font-size: 0.875rem;
+  margin: 0 0 2rem 0;
+  opacity: 0.9;
+}
+
+.card-plan__benefits {
+  margin-bottom: 2rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.benefit-check {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.card-plan__button {
+  width: 100%;
+  height: 44px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Desktop Footer */
+.desktop-footer {
+  background-color: #2d3748;
+  color: white;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 3rem;
+}
+
+.footer-brand {
+  display: flex;
+  gap: 1rem;
+}
+
+.footer-brand__icon {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+  color: #1976d2;
+}
+
+.footer-brand__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.footer-brand__description {
+  color: #a0aec0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.footer-column h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.footer-column a {
+  color: #a0aec0;
+  text-decoration: none;
+  font-size: 0.875rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s;
+}
+
+.footer-column a:hover {
+  color: white;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-links mat-icon {
+  color: #a0aec0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.social-links mat-icon:hover {
+  color: #1976d2;
+}
+
+.footer-bottom {
+  border-top: 1px solid #4a5568;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+
+.footer-bottom p {
+  color: #a0aec0;
+  font-size: 0.875rem;
+  margin: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .desktop-header {
+    display: none;
+  }
+
+  .login-content {
+    padding-top: 2rem;
+  }
+
+  .login-panel {
+    padding: 1rem;
+    background-color: transparent;
+  }
+
+  .login-card {
+    padding: 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .login-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+  }
+
+  .login-icon mat-icon {
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .login-title {
+    font-size: 1.25rem;
+  }
+
+  .form-field {
+    margin-bottom: 1rem;
+  }
+
+  .cards-section,
+  .desktop-footer {
+    display: none;
+  }
+}
+
+/* Very Small Mobile */
+@media (max-width: 480px) {
+  .login-panel {
+    padding: 0.5rem;
+  }
+
+  .mobile-brand__icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .mobile-brand__title {
+    font-size: 1.75rem;
+  }
+
+  .login-card {
+    padding: 1.25rem;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+  .hero-title {
+    font-size: 4rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.375rem;
+  }
+
+  .login-panel {
+    padding: 3rem;
+  }
+
+  .login-card-container {
+    max-width: 480px;
+  }
+}

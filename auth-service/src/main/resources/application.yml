@@ -1,0 +1,40 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: auth-service
+
+  rest:
+    template:
+      connect-timeout: 3s
+      read-timeout: 5s
+
+jwt:
+  secret: ${JWT_SECRET:VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==}
+  expiration: ${JWT_EXPIRATION:3600000}
+  refreshExpiration: ${JWT_REFRESH_EXPIRATION:604800000}
+  issuer: ${JWT_ISSUER:capbank-gateway}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+    enabled: true
+  api-docs:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

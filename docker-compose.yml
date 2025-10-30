@@ -1,0 +1,341 @@
+version: '3.8'
+
+services:
+  postgres-users:
+    image: postgres:15-alpine
+    container_name: capbank-postgres-users
+    environment:
+      POSTGRES_DB: db_user
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_users_data:/var/lib/postgresql/data
+    networks:
+      - capbank-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL Database
+  postgres-transactions:
+    image: postgres:15-alpine
+    container_name: capbank-postgres-transactions
+    environment:
+      POSTGRES_DB: db_transaction
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_transactions_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - capbank-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_transaction"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+  postgres-accounts:
+    image: postgres:15-alpine
+    container_name: capbank-postgres-accounts
+    environment:
+      POSTGRES_DB: db_bankaccount
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_accounts_data:/var/lib/postgresql/data
+    networks:
+      - capbank-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_bankaccount"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL Database for Notifications
+  postgres-notifications:
+    image: postgres:15-alpine
+    container_name: capbank-postgres-notifications
+    environment:
+      POSTGRES_DB: db_notification
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_notifications_data:/var/lib/postgresql/data
+    networks:
+      - capbank-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_notification"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: capbank-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - capbank-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend-service:
+    build:
+      context: ./capbank-frontend
+      dockerfile: Dockerfile
+    container_name: capbank-frontend-service
+    environment:
+      GATEWAY_BASE_URL: http://gateway-service:8081
+    ports:
+      - "8080:8080"
+    networks:
+      - capbank-network
+    depends_on:
+      - gateway-service
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: capbank-gateway-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8081
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+      FRONTEND_SERVICE_BASE_URL: http://frontend-service:8080
+      USER_SERVICE_BASE_URL: http://user-service:8082
+      AUTH_SERVICE_BASE_URL: http://auth-service:8083
+      ACCOUNT_SERVICE_BASE_URL: http://bankaccount-service:8084
+      TRANSACTION_SERVICE_BASE_URL: http://transaction-service:8085
+      NOTIFICATION_SERVICE_BASE_URL: http://notification-service:8086
+      JWT_SECRET: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==
+    networks:
+      - capbank-network
+    depends_on:
+      - auth-service
+      - user-service
+      - bankaccount-service
+      - transaction-service
+      - notification-service
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: capbank-user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-users:5432/db_user
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SERVER_PORT: 8082
+      GATEWAY_BASE_URL: http://gateway-service:8081
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+    ports:
+      - "8082:8082"
+    networks:
+      - capbank-network
+    depends_on:
+      postgres-users:
+        condition: service_healthy
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: capbank-auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8083
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+      JWT_SECRET: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXkhIQ==
+      JWT_EXPIRATION: 3600000
+      JWT_ISSUER: capbank-gateway
+      USER_SERVICE_URL: http://user-service:8082
+    ports:
+      - "8083:8083"
+    networks:
+      - capbank-network
+    depends_on:
+      - user-service
+    restart: unless-stopped
+
+  # Bank Account Microservice
+  bankaccount-service:
+    build:
+      context: ./bankaccount-service
+      dockerfile: Dockerfile
+    container_name: capbank-bankaccount-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-accounts:5432/db_bankaccount
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SERVER_PORT: 8084
+      GATEWAY_BASE_URL: http://gateway-service:8081
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+    ports:
+      - "8084:8084"
+    networks:
+      - capbank-network
+    depends_on:
+      postgres-accounts:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Transaction History Microservice
+  transaction-service:
+    build:
+      context: ./transaction-service
+      dockerfile: Dockerfile
+    container_name: capbank-transaction-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-transactions:5432/db_transaction
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8085
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+      SERVICES_NOTIFICATION_URL: http://notification-service:8086
+    ports:
+      - "8085:8085"
+    networks:
+      - capbank-network
+    depends_on:
+      postgres-transactions:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Notification Microservice
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: capbank-notification-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-notifications:5432/db_notification
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      SERVER_PORT: 8086
+      LOGGING_LEVEL_COM_CAPBANK: INFO
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+    ports:
+      - "8086:8086"
+    networks:
+      - capbank-network
+    depends_on:
+      postgres-notifications:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/api/notifications/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # pgAdmin (opcional - para administração do banco)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: capbank-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@capbank.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8090:80"
+    networks:
+      - capbank-network
+    depends_on:
+      - postgres-transactions
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  # Prometheus monitoring
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: capbank-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - capbank-network
+    depends_on:
+      - gateway-service
+      - user-service
+      - auth-service
+      - bankaccount-service
+      - transaction-service
+      - notification-service
+    restart: unless-stopped
+
+volumes:
+  postgres_transactions_data:
+    driver: local
+  postgres_users_data:
+    driver: local
+  postgres_accounts_data:
+    driver: local
+  postgres_notifications_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  prometheus_data:
+    driver: local
+
+networks:
+  capbank-network:
+    driver: bridge
+    name: capbank-network

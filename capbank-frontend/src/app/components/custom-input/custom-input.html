@@ -1,0 +1,91 @@
+<div
+  class="custom-input-container"
+  [class.focused]="isFocused"
+  [class.filled]="shouldFloat"
+  [class.disabled]="disabled"
+  [class.error]="errorMessage && isTouched"
+>
+  <label class="custom-label" [class.float]="shouldFloat">
+    {{ label }}
+    <span *ngIf="required" class="required-asterisk">*</span>
+  </label>
+
+  <div class="input-wrapper">
+    <div class="prefix" *ngIf="prefixText || prefixIcon">
+      <mat-icon *ngIf="prefixIcon" class="prefix-icon">{{ prefixIcon }}</mat-icon>
+      <span *ngIf="prefixText" class="prefix-text">{{ prefixText }}</span>
+    </div>
+
+    <input
+      *ngIf="!isTextarea && !isSelect"
+      class="custom-input"
+      [type]="inputType"
+      [placeholder]="isFocused ? placeholder : ''"
+      [value]="value"
+      [disabled]="disabled"
+      [min]="min"
+      [max]="max"
+      [step]="step"
+      (input)="onInputChange($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      autocomplete="off"
+    />
+
+    <textarea
+      *ngIf="isTextarea"
+      class="custom-input custom-textarea"
+      [placeholder]="isFocused ? placeholder : ''"
+      [value]="value"
+      [disabled]="disabled"
+      [rows]="rows"
+      (input)="onInputChange($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      autocomplete="off"
+    ></textarea>
+
+    @if (isSelect) {
+    <select
+      class="custom-select"
+      [disabled]="disabled"
+      [value]="value"
+      (change)="onSelectChange($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    >
+      <option *ngIf="!shouldFloat" value="" disabled selected hidden>
+        {{ placeholder }}
+      </option>
+      <option *ngFor="let option of options" [value]="option.value">
+        {{ option.label }}
+      </option>
+    </select>
+    }
+
+    <div class="suffix" *ngIf="suffixIcon || showPasswordToggle">
+      <button
+        *ngIf="showPasswordToggle && type === 'password'"
+        type="button"
+        class="password-toggle-btn"
+        (click)="togglePasswordVisibility()"
+        [disabled]="disabled"
+      >
+        <mat-icon class="suffix-icon">{{
+          showPassword ? 'visibility' : 'visibility_off'
+        }}</mat-icon>
+      </button>
+
+      <mat-icon
+        *ngIf="suffixIcon && !(showPasswordToggle && type === 'password')"
+        class="suffix-icon"
+        >{{ suffixIcon }}</mat-icon
+      >
+    </div>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage && isTouched">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+</div>

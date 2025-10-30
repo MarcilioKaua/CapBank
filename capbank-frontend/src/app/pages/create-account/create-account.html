@@ -1,0 +1,186 @@
+<div class="create-account-container">
+  <!-- Mobile Header -->
+  @if(isMobile()) {
+  <mat-toolbar class="mobile-header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="mobile-header__title">Criar Conta</span>
+  </mat-toolbar>
+  }
+
+  <div class="create-account-content" [class.create-account-content--mobile]="isMobile()">
+    <!-- Desktop Left Panel -->
+    @if(!isMobile()) {
+    <div class="brand-panel">
+      <div class="brand-panel__content">
+        <div class="brand-logo">
+          <mat-icon class="brand-logo__icon">account_balance</mat-icon>
+        </div>
+        <h1 class="brand-title">CAP Bank</h1>
+        <p class="brand-subtitle">Seu banco digital de confiança</p>
+
+        <div class="benefits">
+          <div class="benefit-item">
+            <mat-icon class="benefit-icon">security</mat-icon>
+            <span class="benefit-text">Segurança máxima em todas as transações</span>
+          </div>
+          <div class="benefit-item">
+            <mat-icon class="benefit-icon">smartphone</mat-icon>
+            <span class="benefit-text">Acesso 24/7 pelo app ou web</span>
+          </div>
+          <div class="benefit-item">
+            <mat-icon class="benefit-icon">trending_up</mat-icon>
+            <span class="benefit-text">Investimentos com rentabilidade</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Form Panel -->
+    <div class="form-panel">
+      <div class="form-content">
+        <!-- Desktop Header -->
+        @if(!isMobile()) {
+        <div class="form-header">
+          <h2 class="form-title">Criar conta</h2>
+          <p class="form-subtitle">Preencha os dados para abrir sua conta</p>
+        </div>
+        }
+
+        <!-- Progress Stepper -->
+        <div class="progress-stepper">
+          <div class="stepper-container">
+            <div
+              *ngFor="let step of steps; let i = index"
+              class="step-item"
+              [class.step-item--active]="i === currentStep()"
+              [class.step-item--completed]="isStepCompleted(i)"
+            >
+              <div class="step-circle">
+                @if(isStepCompleted(i)) {
+                <mat-icon>check</mat-icon>
+                } @if(!isStepCompleted(i)) {
+                <span>{{ i + 1 }}</span>
+                }
+              </div>
+
+              <span class="step-label">{{ step.label }}</span>
+
+              @if(i < steps.length - 1) {
+              <div class="step-connector"></div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 1: Personal Data -->
+        <div *ngIf="currentStep() === 0" class="step-content">
+          <form [formGroup]="personalDataForm" (ngSubmit)="onSubmitPersonalData()">
+            <app-custom-input
+              label="Nome completo"
+              formControlName="fullName"
+              suffixIcon="person"
+              [required]="true"
+              [errorMessage]="getFullNameError()"
+            />
+
+            <app-custom-input
+              label="CPF"
+              placeholder="000.000.000-00"
+              cpfMask="000.000.000-00"
+              formControlName="cpf"
+              [required]="true"
+              [errorMessage]="getCpfError()"
+              suffixIcon="badge"
+            />
+
+            <app-custom-input
+              label="Data de nascimento"
+              formControlName="birthDate"
+              type="date"
+              [required]="true"
+              [errorMessage]="getBirthDateError()"
+              suffixIcon="calendar_today"
+            />
+
+            <app-custom-input
+              label="Telefone"
+              formControlName="phone"
+              phoneMask
+              [required]="true"
+              [errorMessage]="getPhoneError()"
+              suffixIcon="phone"
+            />
+
+            <button mat-flat-button color="primary" type="submit" class="step-button">
+              {{ isMobile() ? 'Continuar' : 'Próximo' }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </form>
+        </div>
+
+        <!-- Step 2: Access Data -->
+        <div *ngIf="currentStep() === 1" class="step-content">
+          <form [formGroup]="accessForm" (ngSubmit)="onSubmitAccess()">
+            <app-custom-input
+              label="Email"
+              formControlName="email"
+              [required]="true"
+              placeholder="seu@email.com"
+              type="email"
+              [errorMessage]="getEmailError()"
+              suffixIcon="email"
+            />
+
+            <app-custom-input
+              label="Senha"
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              formControlName="password"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [errorMessage]="getPasswordError()"
+            />
+
+            <app-custom-input
+              label="Confirmar senha"
+              type="password"
+              placeholder="Repita sua senha"
+              formControlName="confirmPassword"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [errorMessage]="getConfirmPasswordError()"
+            />
+
+            <mat-checkbox formControlName="acceptTerms" class="terms-checkbox">
+              Aceito os <a href="#" class="terms-link">termos de uso</a> e
+              <a href="#" class="terms-link">política de privacidade</a>
+            </mat-checkbox>
+
+            <div class="step-buttons">
+              <button mat-raised-button type="button" (click)="previousStep()" class="back-button">
+                <mat-icon>arrow_back</mat-icon>
+                Voltar
+              </button>
+              <button mat-flat-button color="primary" type="submit" class="step-button">
+                Criar conta
+                <mat-icon>check_circle</mat-icon>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Mobile Step Counter -->
+        <div *ngIf="isMobile()" class="step-counter">
+          Etapa {{ currentStep() + 1 }} de {{ steps.length }}
+        </div>
+
+        <div class="login-link">
+          <p>Já tem uma conta? <a routerLink="/login" class="link">Fazer login</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

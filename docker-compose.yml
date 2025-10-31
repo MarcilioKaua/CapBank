@@ -229,6 +229,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8085
       LOGGING_LEVEL_COM_CAPBANK: INFO
+      SERVICES_BANKACCOUNT_URL: http://bankaccount-service:8084
       SERVICES_NOTIFICATION_URL: http://notification-service:8086
     ports:
       - "8085:8085"

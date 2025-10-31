@@ -3,6 +3,7 @@ package com.capbank.transaction_service.unit;
 import com.capbank.transaction_service.core.application.port.in.DepositUseCase;
 import com.capbank.transaction_service.core.application.port.in.WithdrawalUseCase;
 import com.capbank.transaction_service.core.application.port.in.TransferUseCase;
+import com.capbank.transaction_service.core.application.port.out.BankAccountServicePort;
 import com.capbank.transaction_service.core.application.port.out.NotificationServicePort;
 import com.capbank.transaction_service.core.application.port.out.TransactionHistoryRepositoryPort;
 import com.capbank.transaction_service.core.application.port.out.TransactionRepositoryPort;
@@ -39,6 +40,9 @@ class TransactionServiceTest {
     @Mock
     private NotificationServicePort notificationService;
 
+    @Mock
+    private BankAccountServicePort bankAccountService;
+
     private TransactionService transactionService;
 
     private AccountId sourceAccountId;
@@ -50,7 +54,8 @@ class TransactionServiceTest {
         transactionService = new TransactionService(
                 transactionRepository,
                 historyRepository,
-                notificationService
+                notificationService,
+                bankAccountService
         );
 
         sourceAccountId = new AccountId("550e8400-e29b-41d4-a716-446655440000");

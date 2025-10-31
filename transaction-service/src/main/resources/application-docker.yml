@@ -78,3 +78,9 @@ info:
     name: Transaction History Service
     description: Microservice for managing transaction history
     version: 1.0.0
+
+services:
+  bankaccount:
+    url: ${SERVICES_BANKACCOUNT_URL:http://localhost:8084}
+  notification:
+    url: ${SERVICES_NOTIFICATION_URL:http://localhost:8086}

@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/api/transaction")
 @Tag(name = "Transactions", description = "APIs para gerenciamento de transações bancárias")
 public class TransactionController {
 

@@ -48,15 +48,10 @@
           </div>
           <div class="transaction-item__details">
             <span class="transaction-item__description">{{ transaction.description }}</span>
-            <span class="transaction-item__date">{{
-              formatDateTime(transaction.record_date)
-            }}</span>
+            <span class="transaction-item__date">{{ transaction.date }}</span>
           </div>
-          <div
-            class="transaction-item__amount"
-            [class]="getAmountClass(transaction.transaction_type)"
-          >
-            {{ formatAmount(transaction.transaction_amount, transaction.transaction_type) }}
+          <div class="transaction-item__amount" [class]="getAmountClass(transaction.type)">
+            {{ formatAmount(transaction.amount, transaction.type) }}
           </div>
         </div>
         }

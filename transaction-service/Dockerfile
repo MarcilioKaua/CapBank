@@ -7,7 +7,7 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-RUN mvn -q -Dmaven.wagon.http.retryHandler.count=3 -DskipTests clean package
+RUN mvn -q -DskipTests clean package
 
 FROM eclipse-temurin:17-jre-jammy
 

@@ -6,6 +6,7 @@ import com.capbank.bankaccount_service.core.domain.enums.AccountStatus;
 import com.capbank.bankaccount_service.core.domain.model.BankAccount;
 import com.capbank.bankaccount_service.infra.dto.BankAccountResponseDTO;
 import com.capbank.bankaccount_service.infra.exception.BankAccountNotFoundException;
+import com.capbank.bankaccount_service.infra.mapper.BankAccountMapper;
 import com.capbank.bankaccount_service.infra.mapper.BankAccountResponseMapper;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +19,16 @@ import java.util.UUID;
 public class BankAccountServiceImpl implements BankAccountUseCase {
 
     private final BankAccountRepositoryPort bankAccountRepository;
+    private final BankAccountMapper bankAccountMapper;
     private final BankAccountResponseMapper bankAccountResponseMapper;
 
     public BankAccountServiceImpl(
             BankAccountRepositoryPort bankAccountRepository,
+            BankAccountMapper bankAccountMapper,
             BankAccountResponseMapper bankAccountResponseMapper
     ) {
         this.bankAccountRepository = bankAccountRepository;
+        this.bankAccountMapper = bankAccountMapper;
         this.bankAccountResponseMapper = bankAccountResponseMapper;
     }
 

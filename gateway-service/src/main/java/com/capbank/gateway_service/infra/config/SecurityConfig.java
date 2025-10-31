@@ -17,7 +17,6 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/v3/api-docs/**").permitAll()
-                        .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().permitAll()
                 )
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)

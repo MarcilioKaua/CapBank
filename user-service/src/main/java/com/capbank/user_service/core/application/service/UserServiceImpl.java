@@ -13,7 +13,6 @@ import com.capbank.user_service.infra.dto.UpdateUserRequest;
 import com.capbank.user_service.infra.dto.UserResponse;
 import com.capbank.user_service.infra.dto.ValidateUserRequest;
 import com.capbank.user_service.infra.mapper.UserMapper;
-import com.capbank.user_service.infra.metrics.UserMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,15 +30,13 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
     private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
     private final GatewayClientPort gatewayClient;
-    private final UserMetrics userMetrics;
 
     public UserServiceImpl(UserRepositoryPort repository, PasswordEncoder passwordEncoder, UserMapper mapper,
-                           GatewayClientPort gatewayClient,  UserMetrics userMetrics) {
+                           GatewayClientPort gatewayClient) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
         this.gatewayClient = gatewayClient;
-        this.userMetrics = userMetrics;
     }
 
     @Override
@@ -70,13 +67,11 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
         try {
             gatewayClient.createForUser(userEntity.getId(), userEntity.getAccountType());
         } catch (RuntimeException ex) {
-            userMetrics.incrementCreateFailure();
             LOG.error("Failed to create bank account for userId={}, aborting user creation before persistence. Reason: {}", userEntity.getId(), ex.getMessage());
             throw new IllegalStateException("Failed to create bank account. User registration aborted.", ex);
         }
 
         UserEntity saved = repository.save(userEntity);
-        userMetrics.incrementCreateSuccess();
         LOG.info("UserEntity created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
 
         return mapper.toResponse(saved);

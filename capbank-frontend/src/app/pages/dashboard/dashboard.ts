@@ -1,13 +1,14 @@
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatIconModule } from '@angular/material/icon';
+import { MatChip, MatChipOption } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
-import { RouterModule } from '@angular/router';
-import { QuickAction } from '../../shared/models/sidebar.model';
 import { Transaction } from '../../shared/models/transaction.model';
+import { QuickAction } from '../../shared/models/sidebar.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,7 +22,7 @@ import { Transaction } from '../../shared/models/transaction.model';
     MatMenuModule,
   ],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
   balance = signal(12547.89);
@@ -30,52 +31,55 @@ export class Dashboard implements OnInit {
   formattedBalance = computed(() => {
     return this.balance().toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 2
     });
   });
 
   recentTransactions = signal<Transaction[]>([
     {
-      id: '1a2b3c4d-5e6f-7001-89ab-cdef01234567',
-      account_id: 'acc-98765',
-      transaction_id: 'txn-5001',
-      transaction_type: 'deposit',
-      description: 'Depósito Salarial Mensal',
-      transaction_amount: 500.0,
-      balance_before: 2100.5,
-      balance_after: 7600.5,
-      record_date: '2025-10-25T09:30:00',
-      status: 'completed',
-      icon: 'payments',
-      iconColor: 'green',
+      id: '1',
+      type: 'deposit',
+      description: 'Depósito PIX',
+      amount: 1250.0,
+      date: 'Hoje, 14:30',
+      icon: 'arrow_downward',
+      iconColor: '#4caf50'
     },
     {
-      id: '2b3c4d5e-6f70-8112-9abc-def012345678',
-      account_id: 'acc-98765',
-      transaction_id: 'txn-5002',
-      transaction_type: 'withdrawal',
-      description: 'Compra em Supermercado',
-      transaction_amount: 150.75,
-      balance_before: 7600.5,
-      balance_after: 7449.75,
-      record_date: '2025-10-26T14:15:20',
-      status: 'completed',
+      id: '2',
+      type: 'withdrawal',
+      description: 'Supermercado ABC',
+      amount: 89.5,
+      date: 'Ontem, 18:45',
       icon: 'shopping_cart',
-      iconColor: 'red',
+      iconColor: '#f44336'
     },
     {
-      id: '3c4d5e6f-7081-9223-abca-f01234567890',
-      account_id: 'acc-98765',
-      transaction_id: 'txn-5003',
-      transaction_type: 'transfer',
-      description: 'Transferência para Poupança',
-      transaction_amount: 1000.0,
-      balance_before: 7449.75,
-      balance_after: 6449.75,
-      record_date: '2025-10-27T18:05:45',
-      status: 'completed',
-      icon: 'swap_horiz',
-      iconColor: 'blue',
+      id: '3',
+      type: 'transfer',
+      description: 'Transferência para Maria',
+      amount: 300.0,
+      date: 'Ontem, 16:20',
+      icon: 'send',
+      iconColor: '#2196f3'
+    },
+    {
+      id: '4',
+      type: 'withdrawal',
+      description: 'Conta de Luz',
+      amount: 145.3,
+      date: '22/10, 10:15',
+      icon: 'flash_on',
+      iconColor: '#ff9800'
+    },
+    {
+      id: '5',
+      type: 'deposit',
+      description: 'Salário - Empresa XYZ',
+      amount: 4500.0,
+      date: '20/10, 08:00',
+      icon: 'account_balance_wallet',
+      iconColor: '#4caf50',
     },
   ]);
 
@@ -127,13 +131,5 @@ export class Dashboard implements OnInit {
     });
 
     return type === 'deposit' ? `+ R$ ${formattedAmount}` : `- R$ ${formattedAmount}`;
-  }
-
-  formatDateTime(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
   }
 }

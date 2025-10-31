@@ -43,6 +43,7 @@ export class Login implements OnInit {
 
   private authService = inject(AuthService);
   isLoading = this.authService.isLoading;
+  lastError = this.authService.lastError;
 
   cardPlans = [
     {
@@ -103,16 +104,21 @@ export class Login implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
+      console.log('Login attempt:', this.loginForm.value);
       this.authService.login(this.loginForm.value).subscribe({
         next: (res) => {
           this.toast.show('Login realizado com sucesso.', 'success', 6000);
+          console.log('Login successful:', res);
           this.router.navigate(['/dashboard']);
         },          
         error: (err) => {
-          this.toast.show(err?.error?.message || 'Erro ao fazer login', 'error', 4000);
+          console.error('Login failed:', err);
+          this.toast.show(err?.error?.message, 'error', 4000);
         }
       }); 
 
+      // Simulate login success
+      //this.router.navigate(['/dashboard']);
 
     } else {
       this.loginForm.markAllAsTouched();

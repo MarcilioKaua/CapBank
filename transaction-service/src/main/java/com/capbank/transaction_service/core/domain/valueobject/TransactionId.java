@@ -8,19 +8,19 @@ public class TransactionId {
 
     public TransactionId(UUID value) {
         if (value == null) {
-            throw new IllegalArgumentException("TransactionId cannot be null");
+            throw new IllegalArgumentException("ID da transação não pode ser nulo");
         }
         this.value = value;
     }
 
     public TransactionId(String value) {
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("TransactionId cannot be null or empty");
+            throw new IllegalArgumentException("ID da transação não pode ser nulo ou vazio");
         }
         try {
             this.value = UUID.fromString(value);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid UUID format for TransactionId: " + value);
+            throw new IllegalArgumentException("Formato UUID inválido para ID da transação: " + value);
         }
     }
 

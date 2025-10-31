@@ -18,26 +18,26 @@ public interface CreateTransactionUseCase {
     ) {
         public CreateTransactionCommand {
             if (amount == null) {
-                throw new IllegalArgumentException("Amount cannot be null");
+                throw new IllegalArgumentException("Valor não pode ser nulo");
             }
             if (type == null) {
-                throw new IllegalArgumentException("Transaction type cannot be null");
+                throw new IllegalArgumentException("Tipo de transação não pode ser nulo");
             }
 
             switch (type) {
                 case DEPOSIT -> {
                     if (targetAccountId == null) {
-                        throw new IllegalArgumentException("Target account is required for deposits");
+                        throw new IllegalArgumentException("Conta de destino é obrigatória para depósitos");
                     }
                 }
                 case WITHDRAWAL -> {
                     if (sourceAccountId == null) {
-                        throw new IllegalArgumentException("Source account is required for withdrawals");
+                        throw new IllegalArgumentException("Conta de origem é obrigatória para saques");
                     }
                 }
                 case TRANSFER -> {
                     if (sourceAccountId == null || targetAccountId == null) {
-                        throw new IllegalArgumentException("Both accounts are required for transfers");
+                        throw new IllegalArgumentException("Ambas as contas são obrigatórias para transferências");
                     }
                 }
             }

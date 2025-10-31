@@ -8,19 +8,19 @@ public class AccountId {
 
     public AccountId(UUID value) {
         if (value == null) {
-            throw new IllegalArgumentException("AccountId cannot be null");
+            throw new IllegalArgumentException("ID da conta não pode ser nulo");
         }
         this.value = value;
     }
 
     public AccountId(String value) {
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("AccountId cannot be null or empty");
+            throw new IllegalArgumentException("ID da conta não pode ser nulo ou vazio");
         }
         try {
             this.value = UUID.fromString(value);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid UUID format for AccountId: " + value);
+            throw new IllegalArgumentException("Formato UUID inválido para ID da conta: " + value);
         }
     }
 

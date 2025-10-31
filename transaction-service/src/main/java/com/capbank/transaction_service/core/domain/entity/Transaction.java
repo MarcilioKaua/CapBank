@@ -24,8 +24,8 @@ public class Transaction {
         this.id = builder.id != null ? builder.id : TransactionId.generate();
         this.sourceAccountId = builder.sourceAccountId;
         this.targetAccountId = builder.targetAccountId;
-        this.type = Objects.requireNonNull(builder.type, "Transaction type cannot be null");
-        this.amount = Objects.requireNonNull(builder.amount, "Amount cannot be null");
+        this.type = Objects.requireNonNull(builder.type, "Tipo de transação não pode ser nulo");
+        this.amount = Objects.requireNonNull(builder.amount, "Valor não pode ser nulo");
         this.description = builder.description != null ? builder.description : "";
         this.transactionDate = builder.transactionDate != null ? builder.transactionDate : LocalDateTime.now();
         this.status = builder.status != null ? builder.status : TransactionStatus.PENDING;
@@ -38,26 +38,26 @@ public class Transaction {
         switch (type) {
             case DEPOSIT -> {
                 if (targetAccountId == null) {
-                    throw new IllegalArgumentException("Target account is required for deposits");
+                    throw new IllegalArgumentException("Conta de destino é obrigatória para depósitos");
                 }
                 if (sourceAccountId != null) {
-                    throw new IllegalArgumentException("Source account should be null for deposits");
+                    throw new IllegalArgumentException("Conta de origem deve ser nula para depósitos");
                 }
             }
             case WITHDRAWAL -> {
                 if (sourceAccountId == null) {
-                    throw new IllegalArgumentException("Source account is required for withdrawals");
+                    throw new IllegalArgumentException("Conta de origem é obrigatória para saques");
                 }
                 if (targetAccountId != null) {
-                    throw new IllegalArgumentException("Target account should be null for withdrawals");
+                    throw new IllegalArgumentException("Conta de destino deve ser nula para saques");
                 }
             }
             case TRANSFER -> {
                 if (sourceAccountId == null || targetAccountId == null) {
-                    throw new IllegalArgumentException("Both source and target accounts are required for transfers");
+                    throw new IllegalArgumentException("Ambas as contas de origem e destino são obrigatórias para transferências");
                 }
                 if (sourceAccountId.equals(targetAccountId)) {
-                    throw new IllegalArgumentException("Source and target accounts cannot be the same");
+                    throw new IllegalArgumentException("Contas de origem e destino não podem ser as mesmas");
                 }
             }
         }
@@ -98,7 +98,7 @@ public class Transaction {
 
     public Transaction updateStatus(TransactionStatus newStatus) {
         if (this.status == TransactionStatus.SUCCESS && newStatus != TransactionStatus.SUCCESS) {
-            throw new IllegalArgumentException("Cannot change status of successful transaction");
+            throw new IllegalArgumentException("Não é possível alterar o status de uma transação bem-sucedida");
         }
         this.status = newStatus;
         return this;

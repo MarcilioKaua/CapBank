@@ -88,7 +88,7 @@ class TransactionServiceTest {
         assertThat(result.transaction().getTargetAccountId()).isEqualTo(targetAccountId);
         assertThat(result.transaction().getAmount()).isEqualTo(amount);
         assertThat(result.notificationSent()).isTrue();
-        assertThat(result.message()).contains("Deposit processed successfully");
+        assertThat(result.message()).contains("Depósito processado com sucesso");
 
         verify(transactionRepository).save(any(Transaction.class));
         verify(historyRepository).save(any(TransactionHistory.class));
@@ -123,7 +123,7 @@ class TransactionServiceTest {
         assertThat(result.transaction().getSourceAccountId()).isEqualTo(sourceAccountId);
         assertThat(result.transaction().getAmount()).isEqualTo(amount);
         assertThat(result.notificationSent()).isTrue();
-        assertThat(result.message()).contains("Withdrawal processed successfully");
+        assertThat(result.message()).contains("Saque processado com sucesso");
 
         verify(transactionRepository).save(any(Transaction.class));
         verify(historyRepository).save(any(TransactionHistory.class));
@@ -160,7 +160,7 @@ class TransactionServiceTest {
         assertThat(result.transaction().getTargetAccountId()).isEqualTo(targetAccountId);
         assertThat(result.transaction().getAmount()).isEqualTo(amount);
         assertThat(result.notificationSent()).isTrue();
-        assertThat(result.message()).contains("Transfer processed successfully");
+        assertThat(result.message()).contains("Transferência processada com sucesso");
 
         verify(transactionRepository).save(any(Transaction.class));
         verify(historyRepository).save(any(TransactionHistory.class));

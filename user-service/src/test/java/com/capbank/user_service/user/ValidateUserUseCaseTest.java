@@ -96,7 +96,7 @@ class ValidateUserUseCaseTest {
 
         assertThatThrownBy(() -> userService.validate(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("User not found.");
+                .hasMessageContaining("Usuário não encontrado");
 
         verify(userRepository).findByCpf("000");
         verify(passwordEncoder, never()).matches(anyString(), anyString());
@@ -118,7 +118,7 @@ class ValidateUserUseCaseTest {
 
         assertThatThrownBy(() -> userService.validate(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid credentials.");
+                .hasMessageContaining("Credenciais inválidas");
 
         verify(userRepository).findByCpf("12345678910");
         verify(passwordEncoder).matches("wrong", "encoded");

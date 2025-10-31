@@ -31,18 +31,18 @@ public interface FindTransactionUseCase {
     ) {
         public FindTransactionQuery {
             if (accountId == null) {
-                throw new IllegalArgumentException("AccountId cannot be null");
+                throw new IllegalArgumentException("ID da conta não pode ser nulo");
             }
             if (page < 0) {
-                throw new IllegalArgumentException("Page cannot be negative");
+                throw new IllegalArgumentException("Página não pode ser negativa");
             }
             if (size <= 0) {
-                throw new IllegalArgumentException("Size must be positive");
+                throw new IllegalArgumentException("Tamanho deve ser positivo");
             }
             if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-                throw new IllegalArgumentException("Start date cannot be after end date");
+                throw new IllegalArgumentException("Data de início não pode ser após a data de fim");
             }
-        }
+                }
 
         
         public static FindTransactionQuery create(AccountId accountId, int page, int size) {

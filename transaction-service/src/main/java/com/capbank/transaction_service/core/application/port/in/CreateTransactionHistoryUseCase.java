@@ -22,19 +22,19 @@ public interface CreateTransactionHistoryUseCase {
     ) {
         public CreateTransactionHistoryCommand {
             if (accountId == null) {
-                throw new IllegalArgumentException("AccountId cannot be null");
+                throw new IllegalArgumentException("ID da conta não pode ser nulo");
             }
             if (transactionId == null) {
-                throw new IllegalArgumentException("TransactionId cannot be null");
+                throw new IllegalArgumentException("ID da transação não pode ser nulo");
             }
             if (balanceBefore == null) {
-                throw new IllegalArgumentException("Balance before cannot be null");
+                throw new IllegalArgumentException("Saldo anterior não pode ser nulo");
             }
             if (transactionAmount == null) {
-                throw new IllegalArgumentException("Transaction amount cannot be null");
+                throw new IllegalArgumentException("Valor da transação não pode ser nulo");
             }
             if (transactionType == null) {
-                throw new IllegalArgumentException("Transaction type cannot be null");
+                throw new IllegalArgumentException("Tipo de transação não pode ser nulo");
             }
         }
     }

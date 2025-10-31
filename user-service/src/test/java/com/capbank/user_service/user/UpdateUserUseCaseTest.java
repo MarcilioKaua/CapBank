@@ -81,7 +81,7 @@ public class UpdateUserUseCaseTest {
 
         assertThatThrownBy(() -> userService.update("12345678910", request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Email already registered.");
+                .hasMessageContaining("E-mail já cadastrado");
 
         verify(userRepository, never()).save(any());
     }

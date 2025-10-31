@@ -115,7 +115,7 @@
                 <div class="transaction-icon" [style.background-color]="transaction.iconColor">
                   <mat-icon>{{ transaction.icon }}</mat-icon>
                 </div>
-                <span class="description-main">{{ transaction.description }}</span>
+                <span class="description-main">{{ transaction.description || getTransactionCategory(transaction) }}</span>
               </div>
             </td>
           </ng-container>
@@ -196,7 +196,7 @@
           <div class="mobile-transaction__content">
             <div class="mobile-transaction__main">
               <span class="mobile-transaction__description">{{
-                transaction.description.split(' - ')[0]
+                transaction.description?.split(' - ')?.[0] || getTransactionCategory(transaction)
               }}</span>
               <span
                 class="mobile-transaction__amount"
@@ -211,7 +211,7 @@
             </div>
             <div class="mobile-transaction__sub">
               <span class="mobile-transaction__detail">{{
-                transaction.description.split(' - ')[1] || getTransactionCategory(transaction)
+                transaction.description?.split(' - ')?.[1] || getTransactionCategory(transaction)
               }}</span>
               <span class="mobile-transaction__balance">{{
                 formatBalance(transaction.transaction_amount || 0)

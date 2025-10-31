@@ -73,10 +73,11 @@
               color="primary"
               type="submit"
               class="transfer-button"
-              [disabled]="transferForm.invalid"
+              [disabled]="transferForm.invalid || isLoading()"
             >
-              <mat-icon>send</mat-icon>
-              Transferir
+              <mat-spinner *ngIf="isLoading()" diameter="20" class="button-spinner"></mat-spinner>
+              <mat-icon *ngIf="!isLoading()">send</mat-icon>
+              {{ isLoading() ? 'Processando...' : 'Transferir' }}
             </button>
           </form>
         </mat-card>
@@ -140,9 +141,11 @@
           color="primary"
           type="submit"
           class="transfer-button"
-          [disabled]="transferForm.invalid"
+          [disabled]="transferForm.invalid || isLoading()"
         >
-          Transferir
+          <mat-spinner *ngIf="isLoading()" diameter="20" class="button-spinner"></mat-spinner>
+          <mat-icon *ngIf="!isLoading()">send</mat-icon>
+          {{ isLoading() ? 'Processando...' : 'Transferir' }}
         </button>
       </form>
     </mat-card>

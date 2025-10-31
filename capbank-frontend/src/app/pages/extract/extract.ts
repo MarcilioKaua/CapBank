@@ -14,7 +14,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { TransactionService } from 'src/app/shared/services/transaction.service';
 import { CustomInputComponent } from '../../components/custom-input/custom-input';
-import { Transaction } from '../../shared/models/transaction.model';
+import { Transaction, TransactionHistoryPageResponse } from '../../shared/models/transaction.model';
 
 interface TransactionGroup {
   date: string;
@@ -93,7 +93,7 @@ export class Extract implements OnInit {
     return this.allTransactions().filter((transaction) => {
       const transactionDate = new Date(transaction.record_date);
 
-      const matchesSearch = transaction.description.toLowerCase().includes(search);
+      const matchesSearch = transaction.description?.toLowerCase().includes(search) ?? false;
       const matchesType = type === 'all' || transaction.transaction_type.toLowerCase() === type;
 
       let matchesDate = true;
@@ -236,7 +236,7 @@ export class Extract implements OnInit {
       case 'deposit':
         return 'Depósito';
       case 'withdrawal':
-        return transaction.description.includes('Cartão') ? 'Compra' : 'Saque';
+        return transaction.description?.includes('Cartão') ? 'Compra' : 'Saque';
       case 'transfer':
         return 'Transferência';
       default:
@@ -251,18 +251,21 @@ export class Extract implements OnInit {
 
   findTransactions(): void {
     this.transactionService.getTransactions('11111111-2222-3333-4444-555566667777').subscribe({
-      next: (transactions) => {
+      next: (transactions: TransactionHistoryPageResponse) => {
         console.log('Transações encontradas:', transactions);
         const data = transactions.content;
-        data.forEach((transaction) => {
+        const dataWithIcons = data.map((transaction): Transaction => {
           const { icon, iconColor } = this.getTransactionIcon(transaction.transaction_type);
-          transaction.icon = icon;
-          transaction.iconColor = iconColor;
+          return {
+            ...transaction,
+            icon,
+            iconColor
+          };
         });
 
-        this.allTransactions.set(data);
+        this.allTransactions.set(dataWithIcons);
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error('Erro ao buscar transações:', error);
       },
     });

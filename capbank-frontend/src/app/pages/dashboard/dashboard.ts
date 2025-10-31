@@ -6,6 +6,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterModule } from '@angular/router';
+import { TransactionService } from 'src/app/shared/services/transaction.service';
 import { QuickAction } from '../../shared/models/sidebar.model';
 import { Transaction } from '../../shared/models/transaction.model';
 
@@ -24,8 +25,12 @@ import { Transaction } from '../../shared/models/transaction.model';
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
-  balance = signal(12547.89);
+  balance = signal(0);
   balanceVisible = signal(false);
+  accountNumber = signal('');
+  agencyNumber = signal('');
+
+  recentTransactions = signal<Transaction[]>([]);
 
   formattedBalance = computed(() => {
     return this.balance().toLocaleString('pt-BR', {
@@ -33,51 +38,6 @@ export class Dashboard implements OnInit {
       maximumFractionDigits: 2,
     });
   });
-
-  recentTransactions = signal<Transaction[]>([
-    {
-      id: '1a2b3c4d-5e6f-7001-89ab-cdef01234567',
-      account_id: 'acc-98765',
-      transaction_id: 'txn-5001',
-      transaction_type: 'deposit',
-      description: 'Depósito Salarial Mensal',
-      transaction_amount: 500.0,
-      balance_before: 2100.5,
-      balance_after: 7600.5,
-      record_date: '2025-10-25T09:30:00',
-      status: 'completed',
-      icon: 'payments',
-      iconColor: 'green',
-    },
-    {
-      id: '2b3c4d5e-6f70-8112-9abc-def012345678',
-      account_id: 'acc-98765',
-      transaction_id: 'txn-5002',
-      transaction_type: 'withdrawal',
-      description: 'Compra em Supermercado',
-      transaction_amount: 150.75,
-      balance_before: 7600.5,
-      balance_after: 7449.75,
-      record_date: '2025-10-26T14:15:20',
-      status: 'completed',
-      icon: 'shopping_cart',
-      iconColor: 'red',
-    },
-    {
-      id: '3c4d5e6f-7081-9223-abca-f01234567890',
-      account_id: 'acc-98765',
-      transaction_id: 'txn-5003',
-      transaction_type: 'transfer',
-      description: 'Transferência para Poupança',
-      transaction_amount: 1000.0,
-      balance_before: 7449.75,
-      balance_after: 6449.75,
-      record_date: '2025-10-27T18:05:45',
-      status: 'completed',
-      icon: 'swap_horiz',
-      iconColor: 'blue',
-    },
-  ]);
 
   quickActions: QuickAction[] = [
     {
@@ -106,9 +66,57 @@ export class Dashboard implements OnInit {
     },
   ];
 
+  constructor(private transactionService: TransactionService) {}
+
   ngOnInit(): void {
-    // Initialize component
+    this.findBankAccount();
+    this.findRecentTransactions();
   }
+
+  findBankAccount(): void {
+    this.transactionService.getBankAccount().subscribe({
+      next: (account) => {
+        this.accountNumber.set(account.accountNumber);
+        this.agencyNumber.set(account.agency);
+        this.balance.set(account.balance);
+      },
+      error: (error) => {
+        console.error('Erro ao buscar conta bancária:', error);
+      },
+    });
+  }
+
+  findRecentTransactions(): void {
+    this.transactionService.getRecentTransactions().subscribe({
+      next: (transactions) => {
+        const data = transactions.content;
+
+        data.forEach((transaction) => {
+          const { icon, iconColor } = this.getTransactionIcon(transaction.transaction_type);
+          transaction.icon = icon;
+          transaction.iconColor = iconColor;
+        });
+
+        this.recentTransactions.set(data);
+      },
+      error: (error) => {
+        console.error('Erro ao buscar as transações recentes:', error);
+      },
+    });
+  }
+
+  getTransactionIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'deposit':
+        return { icon: 'arrow_downward', iconColor: '#4caf50' };
+      case 'withdrawal':
+        return { icon: 'arrow_upward', iconColor: '#f44336' };
+      case 'transfer':
+        return { icon: 'swap_horiz', iconColor: '#2196f3' };
+      default:
+        return { icon: 'help_outline', iconColor: '#9e9e9e' };
+    }
+  };
 
   toggleBalanceVisibility(): void {
     this.balanceVisible.update((visible) => !visible);

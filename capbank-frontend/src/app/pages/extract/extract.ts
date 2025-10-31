@@ -14,13 +14,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { TransactionService } from 'src/app/shared/services/transaction.service';
 import { CustomInputComponent } from '../../components/custom-input/custom-input';
-import { Transaction } from '../../shared/models/transaction.model';
+import { TransactionHistory } from 'src/app/shared/models/transaction-history.model';
 
 interface TransactionGroup {
   date: string;
   totalPositive: number;
   totalNegative: number;
-  transactions: Transaction[];
+  transactions: TransactionHistory[];
 }
 
 @Component({
@@ -72,7 +72,7 @@ export class Extract implements OnInit {
 
   displayedColumns = ['time', 'description', 'category', 'value', 'balance'];
 
-  allTransactions = signal<Transaction[]>([]);
+  allTransactions = signal<TransactionHistory[]>([]);
 
   currentPage = signal(1);
   pageSize = signal(10);
@@ -223,7 +223,7 @@ export class Extract implements OnInit {
     });
   }
 
-  getTransactionCategory(transaction: Transaction): string {
+  getTransactionCategory(transaction: TransactionHistory): string {
     switch (transaction.transaction_type.toLowerCase()) {
       case 'deposit':
         return 'Depósito';
@@ -242,7 +242,7 @@ export class Extract implements OnInit {
   }
 
   findTransactions(): void {
-    this.transactionService.getTransactions().subscribe({
+    this.transactionService.getTransactionsHistory().subscribe({
       next: (transactions) => {
         const data = transactions.content;
         data.forEach((transaction) => {

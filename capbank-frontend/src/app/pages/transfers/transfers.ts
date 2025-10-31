@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,6 +15,10 @@ import { CurrencyPipe } from '@angular/common';
 import { CustomInputComponent } from '../../components/custom-input/custom-input';
 import { TransactionService } from '../../shared/services/transaction.service';
 import { TransferRequest } from '../../shared/models/transaction.model';
+import { ToastComponent } from 'src/app/components/toast/toast.component';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import { AccountMaskDirective } from 'src/app/shared/directives/account-mask.directive ';
+import { BankAccountService } from 'src/app/shared/services/bank-account.service';
 
 @Component({
   selector: 'app-transfers',
@@ -32,8 +36,9 @@ import { TransferRequest } from '../../shared/models/transaction.model';
     MatProgressSpinnerModule,
     Sidebar,
     CurrencyPipe,
-    CustomInputComponent
-  ],
+    CustomInputComponent,
+    AccountMaskDirective
+],
   templateUrl: './transfers.html',
   styleUrl: './transfers.css'
 })
@@ -42,15 +47,21 @@ export class Transfers implements OnInit {
   isLoading = signal(false);
   transferForm!: FormGroup;
 
+  toast = inject(ToastService);
+  bankAccountService = inject(BankAccountService);
+
   // Dados da conta (por enquanto mockados - pode ser substituído por dados do backend)
-  availableBalance = 15847.50;
-  accountNumber = '12345-6';
-  sourceAccountId = '11111111-2222-3333-4444-555566667777'; // ID mockado - substituir por ID real do usuário logado
+  availableBalance = signal(0);
+  accountNumber = signal('');
+  agencyNumber = signal('');
+
+  balanceVisible = signal(false);
+
+  sourceAccountId = signal<string>('');
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar,
     private transactionService: TransactionService
   ) {
     this.createTransferForm();
@@ -59,9 +70,7 @@ export class Transfers implements OnInit {
   ngOnInit(): void {
     this.checkScreenSize();
     window.addEventListener('resize', () => this.checkScreenSize());
-
-    // TODO: Buscar dados reais da conta do usuário logado
-    // this.loadAccountData();
+    this.loadAccountData();
   }
 
   private checkScreenSize(): void {
@@ -70,7 +79,7 @@ export class Transfers implements OnInit {
 
   private createTransferForm(): void {
     this.transferForm = this.fb.group({
-      destinationAccount: ['', [Validators.required, Validators.pattern(/^\d{4,5}-\d{1}$/)]],
+      destinationAccount: ['', [Validators.required]], //, Validators.pattern(/^\d{4,5}-\d{3}$/)
       amount: ['', [Validators.required, Validators.min(0.01)]],
       description: ['']
     });
@@ -81,27 +90,19 @@ export class Transfers implements OnInit {
    * TODO: Implementar quando houver endpoint para buscar dados da conta
    */
   private loadAccountData(): void {
-    // Exemplo de implementação futura:
-    // const userId = localStorage.getItem('userId');
-    // this.accountService.getAccountByUserId(userId).subscribe({
-    //   next: (account) => {
-    //     this.availableBalance = account.balance;
-    //     this.accountNumber = account.accountNumber;
-    //     this.sourceAccountId = account.id;
-    //   },
-    //   error: (err) => {
-    //     this.showError('Erro ao carregar dados da conta');
-    //   }
-    // });
+    this.transactionService.getBankAccount().subscribe({
+      next: (account) => {
+        this.sourceAccountId.set(account.id);
+        this.accountNumber.set(account.accountNumber);
+        this.agencyNumber.set(account.agency);
+        this.availableBalance.set(account.balance);
+      },
+      error: (error) => {
+        console.error('Erro ao buscar conta bancária:', error);
+      },
+    });
   }
 
- 
-  private getAccountIdByNumber(accountNumber: string): string {
-    // Por enquanto retorna um UUID mockado
-    // Futuramente, deve buscar o ID real da conta através de um serviço
-    // Exemplo: return this.accountService.getAccountIdByNumber(accountNumber)
-    return '22222222-3333-4444-5555-666677778888';
-  }
 
   /**
    * Processa a transferência
@@ -116,29 +117,33 @@ export class Transfers implements OnInit {
     const amount = parseFloat(formData.amount);
 
     // Validação de saldo
-    if (amount > this.availableBalance) {
-      this.showError('Saldo insuficiente para esta transferência');
+    if (amount > this.availableBalance()) {
+      this.toast.showError('Saldo insuficiente para esta transferência');
       return;
     }
 
     // Validação: não pode transferir para a própria conta
     if (formData.destinationAccount === this.accountNumber) {
-      this.showError('Não é possível transferir para a mesma conta');
+      this.toast.showError('Não é possível transferir para a mesma conta');
       return;
     }
 
-    // Prepara os dados da transferência
-    const targetAccountId = this.getAccountIdByNumber(formData.destinationAccount);
+    this.bankAccountService.getBankAccountIdByNumber(formData.destinationAccount.replace('-', ''))
+      .subscribe({
+        next: (id) => {
+          const transferData: TransferRequest = {
+            source_account_id: this.sourceAccountId(),
+            target_account_id: id,
+            amount: amount,
+            description: formData.description || `Transferência para conta ${formData.destinationAccount}`
+          };
 
-    const transferData: TransferRequest = {
-      source_account_id: this.sourceAccountId,
-      target_account_id: targetAccountId,
-      amount: amount,
-      description: formData.description || `Transferência para conta ${formData.destinationAccount}`
-    };
-
-    // Executa a transferência
-    this.performTransfer(transferData);
+          // Executa a transferência
+          this.performTransfer(transferData);
+        },
+        error: (err) => console.error('Erro ao buscar conta:', err)
+      });
+    
   }
 
   /**
@@ -152,11 +157,11 @@ export class Transfers implements OnInit {
         this.isLoading.set(false);
 
         // Atualiza o saldo disponível (subtraindo o valor transferido)
-        this.availableBalance -= transferData.amount;
+        this.availableBalance.set(this.availableBalance() - transferData.amount);
 
         // Mostra mensagem de sucesso
         const message = result.message || 'Transferência realizada com sucesso!';
-        this.showSuccess(message);
+        this.toast.showSuccess(message);
 
         // Exibe informações adicionais se disponíveis
         if (result.notificationSent) {
@@ -168,37 +173,14 @@ export class Transfers implements OnInit {
 
         // Log para debug
         console.log('Transferência concluída:', result);
+        this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         this.isLoading.set(false);
         const errorMessage = error.message || 'Erro ao processar transferência';
-        this.showError(errorMessage);
+        this.toast.showError(errorMessage);
         console.error('Erro na transferência:', error);
       }
-    });
-  }
-
-  /**
-   * Exibe mensagem de sucesso
-   */
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
-      duration: 5000,
-      panelClass: ['success-snackbar'],
-      horizontalPosition: 'center',
-      verticalPosition: 'top'
-    });
-  }
-
-  /**
-   * Exibe mensagem de erro
-   */
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
-      duration: 5000,
-      panelClass: ['error-snackbar'],
-      horizontalPosition: 'center',
-      verticalPosition: 'top'
     });
   }
 
@@ -231,9 +213,9 @@ export class Transfers implements OnInit {
     if (control?.hasError('required')) {
       return 'Conta destino é obrigatória';
     }
-    if (control?.hasError('pattern')) {
-      return 'Formato inválido (ex: 12345-6)';
-    }
+    // if (control?.hasError('pattern')) {
+    //   return 'Formato inválido (ex: 12345-678)';
+    // }
     return '';
   }
 

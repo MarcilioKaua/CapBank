@@ -1,153 +1,124 @@
 <div class="transfers-container">
   <!-- Mobile Header -->
-  <mat-toolbar *ngIf="isMobile()" class="mobile-header">
-    <button mat-icon-button (click)="goBack()" class="back-button">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <span class="header-title">Transferência</span>
-  </mat-toolbar>
+  @if (isMobile()) {
+    <mat-toolbar class="mobile-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <span class="header-title">Transferência</span>
+    </mat-toolbar>
+  }
 
-  <div *ngIf="isMobile()" class="desktop-layout">
-    <app-sidebar></app-sidebar>
-
-    <main class="main-content">
-      <div class="page-header">
-        <h1 class="page-title">Transferência</h1>
-        <p class="page-subtitle">Transfira dinheiro de forma rápida e segura</p>
-      </div>
-
-      <div class="transfer-content">
-        <mat-card class="account-balance-card">
-          <div class="balance-header">
-            <h3>Sua Conta</h3>
-          </div>
-          <div class="balance-info">
-            <div class="balance-label">Saldo Disponível</div>
-            <div class="balance-amount">
-              {{ availableBalance | currency : 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-            </div>
-            <div class="account-number">Conta: {{ accountNumber }}</div>
-          </div>
-        </mat-card>
-
-        <mat-card class="transfer-form-card">
-          <div class="form-header">
-            <h3>Nova Transferência</h3>
-          </div>
-
-          <form [formGroup]="transferForm" (ngSubmit)="onTransfer()">
-            <app-custom-input
-              label="Conta Destino"
-              placeholder="00000-0"
-              formControlName="destinationAccount"
-              suffixIcon="account_balance"
-              [required]="true"
-              [errorMessage]="getDestinationAccountError()"
-            >
-            </app-custom-input>
-
-            <app-custom-input
-              label="Valor"
-              type="number"
-              placeholder="0,00"
-              formControlName="amount"
-              prefixText="R$"
-              suffixIcon="attach_money"
-              [required]="true"
-              [min]="0.01"
-              [step]="0.01"
-              [errorMessage]="getAmountError()"
-            >
-            </app-custom-input>
-
-            <app-custom-input
-              label="Descrição (Opcional)"
-              placeholder="Digite uma descrição para a transferência..."
-              formControlName="description"
-              [rows]="3"
-            >
-            </app-custom-input>
-
-            <button
-              mat-raised-button
-              color="primary"
-              type="submit"
-              class="transfer-button"
-              [disabled]="transferForm.invalid || isLoading()"
-            >
-              <mat-spinner *ngIf="isLoading()" diameter="20" class="button-spinner"></mat-spinner>
-              <mat-icon *ngIf="!isLoading()">send</mat-icon>
-              {{ isLoading() ? 'Processando...' : 'Transferir' }}
-            </button>
-          </form>
-        </mat-card>
-      </div>
-    </main>
-  </div>
-
-  <div *ngIf="!isMobile()" class="mobile-content">
-    <mat-card class="balance-card">
-      <div class="balance-header">
-        <h3>Sua Conta</h3>
-      </div>
-      <div class="balance-info">
-        <div class="balance-label">Saldo Disponível</div>
-        <div class="balance-amount">
-          {{ availableBalance | currency : 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+  @if (isMobile()) {
+    <!-- MOBILE LAYOUT -->
+    <div class="mobile-content">
+      <mat-card class="balance-card">
+        <div class="balance-header">
+          <h3>Sua Conta</h3>
         </div>
-      </div>
-    </mat-card>
+        <div class="balance-info">
+          <div class="balance-label">Saldo Disponível</div>
+          <div class="balance-amount">
+            {{ availableBalance() | currency : 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+          </div>
+          <div class="account-number">Conta: {{ accountNumber() }}</div>
+        </div>
+      </mat-card>
 
-    <mat-card class="transfer-card">
-      <div class="card-header">
-        <h3>Nova Transferência</h3>
-      </div>
+      <mat-card class="transfer-card">
+        <div class="card-header">
+          <h3>Nova Transferência</h3>
+        </div>
+        
+        <ng-container [ngTemplateOutlet]="transferFormTemplate"></ng-container>
+      </mat-card>
+    </div>
+  } @else {
+    <!-- DESKTOP LAYOUT -->
+    <div class="desktop-layout">
+      <app-sidebar></app-sidebar>
 
-      <form [formGroup]="transferForm" (ngSubmit)="onTransfer()">
-        <app-custom-input
-          label="Conta Destino"
-          placeholder="00000-0"
-          formControlName="destinationAccount"
-          suffixIcon="account_balance"
-          [required]="true"
-          [errorMessage]="getDestinationAccountError()"
-        >
-        </app-custom-input>
+      <main class="main-content">
+        <div class="page-header">
+          <h1 class="page-title">Transferência</h1>
+          <p class="page-subtitle">Transfira dinheiro de forma rápida e segura</p>
+        </div>
 
-        <app-custom-input
-          label="Valor"
-          type="number"
-          placeholder="0,00"
-          formControlName="amount"
-          prefixText="R$"
-          suffixIcon="attach_money"
-          [required]="true"
-          [min]="0.01"
-          [step]="0.01"
-          [errorMessage]="getAmountError()"
-        >
-        </app-custom-input>
+        <div class="transfer-content">
+          <mat-card class="account-balance-card">
+            <div class="balance-header">
+              <h3>Sua Conta</h3>
+            </div>
+            <div class="balance-info">
+              <div class="balance-label">Saldo Disponível</div>
+              <div class="balance-amount">
+                {{ availableBalance() | currency : 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              </div>
+              <div class="account-number">Conta: {{ accountNumber() }}</div>
+            </div>
+          </mat-card>
 
-        <app-custom-input
-          label="Descrição (opcional)"
-          placeholder="Digite uma descrição para a transferência..."
-          formControlName="description"
-          [rows]="3"
-        >
-        </app-custom-input>
-
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          class="transfer-button"
-          [disabled]="transferForm.invalid || isLoading()"
-        >
-          <mat-spinner *ngIf="isLoading()" diameter="20" class="button-spinner"></mat-spinner>
-          <mat-icon *ngIf="!isLoading()">send</mat-icon>
-          {{ isLoading() ? 'Processando...' : 'Transferir' }}
-        </button>
-      </form>
-    </mat-card>
-  </div>
+          <mat-card class="transfer-form-card">
+            <div class="form-header">
+              <h3>Nova Transferência</h3>
+            </div>
+            
+            <ng-container [ngTemplateOutlet]="transferFormTemplate"></ng-container>
+          </mat-card>
+        </div>
+      </main>
+    </div>
+  }
 </div>
+
+<ng-template #transferFormTemplate>
+  <form [formGroup]="transferForm" (ngSubmit)="onTransfer()" class="transfer-form">
+    <app-custom-input
+      label="Conta Destino"
+      placeholder="00000-000"
+      AccountMask="00000-000"
+      formControlName="destinationAccount"
+      suffixIcon="account_balance"
+      [required]="true"
+      [errorMessage]="getDestinationAccountError()"
+    >
+    </app-custom-input>
+
+    <app-custom-input
+      label="Valor"
+      type="number"
+      placeholder="0,00"
+      formControlName="amount"
+      prefixText="R$"
+      suffixIcon="attach_money"
+      [required]="true"
+      [min]="0.01"
+      [step]="0.01"
+      [errorMessage]="getAmountError()"
+    >
+    </app-custom-input>
+
+    <app-custom-input
+      label="Descrição (Opcional)"
+      placeholder="Digite uma descrição para a transferência..."
+      formControlName="description"
+      [rows]="3"
+    >
+    </app-custom-input>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      class="transfer-button"
+      [disabled]="transferForm.invalid || isLoading()"
+    >
+      @if (isLoading()) {
+        <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+      } @else {
+        <mat-icon>send</mat-icon>
+      }
+      {{ isLoading() ? 'Processando...' : 'Transferir' }}
+    </button>
+  </form>
+</ng-template>

@@ -18,17 +18,8 @@ import {
 } from '../models/transaction.model';
 
 import { TransactionHistoryPageResponse } from '../models/transaction-history.model';
+import { BankAccountResponse } from '../models/bank-account.model';
 
-interface BankAccountResponse {
-  id: string;
-  accountNumber: string;
-  agency: string;
-  balance: number;
-  accountType: string;
-  status: string;
-  userId: string;
-  createdAt: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -82,7 +73,7 @@ export class TransactionService {
   }
 
   getTransactions(accountId: string): Observable<TransactionPageResponse> {
-    return this.http.get<TransactionPageResponse>(`${this.baseUrl}/${accountId}`);
+    return this.http.get<TransactionPageResponse>(`${this.baseUrl}/api/transaction/${accountId}`);
   }
 
   getBankAccount(): Observable<BankAccountResponse> {
@@ -133,8 +124,18 @@ export class TransactionService {
    * @returns Observable com o resultado da transação
    */
   createTransfer(transferData: TransferRequest): Observable<TransactionResultResponse> {
-    return this.http
-      .post<TransactionResultResponse>(`${this.API_URL}/transfer`, transferData)
+
+    const token = this.cookieService.get('auth-token');
+    const userId = this.cookieService.get('user-id');
+
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
+    });
+
+    return this.http.post<TransactionResultResponse>(`${this.baseUrl}/api/transaction/transfer`, transferData, {
+      headers: headers,
+    });
 
   }
 
@@ -148,7 +149,6 @@ export class TransactionService {
       .get<TransactionResponse>(`${this.API_URL}/${id}`)
 
   }
-
 
   /**
    * Atualiza o status de uma transação

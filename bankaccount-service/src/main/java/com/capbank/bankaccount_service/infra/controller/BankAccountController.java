@@ -110,6 +110,23 @@ public class BankAccountController {
     }
 
     @Operation(
+            summary = "Buscar conta pelo usuário",
+            description = "Recupera as informações de uma conta a partir do id do usuário."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Conta encontrada com sucesso",
+                    content = @Content(schema = @Schema(implementation = BankAccountResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada")
+    })
+    @GetMapping("/userId/{userId}")
+    public ResponseEntity<BankAccountResponseDTO> getByUserId(
+            @Parameter(description = "Id do Usuário", example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable String userId) {
+
+        return ResponseEntity.ok(bankAccountUseCase.findByUserId(userId));
+    }
+
+    @Operation(
             summary = "Consultar saldo",
             description = "Retorna o saldo atual de uma conta bancária específica."
     )

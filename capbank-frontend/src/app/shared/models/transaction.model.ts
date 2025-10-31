@@ -1,9 +1,6 @@
-// ============================================
-// ENUMS
-// ============================================
-
-export type TransactionType = 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER';
-export type TransactionStatus = 'SUCCESS' | 'PENDING' | 'FAILED';
+import { TransactionType } from "./transaction-type.enum";
+import { TransactionStatus } from "./transaction-status.enum";
+import { TransactionHistory } from "./transaction-history.model";
 
 // ============================================
 // REQUEST DTOs
@@ -46,6 +43,8 @@ export interface TransactionResponse {
   description?: string;
   status: TransactionStatus;
   transaction_date: string;
+  icon: string;
+  iconColor: string;
 }
 
 export interface TransactionResultResponse {
@@ -56,33 +55,6 @@ export interface TransactionResultResponse {
 
 export interface TransactionPageResponse {
   content: TransactionResponse[];
-  page_number: number;
-  page_size: number;
-  total_elements: number;
-  total_pages: number;
-  first: boolean;
-  last: boolean;
-}
-
-// ============================================
-// TRANSACTION HISTORY DTOs
-// ============================================
-
-export interface TransactionHistory {
-  id: string;
-  account_id: string;
-  transaction_id: string;
-  balance_before: number;
-  balance_after: number;
-  transaction_amount: number;
-  transaction_type: TransactionType;
-  status: TransactionStatus;
-  description?: string;
-  record_date: string;
-}
-
-export interface TransactionHistoryPageResponse {
-  content: TransactionHistory[];
   page_number: number;
   page_size: number;
   total_elements: number;

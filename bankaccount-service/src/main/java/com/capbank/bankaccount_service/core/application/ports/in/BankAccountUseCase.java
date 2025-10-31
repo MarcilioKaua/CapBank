@@ -14,6 +14,7 @@ public interface BankAccountUseCase {
     BankAccount findById(UUID id);
     List<BankAccount> findAll();
     BankAccountResponseDTO findByAccountNumber(String accountNumber);
+    BankAccountResponseDTO findByUserId(String userId);
     BigDecimal getBalance(String accountNumber);
     BankAccountResponseDTO updateBalance(String accountNumber, BigDecimal newBalance);
     BankAccountResponseDTO updateStatus(String accountNumber, String status);

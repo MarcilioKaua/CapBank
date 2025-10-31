@@ -1,6 +1,10 @@
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
+import { TransactionHistory } from '../models/transaction-history.model';
+import { CookieService } from 'ngx-cookie-service';
+import { HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { catchError, Observable, throwError, switchMap } from 'rxjs';
 import {
   DepositRequest,
   WithdrawalRequest,
@@ -8,21 +12,93 @@ import {
   TransactionResponse,
   TransactionResultResponse,
   TransactionPageResponse,
-  TransactionHistoryPageResponse,
   UpdateTransactionStatusRequest,
   TransactionQueryParams,
   TransactionHistoryQueryParams
 } from '../models/transaction.model';
 
+import { TransactionHistoryPageResponse } from '../models/transaction-history.model';
+
+interface BankAccountResponse {
+  id: string;
+  accountNumber: string;
+  agency: string;
+  balance: number;
+  accountType: string;
+  status: string;
+  userId: string;
+  createdAt: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class TransactionService {
+    private http: HttpClient = inject(HttpClient);
+    private cookieService = inject(CookieService);
+    private baseUrl = environment.apiUrl;
+
   // URL base do microserviço de transações
   private readonly API_URL = 'http://localhost:8085/api/transaction';
   private readonly HISTORY_API_URL = 'http://localhost:8085/api/transaction-history';
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
+
+  getTransactionsHistory(): Observable<TransactionHistoryPageResponse> {
+    const token = this.cookieService.get('auth-token');
+
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
+    });
+
+    return this.getBankAccount().pipe(
+      switchMap((accountResponse) => {
+        const transactionsUrl = `${this.baseUrl}/api/transaction-history/account/${accountResponse.id}`;
+        return this.http.get<TransactionHistoryPageResponse>(transactionsUrl, {
+          headers: headers,
+        });
+      })
+    );
+  }
+
+
+  getRecentTransactions(): Observable<TransactionPageResponse> {
+    const token = this.cookieService.get('auth-token');
+
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
+    });
+
+    return this.getBankAccount().pipe(
+      switchMap((accountResponse) => {
+        const transactionsUrl = `${this.baseUrl}/api/transaction/account/${accountResponse.id}`;
+        return this.http.get<TransactionPageResponse>(transactionsUrl, {
+          headers: headers,
+        });
+      })
+    );
+  }
+
+  getTransactions(accountId: string): Observable<TransactionPageResponse> {
+    return this.http.get<TransactionPageResponse>(`${this.baseUrl}/${accountId}`);
+  }
+
+  getBankAccount(): Observable<BankAccountResponse> {
+    const token = this.cookieService.get('auth-token');
+    const userId = this.cookieService.get('user-id');
+
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
+    });
+
+    return this.http.get<BankAccountResponse>(`${this.baseUrl}/api/bankaccount/userId/${userId}`, {
+      headers: headers,
+    });
+  }
+
 
   // ============================================
   // OPERAÇÕES DE TRANSAÇÃO
@@ -36,7 +112,7 @@ export class TransactionService {
   createDeposit(depositData: DepositRequest): Observable<TransactionResultResponse> {
     return this.http
       .post<TransactionResultResponse>(`${this.API_URL}/deposit`, depositData)
-      
+
   }
 
   /**
@@ -47,8 +123,9 @@ export class TransactionService {
   createWithdrawal(withdrawalData: WithdrawalRequest): Observable<TransactionResultResponse> {
     return this.http
       .post<TransactionResultResponse>(`${this.API_URL}/withdrawal`, withdrawalData)
-     
+
   }
+
 
   /**
    * Realiza uma transferência entre contas
@@ -58,7 +135,7 @@ export class TransactionService {
   createTransfer(transferData: TransferRequest): Observable<TransactionResultResponse> {
     return this.http
       .post<TransactionResultResponse>(`${this.API_URL}/transfer`, transferData)
-   
+
   }
 
   /**
@@ -69,7 +146,7 @@ export class TransactionService {
   getTransactionById(id: string): Observable<TransactionResponse> {
     return this.http
       .get<TransactionResponse>(`${this.API_URL}/${id}`)
-   
+
   }
 
 
@@ -85,7 +162,7 @@ export class TransactionService {
   ): Observable<TransactionResponse> {
     return this.http
       .put<TransactionResponse>(`${this.API_URL}/${id}/status`, statusData)
-   
+
   }
 
   // ============================================
@@ -107,7 +184,7 @@ export class TransactionService {
   getTransactionHistoryById(id: string): Observable<TransactionHistoryPageResponse> {
     return this.http
       .get<TransactionHistoryPageResponse>(`${this.HISTORY_API_URL}/${id}`)
-      
+
   }
 
 

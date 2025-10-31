@@ -14,13 +14,14 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { TransactionService } from 'src/app/shared/services/transaction.service';
 import { CustomInputComponent } from '../../components/custom-input/custom-input';
-import { Transaction, TransactionHistoryPageResponse } from '../../shared/models/transaction.model';
+import { TransactionHistory } from 'src/app/shared/models/transaction-history.model';
+import { TransactionHistoryPageResponse } from 'src/app/shared/models/transaction-history.model';
 
 interface TransactionGroup {
   date: string;
   totalPositive: number;
   totalNegative: number;
-  transactions: Transaction[];
+  transactions: TransactionHistory[];
 }
 
 @Component({
@@ -55,7 +56,6 @@ export class Extract implements OnInit {
   });
 
   isMobile = signal(window.innerWidth < 768);
-  selectedPeriod = signal('all');
 
   periodOptions = [
     { value: 'all', label: 'Todos' },
@@ -73,7 +73,7 @@ export class Extract implements OnInit {
 
   displayedColumns = ['time', 'description', 'category', 'value', 'balance'];
 
-  allTransactions = signal<Transaction[]>([]);
+  allTransactions = signal<TransactionHistory[]>([]);
 
   currentPage = signal(1);
   pageSize = signal(10);
@@ -203,11 +203,6 @@ export class Extract implements OnInit {
     }
   }
 
-  selectPeriod(period: string): void {
-    this.selectedPeriod.set(period);
-    this.filterForm.patchValue({ period });
-  }
-
   formatAmount(amount: number, type: string): string {
     const formattedAmount = amount.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
@@ -231,7 +226,7 @@ export class Extract implements OnInit {
     });
   }
 
-  getTransactionCategory(transaction: Transaction): string {
+  getTransactionCategory(transaction: TransactionHistory): string {
     switch (transaction.transaction_type.toLowerCase()) {
       case 'deposit':
         return 'Depósito';
@@ -250,37 +245,33 @@ export class Extract implements OnInit {
   }
 
   findTransactions(): void {
-    this.transactionService.getTransactions('11111111-2222-3333-4444-555566667777').subscribe({
-      next: (transactions: TransactionHistoryPageResponse) => {
-        console.log('Transações encontradas:', transactions);
-        const data = transactions.content;
-        const dataWithIcons = data.map((transaction): Transaction => {
-          const { icon, iconColor } = this.getTransactionIcon(transaction.transaction_type);
-          return {
-            ...transaction,
-            icon,
-            iconColor
-          };
-        });
+      this.transactionService.getTransactionsHistory().subscribe({
+        next: (transactions) => {
+          const data = transactions.content;
+          data.forEach((transaction) => {
+            const { icon, iconColor } = this.getTransactionIcon(transaction.transaction_type);
+            transaction.icon = icon;
+            transaction.iconColor = iconColor;
+          });
 
-        this.allTransactions.set(dataWithIcons);
-      },
-      error: (error: Error) => {
-        console.error('Erro ao buscar transações:', error);
-      },
-    });
-  }
+          this.allTransactions.set(data);
+        },
+        error: (error) => {
+          console.error('Erro ao buscar transações:', error);
+        },
+      });
+    }
 
   getTransactionIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'deposit':
-        return { icon: 'arrow_downward', iconColor: '#4caf50' }; // verde
+        return { icon: 'arrow_downward', iconColor: '#4caf50' };
       case 'withdrawal':
-        return { icon: 'arrow_upward', iconColor: '#f44336' }; // vermelho
+        return { icon: 'arrow_upward', iconColor: '#f44336' };
       case 'transfer':
-        return { icon: 'swap_horiz', iconColor: '#2196f3' }; // azul
+        return { icon: 'swap_horiz', iconColor: '#2196f3' };
       default:
-        return { icon: 'help_outline', iconColor: '#9e9e9e' }; // cinza
+        return { icon: 'help_outline', iconColor: '#9e9e9e' };
     }
   };
 

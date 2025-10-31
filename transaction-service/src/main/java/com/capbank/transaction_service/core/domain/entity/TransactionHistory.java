@@ -24,13 +24,13 @@ public class TransactionHistory {
 
     private TransactionHistory(Builder builder) {
         this.id = builder.id != null ? builder.id : UUID.randomUUID();
-        this.accountId = Objects.requireNonNull(builder.accountId, "AccountId cannot be null");
-        this.transactionId = Objects.requireNonNull(builder.transactionId, "TransactionId cannot be null");
-        this.balanceBefore = Objects.requireNonNull(builder.balanceBefore, "Balance before cannot be null");
-        this.balanceAfter = Objects.requireNonNull(builder.balanceAfter, "Balance after cannot be null");
-        this.transactionAmount = Objects.requireNonNull(builder.transactionAmount, "Transaction amount cannot be null");
-        this.transactionType = Objects.requireNonNull(builder.transactionType, "Transaction type cannot be null");
-        this.status = Objects.requireNonNull(builder.status, "Status cannot be null");
+        this.accountId = Objects.requireNonNull(builder.accountId, "ID da conta não pode ser nulo");
+        this.transactionId = Objects.requireNonNull(builder.transactionId, "ID da transação não pode ser nulo");
+        this.balanceBefore = Objects.requireNonNull(builder.balanceBefore, "Saldo anterior não pode ser nulo");
+        this.balanceAfter = Objects.requireNonNull(builder.balanceAfter, "Saldo posterior não pode ser nulo");
+        this.transactionAmount = Objects.requireNonNull(builder.transactionAmount, "Valor da transação não pode ser nulo");
+        this.transactionType = Objects.requireNonNull(builder.transactionType, "Tipo de transação não pode ser nulo");
+        this.status = Objects.requireNonNull(builder.status, "Status não pode ser nulo");
         this.description = builder.description != null ? builder.description : "";
         this.recordDate = builder.recordDate != null ? builder.recordDate : LocalDateTime.now();
 
@@ -40,7 +40,7 @@ public class TransactionHistory {
     private void validateBusinessRules() {
         Money expectedBalance = calculateExpectedBalance();
         if (!balanceAfter.isEqualTo(expectedBalance)) {
-            throw new IllegalArgumentException("Balance calculation is incorrect");
+            throw new IllegalArgumentException("Cálculo do saldo está incorreto");
         }
     }
 

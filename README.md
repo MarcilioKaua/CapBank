@@ -1,8 +1,8 @@
-# 🏦 Banco Digital Simplificado
+# 🏦 CAP Bank
 
 ## 📘 Visão Geral
 
-O **Banco Digital Simplificado** é um sistema desenvolvido com foco em **operações bancárias internas**, como criação de contas, transferências, consulta de extratos e histórico de transações.  
+O **CAP Bank** é um sistema desenvolvido com foco em **operações bancárias internas**, como criação de contas, transferências, consulta de extratos e histórico de transações.  
 O sistema inclui um **mecanismo de autenticação robusto** e integração com **mensageria** para envio de notificações (transações, alertas e segurança).
 
 ## 🚀 Funcionalidades Principais
@@ -29,16 +29,18 @@ cd banco-digital-simplificado
 docker-compose up --build
 ```
 
-### ⚙️ Tecnologias Recomendadas
+### ⚙️ Tecnologias
 
 | Camada | Sugestão                |
 |--------|-------------------------|
 | Backend | Java 17 (Spring Boot)   |
 | Banco de Dados | PostgreSQL 15           |
-| Autenticação | JWT + Refresh Token     |
-| Mensageria | RabbitMQ                |
+| Autenticação | JWT + Refresh Token  |
+| Mensageria | RabbitMQ              |
 | Frontend | Angular 20              | 
 | Infraestrutura | Docker + Docker Compose |
+| Testes Unitários | JUnit e Mokito |
+| Monitoramento | Prometheus |
 
 ### 📚  Arquitetura Adotada por Microsserviço
 O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Spring Cloud Gateway (WebFlux) Segurança Centralizada (JWT) e Resiliência (Circuit Breaker).
@@ -54,7 +56,6 @@ O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Spring Cloud Ga
 
 <img width="814" height="804" alt="Microservices Diagram" src="https://github.com/user-attachments/assets/8b2ad338-95b3-4171-bce6-63b450e322af" />
 
-
 ## 🔍 Detalhamento dos Microsserviços e Rotas Chave
 
 | Serviço             | Rotas Chave (Externa)                          | Regra de Autorização Grossa (Gateway) |
@@ -64,13 +65,14 @@ O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Spring Cloud Ga
 | **Bank-Account Service** | `POST api/bankaccount/{accountNumber}/balance` | **USER**                              |
 | **Transaction Service**  | `POST api/transactions`                         | **USER**                              |
 
-<img width="1092" height="549" alt="Diagrama de Fluxo drawio" src="https://github.com/user-attachments/assets/0be41ce9-f4d4-4fd6-ad64-43770080e0b0" />
+<img width="1092" height="549" alt="Diagrama de Fluxo drawio" src="https://github.com/user-attachments/assets/bd1e05b5-a3da-4da1-b42e-d103c81bba77" />
+
 
 ## 🧑‍💻 Infraestrutura e DevOps
 
 ### Docker Compose e Isolamento
 
-* **Rede:** Todos os MS, o RabbitMQ e o Postgres residem na rede privada (`capbank-network`). A comunicação é feita via **nome do serviço** (`http://auth-service:8082`).
+* **Rede:** Todos os MS, o RabbitMQ e o Postgres residem na rede privada (`capbank-network`). A comunicação é feita via **nome do serviço** (`http://gateway-service:8081`).
 * **Exposição:** Apenas o **API Gateway** expõe a porta `8081`.
 * **DB Isolados:** Utilizamos um container **Postgres** para cada MS, com três bases de dados lógicas e isoladas (`user_db`, `db_transaction`, `db_bankaccount`) — o padrão *Database per Service*.
 

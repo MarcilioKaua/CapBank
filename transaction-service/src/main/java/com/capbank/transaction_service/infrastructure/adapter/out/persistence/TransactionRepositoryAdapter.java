@@ -70,7 +70,7 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
     public Transaction update(Transaction transaction) {
        
         if (!jpaRepository.existsById(transaction.getId().getValue())) {
-            throw new IllegalArgumentException("Transaction not found: " + transaction.getId());
+            throw new IllegalArgumentException("Transação não encontrada: " + transaction.getId());
         }
 
         TransactionJpaEntity jpaEntity = mapper.toJpaEntity(transaction);

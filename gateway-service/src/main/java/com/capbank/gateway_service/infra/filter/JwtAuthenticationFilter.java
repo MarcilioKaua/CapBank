@@ -92,6 +92,7 @@ public class JwtAuthenticationFilter implements WebFilter {
         return path.startsWith("/api/auth")
                 || path.startsWith("/api/user")
                 || path.startsWith("/api/gateway/user-registered")
+                || path.startsWith("/api/gateway/user-logged")
                 || path.startsWith("/actuator")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/api-docs")
@@ -100,7 +101,7 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     private boolean isTransactionOrTransferRequest(String path, String method) {
         if (!"POST".equalsIgnoreCase(method)) return false;
-        return path.startsWith("/api/transactions");
+        return path.startsWith("/api/transaction");
     }
 
     private String safeHash(String value) {

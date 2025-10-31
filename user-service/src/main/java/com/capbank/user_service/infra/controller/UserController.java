@@ -1,14 +1,7 @@
 package com.capbank.user_service.infra.controller;
 
-import com.capbank.user_service.core.application.ports.in.DeleteUserUseCase;
-import com.capbank.user_service.core.application.ports.in.GetUserUseCase;
-import com.capbank.user_service.core.application.ports.in.RegisterUserUseCase;
-import com.capbank.user_service.core.application.ports.in.UpdateUserUseCase;
-import com.capbank.user_service.core.application.ports.in.ValidateUserUseCase;
-import com.capbank.user_service.infra.dto.RegisterUserRequest;
-import com.capbank.user_service.infra.dto.UpdateUserRequest;
-import com.capbank.user_service.infra.dto.UserResponse;
-import com.capbank.user_service.infra.dto.ValidateUserRequest;
+import com.capbank.user_service.core.application.ports.in.*;
+import com.capbank.user_service.infra.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -77,7 +70,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Credenciais inválidas")
     })
     @PostMapping("/validate")
-    public ResponseEntity<Boolean> validate(@Valid @RequestBody ValidateUserRequest request) {
+    public ResponseEntity<UserLoginResponse> validate(@Valid @RequestBody ValidateUserRequest request) {
         LOG.info("POST /api/user/validate (cpfHash={})", Integer.toHexString(request.getCpf().hashCode()));
         return ResponseEntity.ok(validateUser.validate(request));
     }

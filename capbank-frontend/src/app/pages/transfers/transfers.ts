@@ -95,10 +95,7 @@ export class Transfers implements OnInit {
     // });
   }
 
-  /**
-   * Converte número da conta (formato XXXXX-X) para UUID
-   * TODO: Implementar busca real do ID da conta pelo número
-   */
+ 
   private getAccountIdByNumber(accountNumber: string): string {
     // Por enquanto retorna um UUID mockado
     // Futuramente, deve buscar o ID real da conta através de um serviço

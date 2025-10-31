@@ -64,7 +64,8 @@ O sistema implementa a arquitetura Hexagonal (Ports & Adapters), Spring Cloud Ga
 | **Bank-Account Service** | `POST api/bankaccount/{accountNumber}/balance` | **USER**                              |
 | **Transaction Service**  | `POST api/transactions`                         | **USER**                              |
 
-<img width="1092" height="549" alt="Diagrama de Fluxo drawio" src="https://github.com/user-attachments/assets/0be41ce9-f4d4-4fd6-ad64-43770080e0b0" />
+<img width="1092" height="549" alt="Diagrama de Fluxo drawio" src="https://github.com/user-attachments/assets/bd1e05b5-a3da-4da1-b42e-d103c81bba77" />
+
 
 ## 🧑‍💻 Infraestrutura e DevOps
 

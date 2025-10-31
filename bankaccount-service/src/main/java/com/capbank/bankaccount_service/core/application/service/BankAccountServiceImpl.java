@@ -53,6 +53,12 @@ public class BankAccountServiceImpl implements BankAccountUseCase {
         return bankAccountResponseMapper.toResponse(account);
     }
 
+    public BankAccountResponseDTO findByUserId(String userId) {
+        BankAccount account = bankAccountRepository.findByUserId(userId)
+                .orElseThrow(() -> new BankAccountNotFoundException("Conta bancária não encontrada"));
+        return bankAccountResponseMapper.toResponse(account);
+    }
+
     public BigDecimal getBalance(String accountNumber) {
         return bankAccountRepository.findByAccountNumber(accountNumber)
                 .map(BankAccount::getBalance)

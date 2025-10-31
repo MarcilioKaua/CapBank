@@ -106,6 +106,7 @@ export class Login implements OnInit {
       this.authService.login(this.loginForm.value).subscribe({
         next: (res) => {
           this.toast.show('Login realizado com sucesso.', 'success', 6000);
+          this.authService.updateUserFromCookies();
           this.router.navigate(['/dashboard']);
         },          
         error: (err) => {

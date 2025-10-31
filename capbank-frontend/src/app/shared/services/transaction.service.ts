@@ -4,6 +4,7 @@ import { Observable, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { TransactionHistory } from '../models/transaction-history.model';
 import { Transaction } from '../models/transaction.model';
+import { CookieService } from 'ngx-cookie-service';
 
 interface TransactionHistoryPageResponse {
   content: TransactionHistory[];
@@ -41,12 +42,11 @@ interface BankAccountResponse {
 })
 export class TransactionService {
   private http: HttpClient = inject(HttpClient);
+  private cookieService = inject(CookieService);
   private baseUrl = environment.apiUrl;
 
-  constructor() {}
-
   getTransactionsHistory(): Observable<TransactionHistoryPageResponse> {
-    const token = localStorage.getItem('auth-token');
+    const token = this.cookieService.get('auth-token');
 
     const headers = new HttpHeaders({
       Authorization: token ? `Bearer ${token}` : '',
@@ -64,7 +64,7 @@ export class TransactionService {
   }
 
   getRecentTransactions(): Observable<TransactionPageResponse> {
-    const token = localStorage.getItem('auth-token');
+    const token = this.cookieService.get('auth-token');
 
     const headers = new HttpHeaders({
       Authorization: token ? `Bearer ${token}` : '',
@@ -82,8 +82,8 @@ export class TransactionService {
   }
 
   getBankAccount(): Observable<BankAccountResponse> {
-    const token = localStorage.getItem('auth-token');
-    const userId = localStorage.getItem('user-id');
+    const token = this.cookieService.get('auth-token');
+    const userId = this.cookieService.get('user-id');
 
     const headers = new HttpHeaders({
       Authorization: token ? `Bearer ${token}` : '',

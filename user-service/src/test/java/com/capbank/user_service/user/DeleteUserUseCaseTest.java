@@ -40,6 +40,6 @@ class DeleteUserUseCaseTest {
 
         assertThatThrownBy(() -> userService.delete("000"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("User not found");
+                .hasMessageContaining("Usuário não encontrado");
     }
 }

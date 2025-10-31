@@ -7,6 +7,7 @@ import com.capbank.user_service.infra.dto.RegisterUserRequest;
 import com.capbank.user_service.infra.dto.UserResponse;
 import com.capbank.user_service.infra.entity.UserEntity;
 import com.capbank.user_service.infra.mapper.UserMapper;
+import com.capbank.user_service.infra.metrics.UserMetrics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ public class RegisterUserUseCaseTest {
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private UserMapper mapper;
     @Mock private GatewayClientPort gatewayClient;
+    @Mock private UserMetrics userMetrics;
 
     @InjectMocks private UserServiceImpl userService;
 
@@ -87,6 +89,7 @@ public class RegisterUserUseCaseTest {
         assertThat(response.getEmail()).isEqualTo("user@test.com");
         verify(userRepository).save(any());
         verify(gatewayClient).createForUser(any(), any());
+        verify(userMetrics).incrementCreateSuccess();
     }
 
     @Test
@@ -96,6 +99,6 @@ public class RegisterUserUseCaseTest {
 
         assertThatThrownBy(() -> userService.register(userRequest))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Passwords do not match");
+                .hasMessageContaining("As senhas não coincidem");
     }
 }

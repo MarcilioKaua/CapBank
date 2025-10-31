@@ -57,7 +57,7 @@ public class GetUserUseCaseTest {
 
         assertThatThrownBy(() -> userService.getByCpf("999"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("User not found");
+                .hasMessageContaining("Usuário não encontrado");
     }
 }
 

@@ -55,7 +55,6 @@ export class Extract implements OnInit {
   });
 
   isMobile = signal(window.innerWidth < 768);
-  selectedPeriod = signal('all');
 
   periodOptions = [
     { value: 'all', label: 'Todos' },
@@ -146,7 +145,6 @@ export class Extract implements OnInit {
     );
   });
 
-  //inicio paginator
   paginatedTransactions = computed(() => {
     const transactions = this.filteredTransactions();
     const page = this.currentPage();
@@ -176,7 +174,6 @@ export class Extract implements OnInit {
   previousPage(): void {
     this.goToPage(this.currentPage() - 1);
   }
-  //fim paginator
 
   ngOnInit(): void {
     this.checkScreenSize();
@@ -201,11 +198,6 @@ export class Extract implements OnInit {
     } else {
       return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
     }
-  }
-
-  selectPeriod(period: string): void {
-    this.selectedPeriod.set(period);
-    this.filterForm.patchValue({ period });
   }
 
   formatAmount(amount: number, type: string): string {
@@ -250,9 +242,8 @@ export class Extract implements OnInit {
   }
 
   findTransactions(): void {
-    this.transactionService.getTransactions('11111111-2222-3333-4444-555566667777').subscribe({
+    this.transactionService.getTransactions().subscribe({
       next: (transactions) => {
-        console.log('Transações encontradas:', transactions);
         const data = transactions.content;
         data.forEach((transaction) => {
           const { icon, iconColor } = this.getTransactionIcon(transaction.transaction_type);
@@ -271,13 +262,13 @@ export class Extract implements OnInit {
   getTransactionIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'deposit':
-        return { icon: 'arrow_downward', iconColor: '#4caf50' }; // verde
+        return { icon: 'arrow_downward', iconColor: '#4caf50' };
       case 'withdrawal':
-        return { icon: 'arrow_upward', iconColor: '#f44336' }; // vermelho
+        return { icon: 'arrow_upward', iconColor: '#f44336' };
       case 'transfer':
-        return { icon: 'swap_horiz', iconColor: '#2196f3' }; // azul
+        return { icon: 'swap_horiz', iconColor: '#2196f3' };
       default:
-        return { icon: 'help_outline', iconColor: '#9e9e9e' }; // cinza
+        return { icon: 'help_outline', iconColor: '#9e9e9e' };
     }
   };
 

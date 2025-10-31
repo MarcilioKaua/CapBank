@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable, switchMap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { Transaction } from '../models/transaction.model';
 
 export interface TransactionPageResponse {
@@ -17,13 +18,27 @@ export interface TransactionPageResponse {
   providedIn: 'root',
 })
 export class TransactionService {
-  //11111111-2222-3333-4444-555566667777
-  //alterar para porta 8081 gateway
-  url = 'http://localhost:8085/api/transaction-history/account';
+  private http: HttpClient = inject(HttpClient);
+  private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
-  getTransactions(accountId: string): Observable<TransactionPageResponse> {
-    return this.http.get<TransactionPageResponse>(`${this.url}/${accountId}`);
+  getTransactions(): Observable<TransactionPageResponse> {
+    const token = localStorage.getItem('auth-token');
+    const userId = localStorage.getItem('user-id');
+
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
+    });
+
+    return this.http
+      .get<{ id: string }>(`${this.baseUrl}/api/bankaccount/userId/${userId}`, { headers: headers })
+      .pipe(
+        switchMap((accountResponse) => {
+          const transactionsUrl = `${this.baseUrl}/api/transaction-history/account/${accountResponse.id}`;
+          return this.http.get<TransactionPageResponse>(transactionsUrl, { headers: headers });
+        })
+      );
   }
 }

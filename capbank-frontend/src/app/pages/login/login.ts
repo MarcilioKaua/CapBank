@@ -108,11 +108,11 @@ export class Login implements OnInit {
           this.toast.showSuccess('Login realizado com sucesso.');
           this.authService.updateUserFromCookies();
           this.router.navigate(['/dashboard']);
-        },          
+        },
         error: (err) => {
           this.toast.showError(err?.error?.message || 'Erro ao fazer login');
         }
-      }); 
+      });
 
 
     } else {

@@ -41,7 +41,7 @@ public class BankAccountServiceClient implements BankAccountServicePort {
             );
 
             if (accountResponse.getStatusCode() != HttpStatus.OK || accountResponse.getBody() == null) {
-                throw new RuntimeException("Failed to retrieve account: " + accountId);
+                throw new IllegalArgumentException("Failed to retrieve account: " + accountId);
             }
 
             String accountNumber = accountResponse.getBody().accountNumber();
@@ -64,10 +64,14 @@ public class BankAccountServiceClient implements BankAccountServicePort {
 
             logger.info("Balance updated successfully for account: {}", accountId);
 
+        } catch(IllegalArgumentException e) {
+            logger.error("Invalid argument while updating balance for account {}: {}", accountId, e.getMessage(), e);
+            throw e;
         } catch (Exception e) {
             logger.error("Error updating balance for account {}: {}", accountId, e.getMessage(), e);
-            throw new RuntimeException("Failed to update account balance: " + e.getMessage(), e);
+            throw e;
         }
+
     }
 
     @Override

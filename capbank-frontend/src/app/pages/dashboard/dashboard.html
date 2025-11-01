@@ -21,11 +21,11 @@
       </div>
 
       <div class="balance-card__actions">
-        <button mat-raised-button color="warn" class="balance-card__btn">
+        <button mat-raised-button color="warn" class="balance-card__btn" (click)="goToTransfer()">
           <mat-icon>send</mat-icon>
           Transferir
         </button>
-        <button mat-flat-button class="balance-card__btn">
+        <button mat-flat-button class="balance-card__btn" (click)="goToExtract()">
           <mat-icon>receipt_long</mat-icon>
           Extrato
         </button>
@@ -47,7 +47,7 @@
             <mat-icon>{{ transaction.icon }}</mat-icon>
           </div>
           <div class="transaction-item__details">
-            <span class="transaction-item__description">{{ transaction.description }}</span>
+            <span class="transaction-item__description">{{ transaction.description || 'Transação' }}</span>
             <span class="transaction-item__date">{{
               formatDateTime(transaction.transaction_date)
             }}</span>

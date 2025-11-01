@@ -212,6 +212,9 @@ public class TransactionService implements
 
             return new TransferUseCase.TransactionResult(savedTransaction, message, notificationSent);
 
+        } catch (IllegalArgumentException e) {
+            logger.error("Error processing transfer: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("Falha ao processar transferência: " + e.getMessage(), e);
         } catch (Exception e) {
             logger.error("Error processing transfer: {}", e.getMessage(), e);
             throw new RuntimeException("Falha ao processar transferência: " + e.getMessage(), e);
@@ -339,7 +342,7 @@ public class TransactionService implements
 
             NotificationServicePort.TransactionNotification notification =
                     new NotificationServicePort.TransactionNotification(
-                            "user-" + transaction.getPrimaryAccountId().toString(),
+                            transaction.getPrimaryAccountId().toString(),
                             transaction.getPrimaryAccountId(),
                             NotificationType.ALERT,
                             NotificationChannel.EMAIL,

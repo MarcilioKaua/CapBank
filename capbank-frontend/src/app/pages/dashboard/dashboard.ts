@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TransactionService } from 'src/app/shared/services/transaction.service';
 import { QuickAction } from '../../shared/models/sidebar.model';
-import { Transaction } from '../../shared/models/transaction.model';
+import { TransactionResponse } from 'src/app/shared/models/transaction.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,8 +29,9 @@ export class Dashboard implements OnInit {
   balanceVisible = signal(false);
   accountNumber = signal('');
   agencyNumber = signal('');
-
-  recentTransactions = signal<Transaction[]>([]);
+  
+  private router = inject(Router);
+  recentTransactions = signal<TransactionResponse[]>([]);
 
   formattedBalance = computed(() => {
     return this.balance().toLocaleString('pt-BR', {
@@ -143,5 +144,13 @@ export class Dashboard implements OnInit {
       minute: '2-digit',
       hour12: false,
     });
+  }
+
+  goToTransfer(): void {
+    this.router.navigate(['/transfers']);
+  }
+
+  goToExtract(): void {
+    this.router.navigate(['/extract']);
   }
 }

@@ -105,13 +105,14 @@ export class Login implements OnInit {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: (res) => {
-          this.toast.show('Login realizado com sucesso.', 'success', 6000);
+          this.toast.showSuccess('Login realizado com sucesso.');
+          this.authService.updateUserFromCookies();
           this.router.navigate(['/dashboard']);
-        },          
+        },
         error: (err) => {
-          this.toast.show(err?.error?.message || 'Erro ao fazer login', 'error', 4000);
+          this.toast.showError(err?.error?.message || 'Erro ao fazer login');
         }
-      }); 
+      });
 
 
     } else {

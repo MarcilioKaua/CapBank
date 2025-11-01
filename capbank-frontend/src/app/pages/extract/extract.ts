@@ -15,6 +15,7 @@ import { RouterModule } from '@angular/router';
 import { TransactionService } from 'src/app/shared/services/transaction.service';
 import { CustomInputComponent } from '../../components/custom-input/custom-input';
 import { TransactionHistory } from 'src/app/shared/models/transaction-history.model';
+import { TransactionHistoryPageResponse } from 'src/app/shared/models/transaction-history.model';
 
 interface TransactionGroup {
   date: string;
@@ -92,7 +93,7 @@ export class Extract implements OnInit {
     return this.allTransactions().filter((transaction) => {
       const transactionDate = new Date(transaction.record_date);
 
-      const matchesSearch = transaction.description.toLowerCase().includes(search);
+      const matchesSearch = transaction.description?.toLowerCase().includes(search) ?? false;
       const matchesType = type === 'all' || transaction.transaction_type.toLowerCase() === type;
 
       let matchesDate = true;
@@ -145,6 +146,7 @@ export class Extract implements OnInit {
     );
   });
 
+  //inicio paginator
   paginatedTransactions = computed(() => {
     const transactions = this.filteredTransactions();
     const page = this.currentPage();
@@ -174,6 +176,7 @@ export class Extract implements OnInit {
   previousPage(): void {
     this.goToPage(this.currentPage() - 1);
   }
+  //fim paginator
 
   ngOnInit(): void {
     this.checkScreenSize();
@@ -228,7 +231,7 @@ export class Extract implements OnInit {
       case 'deposit':
         return 'Depósito';
       case 'withdrawal':
-        return transaction.description.includes('Cartão') ? 'Compra' : 'Saque';
+        return transaction.description?.includes('Cartão') ? 'Compra' : 'Saque';
       case 'transfer':
         return 'Transferência';
       default:
@@ -242,22 +245,22 @@ export class Extract implements OnInit {
   }
 
   findTransactions(): void {
-    this.transactionService.getTransactionsHistory().subscribe({
-      next: (transactions) => {
-        const data = transactions.content;
-        data.forEach((transaction) => {
-          const { icon, iconColor } = this.getTransactionIcon(transaction.transaction_type);
-          transaction.icon = icon;
-          transaction.iconColor = iconColor;
-        });
+      this.transactionService.getTransactionsHistory().subscribe({
+        next: (transactions) => {
+          const data = transactions.content;
+          data.forEach((transaction) => {
+            const { icon, iconColor } = this.getTransactionIcon(transaction.transaction_type);
+            transaction.icon = icon;
+            transaction.iconColor = iconColor;
+          });
 
-        this.allTransactions.set(data);
-      },
-      error: (error) => {
-        console.error('Erro ao buscar transações:', error);
-      },
-    });
-  }
+          this.allTransactions.set(data);
+        },
+        error: (error) => {
+          console.error('Erro ao buscar transações:', error);
+        },
+      });
+    }
 
   getTransactionIcon = (type: string) => {
     switch (type.toLowerCase()) {

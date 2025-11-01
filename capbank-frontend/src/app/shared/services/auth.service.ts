@@ -24,6 +24,7 @@ export class AuthService {
 
   public isLoading: WritableSignal<boolean> = signal(false);
   private token = signal<string | null>(null);
+  userName = signal<string | null>(this.cookieService.get('user-name') || null);
 
   login(data: LoginDTO): Observable<UserLoginResponse> {
     this.isLoading.set(true);
@@ -57,8 +58,13 @@ export class AuthService {
   logout() {
     this.token.set(null);
     this.cookieService.deleteAll('/');
+    this.userName.set(null);
 
     this.router.navigate(['/login']);
+  }
+  
+  updateUserFromCookies() {
+    this.userName.set(this.cookieService.get('user-name') || null);
   }
 
   isAuthenticated(): boolean {

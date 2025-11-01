@@ -155,11 +155,11 @@ export class CreateAccount implements OnInit {
 
       this.accountService.createAccount(payload).subscribe({
         next: (res) => {
-          this.toast.show('Conta criada com sucesso!', 'success', 6000);
+          this.toast.showSuccess('Conta criada com sucesso!');
           this.router.navigate(['login']);
         },
         error: (err) => {
-          this.toast.show(err?.error?.message, 'error', 4000);          
+          this.toast.showError(err?.error?.message || 'Erro ao criar conta');          
           console.error(err);
         },
       });

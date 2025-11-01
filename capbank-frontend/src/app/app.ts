@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, HostListener, inject } from '@angular/core';
+import { Component, signal, OnInit, HostListener, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -34,7 +34,7 @@ export class App implements OnInit {
   sidebarOpen = signal(false);
   routeShowSidebar = signal(false);
   activeUrl = signal('');
-  userName = signal<string | null>(this.cookieService.get('user-name') || null);
+  userName = computed(() => this.authService.userName());
 
   constructor(private router: Router) {
     this.router.events

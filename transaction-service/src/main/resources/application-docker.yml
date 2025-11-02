@@ -84,3 +84,20 @@ services:
     url: ${SERVICES_BANKACCOUNT_URL:http://localhost:8084}
   notification:
     url: ${SERVICES_NOTIFICATION_URL:http://localhost:8086}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userGatewayClient:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+  timelimiter:
+    instances:
+      userGatewayClient:
+        timeoutDuration: 5s

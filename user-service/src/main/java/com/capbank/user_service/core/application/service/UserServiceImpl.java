@@ -58,8 +58,11 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
         userEntity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userEntity.setStatus(UserEntity.Status.ACTIVE);
 
-        var generatedId = UUID.randomUUID();
-        userEntity.setId(generatedId);
+        UserEntity saved = repository.save(userEntity);
+        userMetrics.incrementCreateSuccess();
+        LOG.info("UserEntity created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
+
+        userEntity.setId(saved.getId());
 
         try {
             gatewayClient.createForUser(userEntity.getId(), userEntity.getAccountType());
@@ -68,10 +71,6 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
             LOG.error("Failed to create bank account for userId={}, aborting user creation before persistence. Reason: {}", userEntity.getId(), ex.getMessage());
             throw new IllegalStateException("Falha ao criar conta bancária. Cadastro do usuário abortado.", ex);
         }
-
-        UserEntity saved = repository.save(userEntity);
-        userMetrics.incrementCreateSuccess();
-        LOG.info("UserEntity created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
 
         return mapper.toResponse(saved);
     }

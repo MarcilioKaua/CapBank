@@ -78,7 +78,7 @@ public class GatewayOrchestratorController {
         BankAccountCreateRequest request = new BankAccountCreateRequest();
         request.setUserId(event.getUserId());
         request.setAccountType(event.getAccountType());
-        request.setBalance(BigDecimal.ZERO);
+        request.setBalance(BigDecimal.valueOf(10000)); // Initial balance
         request.setAccountNumber(generatedAccountNumber);
         request.setAgency(agencyToUse);
 

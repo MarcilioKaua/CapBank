@@ -181,17 +181,16 @@ Simula ou integra com um sistema de mensageria (RabbitMQ, Kafka, etc.).
 ---
 ## Principais Telas do sistema
 ### Login
-<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/82e32a34-bc79-4b57-ad08-226efe898aa8" />
+<img width="1989" height="1723" alt="Frame 1" src="https://github.com/user-attachments/assets/eb7f7a90-9aa6-405a-9aed-683d70d16b5f" />
 
 ### Cadastrar usuário
-<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/11457c99-9159-456a-9339-a184090957b8" />
+<img width="1891" height="1020" alt="Group 2" src="https://github.com/user-attachments/assets/0a2a6d10-6ccf-4e4a-a3db-4cbbb52be41e" />
 
 ### Extrato
-<img width="1200" height="1200" alt="image" src="https://github.com/user-attachments/assets/c946185f-b90d-4d09-a0bd-2a0063dc051b" />
+<img width="1971" height="961" alt="Group 3" src="https://github.com/user-attachments/assets/752e1e0d-33b6-4241-86d9-c3e62af3ef97" />
 
 ### Transferência
-<img width="3726" height="2880" alt="image" src="https://github.com/user-attachments/assets/add2577b-2a4a-4234-b7fc-1d72a9a7d372" />
-
+<img width="1863" height="1440" alt="Group 4" src="https://github.com/user-attachments/assets/939fcd09-367b-445b-b302-79cf6f4d9679" />
 
 ---
 ## 🧠 Extensões Futuras

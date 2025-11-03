@@ -47,14 +47,17 @@
         <div class="transfer-content">
           <mat-card class="account-balance-card">
             <div class="balance-header">
-              <h3>Sua Conta</h3>
+              <h3>Conta Corrente</h3>
             </div>
             <div class="balance-info">
+              <div class="account-number">
+                <span class="balance-card__account">Ag: {{ agencyNumber() }} • Conta: {{ accountNumber() }}</span>
+              </div>
               <div class="balance-label">Saldo Disponível</div>
               <div class="balance-amount">
                 {{ availableBalance() | currency : 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
               </div>
-              <div class="account-number">Conta: {{ accountNumber() }}</div>
+              
             </div>
           </mat-card>
 

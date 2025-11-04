@@ -1,17 +1,11 @@
 package com.capbank.user_service.core.application.service;
 
-import com.capbank.user_service.core.application.ports.in.DeleteUserUseCase;
-import com.capbank.user_service.core.application.ports.in.GetUserUseCase;
-import com.capbank.user_service.core.application.ports.in.RegisterUserUseCase;
-import com.capbank.user_service.core.application.ports.in.UpdateUserUseCase;
-import com.capbank.user_service.core.application.ports.in.ValidateUserUseCase;
+import com.capbank.user_service.core.application.ports.in.*;
 import com.capbank.user_service.core.application.ports.out.GatewayClientPort;
 import com.capbank.user_service.core.application.ports.out.UserRepositoryPort;
+import com.capbank.user_service.infra.client.dto.AuthResponseDTO;
+import com.capbank.user_service.infra.dto.*;
 import com.capbank.user_service.infra.entity.UserEntity;
-import com.capbank.user_service.infra.dto.RegisterUserRequest;
-import com.capbank.user_service.infra.dto.UpdateUserRequest;
-import com.capbank.user_service.infra.dto.UserResponse;
-import com.capbank.user_service.infra.dto.ValidateUserRequest;
 import com.capbank.user_service.infra.mapper.UserMapper;
 import com.capbank.user_service.infra.metrics.UserMetrics;
 import org.slf4j.Logger;
@@ -48,15 +42,15 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
         final String cpf = normalizeCpf(request.getCpf());
 
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords do not match.");
+            throw new IllegalArgumentException("As senhas não coincidem.");
         }
 
         if (repository.existsByCpf(cpf)) {
-            throw new IllegalArgumentException("CPF already registered.");
+            throw new IllegalArgumentException("CPF já cadastrado.");
         }
 
         if (repository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already registered.");
+            throw new IllegalArgumentException("E-mail já cadastrado.");
         }
 
         UserEntity userEntity = mapper.toEntity(request);
@@ -64,37 +58,54 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
         userEntity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userEntity.setStatus(UserEntity.Status.ACTIVE);
 
-        var generatedId = UUID.randomUUID();
-        userEntity.setId(generatedId);
+        UserEntity saved = repository.save(userEntity);
+        userMetrics.incrementCreateSuccess();
+        LOG.info("UserEntity created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
+
+        userEntity.setId(saved.getId());
 
         try {
             gatewayClient.createForUser(userEntity.getId(), userEntity.getAccountType());
         } catch (RuntimeException ex) {
             userMetrics.incrementCreateFailure();
             LOG.error("Failed to create bank account for userId={}, aborting user creation before persistence. Reason: {}", userEntity.getId(), ex.getMessage());
-            throw new IllegalStateException("Failed to create bank account. User registration aborted.", ex);
+            throw new IllegalStateException("Falha ao criar conta bancária. Cadastro do usuário abortado.", ex);
         }
-
-        UserEntity saved = repository.save(userEntity);
-        userMetrics.incrementCreateSuccess();
-        LOG.info("UserEntity created id={}, cpfHash={}", saved.getId(), safeHash(cpf));
 
         return mapper.toResponse(saved);
     }
 
     @Override
-    public boolean validate(ValidateUserRequest request) {
-        String cpf = normalizeCpf(request.getCpf());
-        return repository.findByCpf(cpf)
-                .map(u -> passwordEncoder.matches(request.getPassword(), u.getPasswordHash()))
-                .orElse(false);
+    public UserLoginResponse validate(ValidateUserRequest request) {
+        String normalized = normalizeCpf(request.getCpf());
+
+        UserEntity user = repository.findByCpf(normalized)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+
+        boolean validPassword = passwordEncoder.matches(request.getPassword(), user.getPasswordHash());
+        if (!validPassword) {
+            LOG.warn("Invalid password for cpfHash={}", safeHash(normalized));
+            throw new IllegalArgumentException("Credenciais inválidas.");
+        }
+
+        AuthResponseDTO tokenResponse;
+        try {
+            tokenResponse = gatewayClient.loginForUser(request.getCpf(), request.getPassword());
+        } catch (RuntimeException ex) {
+            LOG.error("Failed to generate token for cpfHash={}: {}", safeHash(normalized), ex.getMessage());
+            throw new IllegalStateException("Falha ao gerar token. Login do usuário abortado.", ex);
+        }
+
+        UserResponse userResponse = mapper.toResponse(user);
+        LOG.info("User validated successfully cpfHash={}", safeHash(normalized));
+        return new UserLoginResponse(userResponse, tokenResponse);
     }
 
     @Override
     public UserResponse getByCpf(String cpf) {
         String normalized = normalizeCpf(cpf);
         UserEntity user = repository.findByCpf(normalized)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
         return mapper.toResponse(user);
     }
 
@@ -102,12 +113,12 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
     public UserResponse update(String cpf, UpdateUserRequest request) {
         String normalized = normalizeCpf(cpf);
         UserEntity user = repository.findByCpf(normalized)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
         if (request.getEmail() != null) {
             String newEmail = request.getEmail();
             if (!newEmail.equalsIgnoreCase(user.getEmail()) && repository.existsByEmail(newEmail)) {
-                throw new IllegalArgumentException("Email already registered.");
+                throw new IllegalArgumentException("E-mail já cadastrado.");
             }
             user.setEmail(newEmail);
         }
@@ -134,7 +145,7 @@ public class UserServiceImpl implements RegisterUserUseCase, ValidateUserUseCase
         String normalized = normalizeCpf(cpf);
         boolean exists = repository.findByCpf(normalized).isPresent();
         if (!exists) {
-            throw new IllegalArgumentException("User not found.");
+            throw new IllegalArgumentException("Usuário não encontrado.");
         }
         repository.deleteByCpf(normalized);
         LOG.info("UserEntity deleted cpfHash={}", safeHash(normalized));

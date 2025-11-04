@@ -1,6 +1,7 @@
 package com.capbank.transaction_service.core.application.service;
 
 import com.capbank.transaction_service.core.application.port.in.*;
+import com.capbank.transaction_service.core.application.port.out.BankAccountServicePort;
 import com.capbank.transaction_service.core.application.port.out.NotificationServicePort;
 import com.capbank.transaction_service.core.application.port.out.TransactionHistoryRepositoryPort;
 import com.capbank.transaction_service.core.application.port.out.TransactionRepositoryPort;
@@ -31,17 +32,19 @@ public class TransactionService implements
     private final TransactionRepositoryPort transactionRepository;
     private final TransactionHistoryRepositoryPort historyRepository;
     private final NotificationServicePort notificationService;
+    private final BankAccountServicePort bankAccountService;
 
     public TransactionService(
             TransactionRepositoryPort transactionRepository,
             TransactionHistoryRepositoryPort historyRepository,
-            NotificationServicePort notificationService) {
+            NotificationServicePort notificationService,
+            BankAccountServicePort bankAccountService) {
         this.transactionRepository = transactionRepository;
         this.historyRepository = historyRepository;
         this.notificationService = notificationService;
+        this.bankAccountService = bankAccountService;
     }
 
-    // Original method - kept for backward compatibility
     @Override
     public CreateTransactionUseCase.TransactionResult processTransaction(CreateTransactionCommand command) {
         logger.info("Processing transaction: type={}, amount={}", command.type(), command.amount());
@@ -62,22 +65,21 @@ public class TransactionService implements
             boolean notificationSent = sendTransactionNotification(savedTransaction);
             logger.info("Notification sent: {} for transaction: {}", notificationSent, savedTransaction.getId());
 
-            String message = String.format("Transaction processed successfully. Amount: %s, Type: %s",
+            String message = String.format("Transação processada com sucesso. Valor: %s, Tipo: %s",
                     savedTransaction.getAmount(), savedTransaction.getType());
 
             return new CreateTransactionUseCase.TransactionResult(savedTransaction, message, notificationSent);
 
         } catch (Exception e) {
             logger.error("Error processing transaction: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to process transaction: " + e.getMessage(), e);
+            throw new RuntimeException("Falha ao processar transação: " + e.getMessage(), e);
         }
     }
 
-    // Specific method for deposits
     @Override
     public DepositUseCase.TransactionResult processDeposit(DepositUseCase.DepositCommand command) {
         logger.info("Processing deposit: targetAccountId={}, amount={}",
-                   command.targetAccountId(), command.amount());
+                command.targetAccountId(), command.amount());
 
         try {
             // 1. Create deposit transaction
@@ -89,32 +91,39 @@ public class TransactionService implements
             Transaction savedTransaction = transactionRepository.save(transaction);
             logger.info("Deposit transaction created with ID: {}", savedTransaction.getId());
 
-            // 2. Create transaction history
+            // 2. Update account balance
+            bankAccountService.updateBalance(
+                    savedTransaction.getTargetAccountId(),
+                    savedTransaction.getAmount(),
+                    BankAccountServicePort.BalanceOperation.ADD
+            );
+            logger.info("Account balance updated for deposit: {}", savedTransaction.getId());
+
+            // 3. Create transaction history
             Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
             TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
             historyRepository.save(history);
             logger.info("Transaction history created for deposit: {}", savedTransaction.getId());
 
-            // 3. Send notification
+            // 4. Send notification
             boolean notificationSent = sendTransactionNotification(savedTransaction);
             logger.info("Notification sent: {} for deposit: {}", notificationSent, savedTransaction.getId());
 
-            String message = String.format("Deposit processed successfully. Amount: %s",
+            String message = String.format("Depósito processado com sucesso. Valor: %s",
                     savedTransaction.getAmount());
 
             return new DepositUseCase.TransactionResult(savedTransaction, message, notificationSent);
 
         } catch (Exception e) {
             logger.error("Error processing deposit: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to process deposit: " + e.getMessage(), e);
+            throw new RuntimeException("Falha ao processar depósito: " + e.getMessage(), e);
         }
     }
 
-    // Specific method for withdrawals
     @Override
     public WithdrawalUseCase.TransactionResult processWithdrawal(WithdrawalUseCase.WithdrawalCommand command) {
         logger.info("Processing withdrawal: sourceAccountId={}, amount={}",
-                   command.sourceAccountId(), command.amount());
+                command.sourceAccountId(), command.amount());
 
         try {
             // 1. Create withdrawal transaction
@@ -126,32 +135,39 @@ public class TransactionService implements
             Transaction savedTransaction = transactionRepository.save(transaction);
             logger.info("Withdrawal transaction created with ID: {}", savedTransaction.getId());
 
-            // 2. Create transaction history
+            // 2. Update account balance
+            bankAccountService.updateBalance(
+                    savedTransaction.getSourceAccountId(),
+                    savedTransaction.getAmount(),
+                    BankAccountServicePort.BalanceOperation.SUBTRACT
+            );
+            logger.info("Account balance updated for withdrawal: {}", savedTransaction.getId());
+
+            // 3. Create transaction history
             Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
             TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
             historyRepository.save(history);
             logger.info("Transaction history created for withdrawal: {}", savedTransaction.getId());
 
-            // 3. Send notification
+            // 4. Send notification
             boolean notificationSent = sendTransactionNotification(savedTransaction);
             logger.info("Notification sent: {} for withdrawal: {}", notificationSent, savedTransaction.getId());
 
-            String message = String.format("Withdrawal processed successfully. Amount: %s",
+            String message = String.format("Saque processado com sucesso. Valor: %s",
                     savedTransaction.getAmount());
 
             return new WithdrawalUseCase.TransactionResult(savedTransaction, message, notificationSent);
 
         } catch (Exception e) {
             logger.error("Error processing withdrawal: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to process withdrawal: " + e.getMessage(), e);
+            throw new RuntimeException("Falha ao processar saque: " + e.getMessage(), e);
         }
     }
 
-    // Specific method for transfers
     @Override
     public TransferUseCase.TransactionResult processTransfer(TransferUseCase.TransferCommand command) {
         logger.info("Processing transfer: sourceAccountId={}, targetAccountId={}, amount={}",
-                   command.sourceAccountId(), command.targetAccountId(), command.amount());
+                command.sourceAccountId(), command.targetAccountId(), command.amount());
 
         try {
             // 1. Create transfer transaction
@@ -164,24 +180,44 @@ public class TransactionService implements
             Transaction savedTransaction = transactionRepository.save(transaction);
             logger.info("Transfer transaction created with ID: {}", savedTransaction.getId());
 
-            // 2. Create transaction history
+            // 2. Update account balances
+            // Subtract from source account
+            bankAccountService.updateBalance(
+                    savedTransaction.getSourceAccountId(),
+                    savedTransaction.getAmount(),
+                    BankAccountServicePort.BalanceOperation.SUBTRACT
+            );
+            logger.info("Source account balance updated for transfer: {}", savedTransaction.getId());
+
+            // Add to target account
+            bankAccountService.updateBalance(
+                    savedTransaction.getTargetAccountId(),
+                    savedTransaction.getAmount(),
+                    BankAccountServicePort.BalanceOperation.ADD
+            );
+            logger.info("Target account balance updated for transfer: {}", savedTransaction.getId());
+
+            // 3. Create transaction history
             Money currentBalance = getCurrentBalance(savedTransaction.getPrimaryAccountId());
             TransactionHistory history = createHistoryFromTransaction(savedTransaction, currentBalance);
             historyRepository.save(history);
             logger.info("Transaction history created for transfer: {}", savedTransaction.getId());
 
-            // 3. Send notification
+            // 4. Send notification
             boolean notificationSent = sendTransactionNotification(savedTransaction);
             logger.info("Notification sent: {} for transfer: {}", notificationSent, savedTransaction.getId());
 
-            String message = String.format("Transfer processed successfully. Amount: %s",
+            String message = String.format("Transferência processada com sucesso. Valor: %s",
                     savedTransaction.getAmount());
 
             return new TransferUseCase.TransactionResult(savedTransaction, message, notificationSent);
 
+        } catch (IllegalArgumentException e) {
+            logger.error("Error processing transfer: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("Falha ao processar transferência: " + e.getMessage(), e);
         } catch (Exception e) {
             logger.error("Error processing transfer: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to process transfer: " + e.getMessage(), e);
+            throw new RuntimeException("Falha ao processar transferência: " + e.getMessage(), e);
         }
     }
 
@@ -197,7 +233,7 @@ public class TransactionService implements
 
 
         if (query.size() > 100) {
-            throw new IllegalArgumentException("Page size cannot be greater than 100");
+            throw new IllegalArgumentException("Tamanho da página não pode ser maior que 100");
         }
 
         return transactionRepository.findByAccountWithFilters(query);
@@ -209,7 +245,7 @@ public class TransactionService implements
                    command.transactionId(), command.newStatus());
 
         Transaction transaction = transactionRepository.findById(command.transactionId())
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + command.transactionId()));
+                .orElseThrow(() -> new IllegalArgumentException("Transação não encontrada: " + command.transactionId()));
 
       
         transaction.updateStatus(command.newStatus());
@@ -298,15 +334,15 @@ public class TransactionService implements
 
     private void sendStatusChangeNotification(Transaction transaction, String reason) {
         try {
-            String title = "Transaction Failed";
-            String message = String.format("Your %s transaction of %s has failed. Reason: %s",
+            String title = "Transação Falhou";
+            String message = String.format("Sua transação de %s no valor de %s falhou. Motivo: %s",
                     transaction.getType().toString().toLowerCase(),
                     transaction.getAmount(),
-                    reason != null ? reason : "Unknown error");
+                    reason != null ? reason : "Erro desconhecido");
 
             NotificationServicePort.TransactionNotification notification =
                     new NotificationServicePort.TransactionNotification(
-                            "user-" + transaction.getPrimaryAccountId().toString(),
+                            transaction.getPrimaryAccountId().toString(),
                             transaction.getPrimaryAccountId(),
                             NotificationType.ALERT,
                             NotificationChannel.EMAIL,
@@ -323,19 +359,19 @@ public class TransactionService implements
 
     private String generateNotificationTitle(Transaction transaction) {
         return switch (transaction.getType()) {
-            case DEPOSIT -> "Deposit Successful";
-            case WITHDRAWAL -> "Withdrawal Successful";
-            case TRANSFER -> "Transfer Successful";
+            case DEPOSIT -> "Depósito Realizado com Sucesso";
+            case WITHDRAWAL -> "Saque Realizado com Sucesso";
+            case TRANSFER -> "Transferência Realizada com Sucesso";
         };
     }
 
     private String generateNotificationMessage(Transaction transaction) {
         return switch (transaction.getType()) {
-            case DEPOSIT -> String.format("A deposit of %s has been processed successfully.",
+            case DEPOSIT -> String.format("Um depósito de %s foi processado com sucesso.",
                     transaction.getAmount());
-            case WITHDRAWAL -> String.format("A withdrawal of %s has been processed successfully.",
+            case WITHDRAWAL -> String.format("Um saque de %s foi processado com sucesso.",
                     transaction.getAmount());
-            case TRANSFER -> String.format("A transfer of %s has been processed successfully.",
+            case TRANSFER -> String.format("Uma transferência de %s foi processada com sucesso.",
                     transaction.getAmount());
         };
     }

@@ -3,6 +3,7 @@ package com.capbank.transaction_service.unit;
 import com.capbank.transaction_service.core.application.port.in.DepositUseCase;
 import com.capbank.transaction_service.core.application.port.in.WithdrawalUseCase;
 import com.capbank.transaction_service.core.application.port.in.TransferUseCase;
+import com.capbank.transaction_service.core.application.port.out.BankAccountServicePort;
 import com.capbank.transaction_service.core.application.port.out.NotificationServicePort;
 import com.capbank.transaction_service.core.application.port.out.TransactionHistoryRepositoryPort;
 import com.capbank.transaction_service.core.application.port.out.TransactionRepositoryPort;
@@ -39,6 +40,9 @@ class TransactionServiceTest {
     @Mock
     private NotificationServicePort notificationService;
 
+    @Mock
+    private BankAccountServicePort bankAccountService;
+
     private TransactionService transactionService;
 
     private AccountId sourceAccountId;
@@ -50,7 +54,8 @@ class TransactionServiceTest {
         transactionService = new TransactionService(
                 transactionRepository,
                 historyRepository,
-                notificationService
+                notificationService,
+                bankAccountService
         );
 
         sourceAccountId = new AccountId("550e8400-e29b-41d4-a716-446655440000");
@@ -83,7 +88,7 @@ class TransactionServiceTest {
         assertThat(result.transaction().getTargetAccountId()).isEqualTo(targetAccountId);
         assertThat(result.transaction().getAmount()).isEqualTo(amount);
         assertThat(result.notificationSent()).isTrue();
-        assertThat(result.message()).contains("Deposit processed successfully");
+        assertThat(result.message()).contains("Depósito processado com sucesso");
 
         verify(transactionRepository).save(any(Transaction.class));
         verify(historyRepository).save(any(TransactionHistory.class));
@@ -118,7 +123,7 @@ class TransactionServiceTest {
         assertThat(result.transaction().getSourceAccountId()).isEqualTo(sourceAccountId);
         assertThat(result.transaction().getAmount()).isEqualTo(amount);
         assertThat(result.notificationSent()).isTrue();
-        assertThat(result.message()).contains("Withdrawal processed successfully");
+        assertThat(result.message()).contains("Saque processado com sucesso");
 
         verify(transactionRepository).save(any(Transaction.class));
         verify(historyRepository).save(any(TransactionHistory.class));
@@ -155,7 +160,7 @@ class TransactionServiceTest {
         assertThat(result.transaction().getTargetAccountId()).isEqualTo(targetAccountId);
         assertThat(result.transaction().getAmount()).isEqualTo(amount);
         assertThat(result.notificationSent()).isTrue();
-        assertThat(result.message()).contains("Transfer processed successfully");
+        assertThat(result.message()).contains("Transferência processada com sucesso");
 
         verify(transactionRepository).save(any(Transaction.class));
         verify(historyRepository).save(any(TransactionHistory.class));

@@ -1,11 +1,12 @@
 <div class="dashboard">
-  <!-- Account Balance Card -->
   <div class="dashboard__balance">
     <mat-card class="balance-card">
       <div class="balance-card__header">
         <div class="balance-card__info">
           <span class="balance-card__label">Conta Corrente</span>
-          <span class="balance-card__account">Ag: 1234 • Conta: 56789-0</span>
+          <span class="balance-card__account"
+            >Ag: {{ agencyNumber() }} • Conta: {{ accountNumber() }}</span
+          >
         </div>
         <button mat-icon-button class="balance-card__toggle" (click)="toggleBalanceVisibility()">
           <mat-icon>{{ balanceVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
@@ -20,11 +21,11 @@
       </div>
 
       <div class="balance-card__actions">
-        <button mat-raised-button color="warn" class="balance-card__btn">
+        <button mat-raised-button color="warn" class="balance-card__btn" (click)="goToTransfer()">
           <mat-icon>send</mat-icon>
           Transferir
         </button>
-        <button mat-flat-button class="balance-card__btn">
+        <button mat-flat-button class="balance-card__btn" (click)="goToExtract()">
           <mat-icon>receipt_long</mat-icon>
           Extrato
         </button>
@@ -33,7 +34,6 @@
   </div>
 
   <div class="dashboard__content">
-    <!-- Recent Transactions -->
     <div class="dashboard__transactions">
       <div class="transactions-header">
         <h2 class="transactions-title">Últimas Transações</h2>
@@ -47,23 +47,22 @@
             <mat-icon>{{ transaction.icon }}</mat-icon>
           </div>
           <div class="transaction-item__details">
-            <span class="transaction-item__description">{{ transaction.description }}</span>
+            <span class="transaction-item__description">{{ transaction.description || 'Transação' }}</span>
             <span class="transaction-item__date">{{
-              formatDateTime(transaction.record_date)
+              formatDateTime(transaction.transaction_date)
             }}</span>
           </div>
           <div
             class="transaction-item__amount"
             [class]="getAmountClass(transaction.transaction_type)"
           >
-            {{ formatAmount(transaction.transaction_amount, transaction.transaction_type) }}
+            {{ formatAmount(transaction.amount, transaction.transaction_date) }}
           </div>
         </div>
         }
       </div>
     </div>
 
-    <!-- Quick Actions -->
     <div class="dashboard__actions">
       <div class="quick-actions">
         <div *ngFor="let action of quickActions" class="quick-action" [routerLink]="action.route">

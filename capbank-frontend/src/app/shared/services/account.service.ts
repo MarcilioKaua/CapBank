@@ -100,7 +100,7 @@ export class AccountService {
       finalize(() => this.isLoading.set(false))
     );
   }
-
+  
   /**
    * Helper: extrai mensagem de erro de um HttpErrorResponse (simplificado)
    */

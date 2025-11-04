@@ -1,32 +1,37 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, LOCALE_ID, DEFAULT_CURRENCY_CODE } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeuix/themes/aura';
-import { routes } from './app.routes';
+import { registerLocaleData } from '@angular/common';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { registerLocaleData } from '@angular/common';              // ✅ importar
 import localePt from '@angular/common/locales/pt';
+import {
+  ApplicationConfig,
+  DEFAULT_CURRENCY_CODE,
+  LOCALE_ID,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from '@angular/core';
+import { provideRouter } from '@angular/router';
+import Aura from '@primeuix/themes/aura';
+import { CookieService } from 'ngx-cookie-service';
+import { providePrimeNG } from 'primeng/config';
+import { routes } from './app.routes';
 import { authInterceptor } from './shared/interceptors/auth.interceptor';
 
-registerLocaleData(localePt);  // registro simples
-
+registerLocaleData(localePt);
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptors([authInterceptor])),
 
-    { provide: LOCALE_ID, useValue: 'pt-BR' },    // locale global
-    { provide: DEFAULT_CURRENCY_CODE, useValue: 'BRL' }, // moeda padrão
+    { provide: LOCALE_ID, useValue: 'pt-BR' },
+    { provide: DEFAULT_CURRENCY_CODE, useValue: 'BRL' },
 
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideZoneChangeDetection({ eventCoalescing: true }), provideAnimationsAsync(),
-        providePrimeNG({ 
-            theme: {
-                preset: Aura
-            }
-        }),
-
-  ]
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    providePrimeNG({
+      theme: {
+        preset: Aura,
+      },
+    }),
+    CookieService,
+  ],
 };

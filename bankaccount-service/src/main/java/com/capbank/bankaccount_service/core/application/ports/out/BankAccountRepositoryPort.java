@@ -12,4 +12,5 @@ public interface BankAccountRepositoryPort {
     Optional<BankAccount> findById(UUID id);
     List<BankAccount> findAll();
     Optional<BankAccount> findByAccountNumber(String accountNumber);
+    Optional<BankAccount> findByUserId(String userId);
 }

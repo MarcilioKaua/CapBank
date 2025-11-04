@@ -11,10 +11,10 @@ public class Money {
 
     public Money(BigDecimal amount) {
         if (amount == null) {
-            throw new IllegalArgumentException("Amount cannot be null");
+            throw new IllegalArgumentException("Valor não pode ser nulo");
         }
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative");
+            throw new IllegalArgumentException("Valor não pode ser negativo");
         }
         this.amount = amount.setScale(2, RoundingMode.HALF_UP);
     }

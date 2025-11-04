@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/api/transaction")
 @Tag(name = "Transactions", description = "APIs para gerenciamento de transações bancárias")
 public class TransactionController {
 
@@ -148,26 +148,17 @@ public class TransactionController {
         logger.info("Creating transfer: sourceAccountId={}, targetAccountId={}, amount={}",
                    request.sourceAccountId(), request.targetAccountId(), request.amount());
 
-        try {
             TransferUseCase.TransactionResult result = transferUseCase.processTransfer(
                     mapper.toTransferCommand(request));
 
-            TransactionResultResponse response = new TransactionResultResponse(
-                    mapper.toResponse(result.transaction()),
-                    result.message(),
-                    result.notificationSent()
-            );
+        TransactionResultResponse response = new TransactionResultResponse(
+                mapper.toResponse(result.transaction()),
+                result.message(),
+                result.notificationSent()
+        );
 
-            logger.info("Transfer created successfully with ID: {}", result.transaction().getId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-        } catch (IllegalArgumentException e) {
-            logger.error("Business rule violation creating transfer: {}", e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("Unexpected error creating transfer: {}", e.getMessage(), e);
-            throw e;
-        }
+        logger.info("Transfer created successfully with ID: {}", result.transaction().getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Criar transação (DEPRECATED)",

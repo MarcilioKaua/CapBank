@@ -16,12 +16,12 @@ public record CreateTransactionRequest(
         String targetAccountId,
 
         @JsonProperty("transaction_type")
-        @NotNull(message = "Transaction type cannot be null")
+        @NotNull(message = "Tipo de transação não pode ser nulo")
         TransactionType transactionType,
 
         @JsonProperty("amount")
-        @NotNull(message = "Amount cannot be null")
-        @Positive(message = "Amount must be positive")
+        @NotNull(message = "Valor não pode ser nulo")
+        @Positive(message = "Valor deve ser positivo")
         BigDecimal amount,
 
         @JsonProperty("description")
@@ -32,29 +32,29 @@ public record CreateTransactionRequest(
         switch (transactionType) {
             case DEPOSIT -> {
                 if (targetAccountId == null || targetAccountId.trim().isEmpty()) {
-                    throw new IllegalArgumentException("Target account is required for deposits");
+                    throw new IllegalArgumentException("Conta de destino é obrigatória para depósitos");
                 }
                 if (sourceAccountId != null && !sourceAccountId.trim().isEmpty()) {
-                    throw new IllegalArgumentException("Source account should be null for deposits");
+                    throw new IllegalArgumentException("Conta de origem deve ser nula para depósitos");
                 }
             }
             case WITHDRAWAL -> {
                 if (sourceAccountId == null || sourceAccountId.trim().isEmpty()) {
-                    throw new IllegalArgumentException("Source account is required for withdrawals");
+                    throw new IllegalArgumentException("Conta de origem é obrigatória para saques");
                 }
                 if (targetAccountId != null && !targetAccountId.trim().isEmpty()) {
-                    throw new IllegalArgumentException("Target account should be null for withdrawals");
+                    throw new IllegalArgumentException("Conta de destino deve ser nula para saques");
                 }
             }
             case TRANSFER -> {
                 if (sourceAccountId == null || sourceAccountId.trim().isEmpty()) {
-                    throw new IllegalArgumentException("Source account is required for transfers");
+                    throw new IllegalArgumentException("Conta de origem é obrigatória para transferências");
                 }
                 if (targetAccountId == null || targetAccountId.trim().isEmpty()) {
-                    throw new IllegalArgumentException("Target account is required for transfers");
+                    throw new IllegalArgumentException("Conta de destino é obrigatória para transferências");
                 }
                 if (sourceAccountId.equals(targetAccountId)) {
-                    throw new IllegalArgumentException("Source and target accounts cannot be the same");
+                    throw new IllegalArgumentException("Contas de origem e destino não podem ser as mesmas");
                 }
             }
         }

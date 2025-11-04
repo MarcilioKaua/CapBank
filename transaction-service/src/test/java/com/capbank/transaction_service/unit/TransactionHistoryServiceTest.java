@@ -91,7 +91,7 @@ class TransactionHistoryServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> service.createTransactionHistory(command));
 
-        assertTrue(exception.getMessage().contains("Transaction history already exists"));
+        assertTrue(exception.getMessage().contains("Histórico de transação já existe"));
         verify(repositoryPort).existsByTransactionId(transactionId.getValue());
         verify(repositoryPort, never()).save(any(TransactionHistory.class));
     }
@@ -160,7 +160,7 @@ class TransactionHistoryServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> service.findByAccountId(query));
 
-        assertTrue(exception.getMessage().contains("Page size cannot be greater than 100"));
+        assertTrue(exception.getMessage().contains("Tamanho da página não pode ser maior que 100"));
         verify(repositoryPort, never()).findByAccountIdWithFilters(any());
     }
 
@@ -171,7 +171,7 @@ class TransactionHistoryServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> service.findById(null));
 
-        assertEquals("ID cannot be null", exception.getMessage());
+        assertEquals("ID não pode ser nulo", exception.getMessage());
         verify(repositoryPort, never()).findById(any());
     }
 }

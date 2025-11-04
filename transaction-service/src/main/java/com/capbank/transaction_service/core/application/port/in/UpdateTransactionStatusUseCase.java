@@ -17,10 +17,10 @@ public interface UpdateTransactionStatusUseCase {
     ) {
         public UpdateStatusCommand {
             if (transactionId == null) {
-                throw new IllegalArgumentException("TransactionId cannot be null");
+                throw new IllegalArgumentException("ID da transação não pode ser nulo");
             }
             if (newStatus == null) {
-                throw new IllegalArgumentException("New status cannot be null");
+                throw new IllegalArgumentException("Novo status não pode ser nulo");
             }
         }
     }

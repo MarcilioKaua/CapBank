@@ -24,7 +24,7 @@ public class TransactionHistoryService implements CreateTransactionHistoryUseCas
     public TransactionHistory createTransactionHistory(CreateTransactionHistoryCommand command) {
         // Validar se já existe histórico para esta transação
         if (transactionHistoryRepositoryPort.existsByTransactionId(command.transactionId().getValue())) {
-            throw new IllegalArgumentException("Transaction history already exists for transaction: " + command.transactionId());
+            throw new IllegalArgumentException("Histórico de transação já existe para a transação: " + command.transactionId());
         }
 
         // Criar o histórico baseado no tipo de transação
@@ -63,7 +63,7 @@ public class TransactionHistoryService implements CreateTransactionHistoryUseCas
     @Override
     public Optional<TransactionHistory> findById(UUID id) {
         if (id == null) {
-            throw new IllegalArgumentException("ID cannot be null");
+            throw new IllegalArgumentException("ID não pode ser nulo");
         }
         return transactionHistoryRepositoryPort.findById(id);
     }
@@ -79,7 +79,7 @@ public class TransactionHistoryService implements CreateTransactionHistoryUseCas
 
     private void validateQuery(FindTransactionHistoryQuery query) {
         if (query.size() > 100) {
-            throw new IllegalArgumentException("Page size cannot be greater than 100");
+            throw new IllegalArgumentException("Tamanho da página não pode ser maior que 100");
         }
 
         // Outras validações de negócio podem ser adicionadas aqui
